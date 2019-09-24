@@ -5,8 +5,8 @@
 #include "particles.h"
 #include "vector3.h"
 #include "module.h"
-using std::cout;
-using std::endl;
+ using std::cout;
+ using std::endl;
 #include "vector"
 
     // levels of grids for fields and particles

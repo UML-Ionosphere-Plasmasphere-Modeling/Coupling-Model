@@ -7,7 +7,8 @@ GridsPoints::GridsPoints( double px_in, double py_in, double pz_in,
                           double ex_in, double ey_in, double ez_in,
                           double bx_in, double by_in, double bz_in,
                           double vx_in, double vy_in, double vz_in,
-                          double density_in)
+                          double density_in, double temperature_in,
+                          int stopSign_in)
 {
 //    ex = ex_in; ey = ey_in; ez = ez_in;
 //    density = density_in;
@@ -19,6 +20,8 @@ GridsPoints::GridsPoints( double px_in, double py_in, double pz_in,
     b3 =   Vector3( bx_in, by_in, bz_in);
     v3 =   Vector3( vx_in, vy_in, vz_in);
     density = density_in;
+    temperature = temperature_in;
+    stopSign = stopSign_in;
 //    face = 0; gi = 0; gj = 0; gk =0;
 }
 
@@ -32,6 +35,8 @@ GridsPoints::GridsPoints(const GridsPoints& other)
     b3 = Vector3( other.b3);
     v3 = Vector3( other.v3);
     density = other.density;
+    temperature = other.temperature;
+    stopSign = other.stopSign;
 }
 
 GridsPoints::GridsPoints()
@@ -41,5 +46,7 @@ GridsPoints::GridsPoints()
     b3 =   Vector3( 0.0, 0.0, 0.0);
     v3 =   Vector3( 0.0, 0.0, 0.0);
     density = 0.0;
+    temperature = 0.0;
+    stopSign= 0;
 //    face = 0; gi = 0; gj = 0; gk =0;
 }

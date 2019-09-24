@@ -85,16 +85,16 @@ inline Vector3 FaceFieldVectorT(GridsPoints***** ptrArray_in, int face_in, int i
     switch(field_in)
     {
     case 'E': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->E3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->E3());
+    temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->E3());
+    temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->E3());
     break;}
     case 'B': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->B3());
+    temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
+    temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->B3());
     break;}
     case 'P': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3());
+    temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
+    temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3());
     break;}
     }
     return temp1.PlusProduct(temp2).ScaleProduct(1/4);    
@@ -106,16 +106,16 @@ inline Vector3 FaceFieldVectorR(GridsPoints***** ptrArray_in, int face_in, int i
     switch(field_in)
     {
     case 'E': { 
-    Vector3 temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->E3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->E3());
+    temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->E3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->E3());
     break;}
     case 'B': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->B3());
+    temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->B3());
     break;}
     case 'P': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3());
+    temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3());
     break;}
     }
     return temp1.PlusProduct(temp2).ScaleProduct(1/4);
@@ -127,19 +127,19 @@ inline Vector3 FaceFieldVectorBot(GridsPoints***** ptrArray_in, int face_in, int
     switch(field_in)
     {
     case 'E': { 
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in]->E3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in+1]->E3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in]->E3());
+    temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in+1]->E3());
     break;}
     case 'B': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in+1]->B3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
+    temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in+1]->B3());
     break;}
     case 'P': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Pos3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
+    temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Pos3());
     break;}
     }
-    return temp1.PlusProduct(temp2).ScaleProduct(1/4);
+    return temp1.PlusProduct(temp2).ScaleProduct(1/4); // 1/4 is not acceptable !
 };
 
 inline Vector3 FaceFieldVectorF(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in, char field_in)
@@ -148,19 +148,21 @@ inline Vector3 FaceFieldVectorF(GridsPoints***** ptrArray_in, int face_in, int i
     switch(field_in)
     {
     case 'E': { 
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->E3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->E3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->E3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->E3());
     break;}
     case 'B': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->B3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->B3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->B3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->B3());
     break;}
     case 'P': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Pos3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Pos3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3());
     break;}
     }
-    return temp1.PlusProduct(temp2).ScaleProduct(1/4);
+//    std::cout << " PPP" << temp1.PlusProduct(temp2).ScaleProduct(0.25).x() << " " << temp1.PlusProduct(temp2).y() << " " << temp1.PlusProduct(temp2).z() << " " ;
+  
+    return temp1.PlusProduct(temp2).ScaleProduct(0.25);
 };
 
 inline Vector3 FaceFieldVectorBack(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in, char field_in)
@@ -169,16 +171,16 @@ inline Vector3 FaceFieldVectorBack(GridsPoints***** ptrArray_in, int face_in, in
     switch(field_in)
     {
     case 'E': { 
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->E3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->E3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->E3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->E3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->E3());
     break;}
     case 'B': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->B3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->B3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->B3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->B3());
     break;}
     case 'P': {
-    Vector3 temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->Pos3());
-    Vector3 temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->Pos3());
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Pos3().PlusProduct( ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3());
     break;}
     }
     return temp1.PlusProduct(temp2).ScaleProduct(1/4);
@@ -198,7 +200,8 @@ inline double FaceDensityL(GridsPoints***** ptrArray_in, int face_in, int i_in, 
     double temp1, temp2;
     temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density();
     temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density();
-    return (temp1 + temp2) * (1/4);
+
+    return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceDensityT(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
@@ -206,7 +209,7 @@ inline double FaceDensityT(GridsPoints***** ptrArray_in, int face_in, int i_in, 
     double temp1, temp2;
     temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->Density() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density();
     temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density();
-    return (temp1 + temp2) * (1/4);
+    return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceDensityR(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
@@ -214,7 +217,7 @@ inline double FaceDensityR(GridsPoints***** ptrArray_in, int face_in, int i_in, 
     double temp1, temp2;
     temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Density() +  ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density();
     temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density();
-    return (temp1 + temp2) * (1/4);
+    return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceDensityBot(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
@@ -222,7 +225,7 @@ inline double FaceDensityBot(GridsPoints***** ptrArray_in, int face_in, int i_in
     double temp1, temp2;
     temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density() + ptrArray_in[face_in][i_in+1][j_in][k_in]->Density();
     temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density() + ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density();
-    return (temp1 + temp2) * (1/4);
+    return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceDensityF(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
@@ -230,7 +233,7 @@ inline double FaceDensityF(GridsPoints***** ptrArray_in, int face_in, int i_in, 
     double temp1, temp2;
     temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density();
     temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density();
-    return (temp1 + temp2) * (1/4);
+    return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceDensityBack(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
@@ -238,7 +241,7 @@ inline double FaceDensityBack(GridsPoints***** ptrArray_in, int face_in, int i_i
     double temp1, temp2;
     temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density();
     temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Density() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density();
-    return (temp1 + temp2) * (1/4);
+    return (temp1 + temp2) * (1.0/4.0);
 };
 
 //************************************************************************
@@ -288,7 +291,11 @@ inline Vector3 AreaVectorF(GridsPoints***** ptrArray_in, int face_in, int i_in, 
     
     Vector3 temp3 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Pos3().MinusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Pos3());
     Vector3 temp4 = ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3().MinusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Pos3());
-    return temp2.CrossProduct(temp1).PlusProduct(temp3.CrossProduct(temp4));
+/*    std::cout << " check " << ptrArray_in[face_in][i_in][j_in][k_in+1]->Pos3().x() << 
+                      " - " << ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3().x() << 
+                      " - " << ptrArray_in[face_in][i_in][j_in][k_in+1]->Pos3().x() << 
+                      " - " << ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Pos3().x() << " - ";
+*/    return temp2.CrossProduct(temp1).PlusProduct(temp3.CrossProduct(temp4));
 };
 
 inline Vector3 AreaVectorBack(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
@@ -298,6 +305,7 @@ inline Vector3 AreaVectorBack(GridsPoints***** ptrArray_in, int face_in, int i_i
     
     Vector3 temp3 = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().MinusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->Pos3());
     Vector3 temp4 = ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Pos3().MinusProduct( ptrArray_in[face_in][i_in][j_in+1][k_in]->Pos3());
+    
     return temp2.CrossProduct(temp1).PlusProduct(temp3.CrossProduct(temp4)).ScaleProduct(-1.0);
 };
 
@@ -311,9 +319,13 @@ inline Vector3 AreaVectorBack(GridsPoints***** ptrArray_in, int face_in, int i_i
 inline double CellVolume(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     double normV = FaceFieldVectorF(ptrArray_in, face_in, i_in, j_in, k_in, 'P').PlusProduct(
-                     FaceFieldVectorBack(ptrArray_in, face_in, i_in, j_in, k_in, 'P')).norm()/2;
+                     FaceFieldVectorBack(ptrArray_in, face_in, i_in, j_in, k_in, 'P')).norm()/2.0;
+   
     double avgArea = AreaVectorBack(ptrArray_in, face_in, i_in, j_in, k_in).PlusProduct(
-                     AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).ScaleProduct(-1.0)).norm()/2;
+                     AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).ScaleProduct(-1.0)).norm()/2.0;
+//    std::cout << " test" << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).x() << " " 
+//              << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).y() << " "
+//              << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).z() << " ";
     return normV * avgArea;
 }
 
@@ -336,7 +348,7 @@ void updateCellMatrix(Vector3**** curlB_in, Vector3**** curlE_in,
 // Value gradient field of Pe.
 //************************************************************************
 //************************************************************************
-Vector3**** ValueGradientPe(Vector3**** gradientArray_in, GridsPoints***** ptrArray_in, int face_in);
+Vector3*** ValueGradientPe(Vector3*** gradientArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in);
 
 
 //************************************************************************
@@ -492,7 +504,7 @@ T erfinv(T x) {
 //************************************************************************
 inline double MaxwellDisV( double iKT, double bulkV)
 {
-    double sigma = sqrt(iKT / mi);
+    double sigma = sqrt(iKT / mi0);
     double temp = 0.0;
     while ( temp < 0.25 || temp > 0.75)
     {
@@ -546,6 +558,8 @@ inline uint_64 UniDisInCell( GridsPoints***** ptrArray_in, int face_in, int i_in
     uint_64 jg = j_in -1 ;
     uint_64 kg = k_in;
    
+//    std::cout << ipar << " " << jpar << " " << kpar << " " << std::endl;
+
     // 3. Transfer the location in int to the location in Uint_64 
     uint_64 posUint = face << 61;
     for( int i = 0; i < fieldsGridsLevel; i++)
@@ -555,13 +569,19 @@ inline uint_64 UniDisInCell( GridsPoints***** ptrArray_in, int face_in, int i_in
                     + (((kg >> fieldsGridsLevel-1-i) & 1 )<< 60-2 - i *3) ;
     }
 
-//    std::cout << "     " << std::bitset<64>(posUint) << std::endl; 
-    for( int i = 0; i < cellSize1; i++)
+
+//    std::cout << "1    " << std::bitset<64>(posUint) << std::endl; 
+    int cellLevel = particlesGridsLevel - fieldsGridsLevel;
+    for( int i = fieldsGridsLevel; i < particlesGridsLevel; i++)
     {  
-        posUint += (((ipar >> cellSize1-1-i) & 1 )<< 60 - fieldsGridsLevel-1 - i *3) 
-                    + (((jpar >> cellSize1-1-i) & 1 )<< 60-1 - fieldsGridsLevel-1- i *3)
-                    + (((kpar >> cellSize1-1-i) & 1 )<< 60-2 - fieldsGridsLevel-1- i *3) ;
+        int j = i - fieldsGridsLevel;
+        posUint += (((ipar >> cellLevel-1- j) & 1 )<< 60 - i *3) 
+                    + (((jpar >> cellLevel-1- j) & 1 )<< 60-1 - i *3)
+                    + (((kpar >> cellLevel-1- j) & 1 )<< 60-2 - i *3) ;
     }
+/*
+    std::cout << "2    " << std::bitset<64>(posUint) << std::endl; 
+
     struct structg strg = {0,0,0,0,0,0,0, 0.0, 0.0, 0.0, 0.0};
     strg.face = posUint >> 61;
     for( int i = 0; i < fieldsGridsLevel; i++) 
@@ -570,12 +590,28 @@ inline uint_64 UniDisInCell( GridsPoints***** ptrArray_in, int face_in, int i_in
         strg.jg = (strg.jg << 1) + ((posUint >> 60-1 - i*3) & 1);
         strg.kg = (strg.kg << 1) + ((posUint >> 60-2 - i*3) & 1);
     }
+
+    std::cout << "3    " << std::bitset<64>(posUint) << std::endl; 
+
     for( int i = fieldsGridsLevel; i < particlesGridsLevel; i++)
     {
         strg.iw = (strg.iw << 1) + ((posUint >> 60   - i*3) & 1);
         strg.jw = (strg.jw << 1) + ((posUint >> 60-1 - i*3) & 1);
         strg.kw = (strg.kw << 1) + ((posUint >> 60-2 - i*3) & 1);
     }
+
+    
+   std::cout <<"face " << std::bitset<64>(strg.face) << std::endl;
+    std::cout << "ig   " <<std::bitset<64>(strg.ig) << std::endl;
+    std::cout <<"jg   " << std::bitset<64>(strg.jg) << std::endl;
+    std::cout << "kg   " <<std::bitset<64>(strg.kg) << std::endl << std::endl;
+    std::cout << "iw   " <<std::bitset<64>(strg.iw) << std::endl;
+    std::cout <<"jw   " << std::bitset<64>(strg.jw) << std::endl;
+    std::cout << "kw   " <<std::bitset<64>(strg.kw) << std::endl;
+
+int pause ;
+std::cin >> pause;
+*/
 
     return posUint;
 }
@@ -588,7 +624,7 @@ inline uint_64 UniDisInCell( GridsPoints***** ptrArray_in, int face_in, int i_in
 // Initialization the particles for velocity and position
 //************************************************************************
 //************************************************************************
-list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in);
+list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in);
 
 //************************************************************************
 //************************************************************************
@@ -624,7 +660,52 @@ void ProcessFunc();
 // weighting
 //************************************************************************
 //************************************************************************
-void UpdateInfoGrids( GridsPoints***** ptrArray_in, list<Particles>* ptrParticlesList_in);
+void UpdateInfoGrids( GridsPoints***** ptrArray_in, 
+                    list<Particles>* ptrParticlesList_in, 
+                    list<Particles>* ptrParticlesListBottom_in,
+                    list<Particles>* ptrParticlesListTop_in, 
+                    double*** ptrVolumeGridArray_in, 
+                    int timeline_in, 
+                    int updateInfoPeriod_in);
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Create a array to store volume of cells needed to calculate density 
+// at each grids points
+// (fieldGridsSize+1)*(fieldGridsSize+1)*(fieldGridsSize+1) for "double" 
+//************************************************************************
+//************************************************************************
+double*** VolumeGridsField( double*** ptrVolumeCellArray_in);
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Create a array to store volume of cells needed to calculate density 
+// at each cell
+// (fieldGridsSize * fieldGridsSize * fieldGridsSize) for "double" type 
+//************************************************************************
+//************************************************************************
+double*** VolumeCellsField( GridsPoints***** ptrArray_in);
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Each calculation are on the girds.
+// Update E at grids for ve = vi ( no current)
+//************************************************************************
+//************************************************************************
+void updateE_nocurrent( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in);
+
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Calculation the temprature
+//************************************************************************
+//************************************************************************
+void Titheridge_Te(GridsPoints***** ptrArray_in);
+
 
 
 #endif

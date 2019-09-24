@@ -7,6 +7,7 @@
 #include "vector3.h"
 #include "structdef.h"
 #include "fieldsgrids.h"
+#include <bitset>
 
 class Particles
 {
@@ -43,7 +44,12 @@ inline structg InttoStrp1()
     }
     strg.vx = vp.x(); strg.vy = vp.y(); strg.vz = vp.z();
     strg.mass = mass1;
-    return strg;
+
+/*    std::cout << std::bitset<64>(posUint) << " "<< strg.face <<" "<< strg.ig<<" "<< strg.jg<<" "<< strg.kg << " "
+              << strg.iw << " " << strg.jw << " " << strg.kw << std::endl;
+    int pause ;
+    std::cin >> pause;
+*/  return strg;
 }
 //************************************************************************
 //************************************************************************

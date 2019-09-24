@@ -12,21 +12,21 @@
     const double dMoment = -8e15;
 
     // Simulation parameters
-    const double tstep = 10.0 ;
+    const double tstep = 0.1 ;
     // alpha
     const double alpha = 1.0;
     // Ni
     const double Ni = 1.0;
-    // charge
-    const double qi = 1.0;
+    // charge (C)
+    const double qi0 = 1.602e-19;
     // mass (kg)
-    const double mi = 1.66e-27;
+    const double mi0 = 1.66e-27;
     // electron kT
     const double ekT = 1.0;
     // ion kT k =  1.38 x 10−23 J·K−1, T = 1000 K
     const double ikT = 1.38e-20;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 2;
+    const int iniParticleNumberPerCell = 1;
     // g (m / s2)
     const double gravity = 9.8;
     // number density at base level ( / m^3)
@@ -41,9 +41,9 @@
     // it is easy to calculate the weighting of each particle on the gridspoints, otherwise, with a cuboid cell, 
     // it may be hard to judge which particles in the cell will have weighting on the grids points.
     const int fieldsGridsLevel = 2;
-    const int particlesGridsLevel = 3;
+    const int particlesGridsLevel = 5;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
-    const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel + 3);
+    const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
     const int fieldsGridsSize = 1 << fieldsGridsLevel;
     const int particlesGridsSize = 1 << particlesGridsLevel;
   //  extern uint_64 fieldsGridsSize;
@@ -64,8 +64,20 @@
 //    const int numMax = numMin + radialGridsSize;
     const double LMax = LMin * pow(ratio, fieldsGridsSize);
 
+//************************************************************************
+//************************************************************************
+// For printout
+//************************************************************************
+//************************************************************************
     
     static int h5FileCheck = 0; // 0: create a new h5, 1: open exist h5
 
+
+//************************************************************************
+//************************************************************************
+// For Titheridge_Te temprature of electrons
+//************************************************************************
+//************************************************************************           
+                 
 
 #endif

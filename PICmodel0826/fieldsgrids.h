@@ -48,7 +48,7 @@ inline void XYZtoE()
     Vector3 temp; // for calculating grad(Pe) term
     if( pos3.norm() > 0)
     {
-    temp = pos3.NormalizedVector().ScaleProduct( mi * gravity);
+    temp = pos3.NormalizedVector().ScaleProduct( mi0 * gravity);
     e3 = temp.PlusProduct( b3.CrossProduct(v3));
     }
 }
@@ -59,9 +59,9 @@ inline void XYZtoE()
 //************************************************************************
 inline void XYZtoDensity( )
 {
-    double scaleHeight = ikT / mi / gravity;
+    double scaleHeight = ikT / mi0 / gravity;
     if( pos3.norm() > 0)
-    density = N0_i * mi * exp(-1 * (pos3.norm() - radius) / scaleHeight);              
+    density = N0_i * mi0 * exp(-1 * (pos3.norm() - radius) / scaleHeight);              
 }
 
 //************************************************************************
@@ -142,9 +142,11 @@ inline void UpdateDueToWgt( int iw, int jw, int kw, double mass_in, Vector3 vp_i
 // mass at each grid points, and the v3 means the total momentum. 
 inline void UpdateDueToWgt( GridsPoints***** ptrArray_in, double volume_in)
 {
+    if ( density != 0.0)
+    {
     v3 = v3.ScaleProduct(1/density);
-
     density = density / volume_in;
+    }
 }
 //************************************************************************
 //************************************************************************
@@ -217,13 +219,34 @@ inline Vector3 Vel3()
 {
     return v3;
 }
+
+// return stopSign
+inline int StopSign()
+{
+    return stopSign;
+}
+
+// set temperature
+inline void SetTemperature( double temperature_in)
+{
+    temperature = temperature_in;
+}
+
+// set stopSign
+inline void SetStopSign( int stopSign_in)
+{
+    stopSign = stopSign_in;
+}
+
 //////////////////////////    
     // Constructors
     GridsPoints( double px_in, double py_in, double pz_in,
                  double ex_in, double ey_in, double ez_in,
                  double bx_in, double by_in, double bz_in,
                  double vx_in, double vy_in, double vz_in,
-                 double density_in);
+                 double density_in, double temperature_in,
+                 int stopSign_in);
+                 
     GridsPoints( const GridsPoints& other);
 
     GridsPoints();
@@ -236,6 +259,8 @@ inline Vector3 Vel3()
     Vector3 v3;             // velocity3
 
     double density;
+    double temperature;
+    int stopSign;
 //    int face; int gi; int gj; int gk; //face, i, j, in fieldsgrids, radial
 };
 #endif
