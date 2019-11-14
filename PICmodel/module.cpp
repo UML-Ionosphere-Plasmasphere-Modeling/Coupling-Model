@@ -30,7 +30,7 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in)
 //    auto listsPtr = make_shared<list<Particles>>();
     list<Particles>* listsPtr = new list<Particles>;
 //   shared_ptr<Particles> p1 = make_shared<Particles> (); // test
-    double scaleHeight = ikT / mi / gravity;
+    double scaleHeight = ikT / mi0 / gravity;
 
     for( int i = 0; i < totalFace; i++)
     {
@@ -43,7 +43,7 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in)
                     // number of real particles
                     double N = N0_i * exp(-1 * (ptrArray_in[i][j][k][s]->Pos3().norm() - radius) / scaleHeight);
                     // mass of each simulation particle
-                    double mi_simu = N / iniParticleNumberPerCell *mi;
+                    double mi_simu = N / iniParticleNumberPerCell *mi0;
                     for ( int t = 1; t <= iniParticleNumberPerCell; t++)
                     {
                     // calculate random position
@@ -95,7 +95,7 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in)
 list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, const char* x)
 {
     list<Particles>* listsPtrTemp = new list<Particles>;
-    double scaleHeight = ikT / mi / gravity;
+    double scaleHeight = ikT / mi0 / gravity;
     double N, mi_simu;
     int s;
     if( x = "B")
@@ -115,7 +115,7 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, const char* x
                     N = N0_i * exp(-1 * (ptrArray_in[i][j][k][s]->Pos3().norm() - radius) / scaleHeight);
                     
                     // mass of each simulation particle
-                    mi_simu = N / iniParticleNumberPerCell *mi;
+                    mi_simu = N / iniParticleNumberPerCell *mi0;
                     for ( int t = 1; t <= iniParticleNumberPerCell; t++)
                     {
                     // calculate random position
@@ -492,8 +492,8 @@ GridsPoints***** GridsCreation()
 
     cout << "fieldsGridsSize " << fieldsGridsSize  << endl;
 //    cout << "sizeof " << sizeof(ptrArray[0])/sizeof(ptrArray[0][0][0][0]) << endl;
-/*    
-    // face 0, bottom left
+    
+/*    // face 0, bottom left
     cout <<"0 "<< ptrArray[0][1][1][0]<<" 5 "<< ptrArray[5][1][fieldsGridsSize+1][0] <<" 4 "<< ptrArray[4][fieldsGridsSize+1][1][0] << endl;
     // face 0, bottom right
     cout <<"0 "<< ptrArray[0][fieldsGridsSize+1][1][0]<<" 5 "<< ptrArray[5][fieldsGridsSize+1][fieldsGridsSize+1][0] <<" 1 "<< ptrArray[1][1][1][0] << endl;
@@ -518,7 +518,7 @@ GridsPoints***** GridsCreation()
         cout << "topleft " << ptrArray[i][0][fieldsGridsSize+1][0] << " " << ptrArray[i][1][fieldsGridsSize+2][0] << endl;
         cout << "topright" << ptrArray[i][fieldsGridsSize+2][fieldsGridsSize+1][0] << " " << ptrArray[i][fieldsGridsSize+1][fieldsGridsSize+2][0] << endl << endl;        
     }
-*/      
+*/   
     return ptrArray;
 }
 
@@ -528,8 +528,8 @@ GridsPoints***** GridsCreation()
 // FUNCTION // Set up a matrix to store the curl E or B for Faraday's Law
 // and for Ampere's Law, or the gradient of Pe. 
 // The size of the matrix should be 1 smaller than 
-// the size of gridspoints in main doman which is a cubic, which is [fsize+1].
-// Therefore, it is [fsize+1][fsize+1][fsize]
+// the size of gridspoints in main doman which is a cubic, which is [fsize+2].
+// Therefore, it is [fsize+2][fsize+2][fsize]
 // For each face, 8 corner cell should be excluded. ?
 // Notice that the curl E or B is at the center of each cell.
 // The data structure is array of Vector3, which is created in heap. Return
@@ -540,10 +540,10 @@ GridsPoints***** GridsCreation()
 Vector3**** CellCenterField()
 {
     Vector3**** cellArray;
-    cellArray = new Vector3***[fieldsGridsSize+1];
+    cellArray = new Vector3***[fieldsGridsSize+2];
     for( int i = 0; i < fieldsGridsSize+2; i++)
     {
-        cellArray[i] = new Vector3**[fieldsGridsSize+1];
+        cellArray[i] = new Vector3**[fieldsGridsSize+2];
         for( int j=0; j < fieldsGridsSize+2; j++)
         {
             cellArray[i][j] = new Vector3*[fieldsGridsSize];
@@ -618,7 +618,7 @@ Vector3**** ValueGradientPe(Vector3**** gradientArray_in, GridsPoints***** ptrAr
     {
         for( int j = 0; j < fieldsGridsSize+2; j++)
         {
-            for( int k = 0; k < fieldsGridsSize+2; k++)
+            for( int k = 0; k < fieldsGridsSize; k++)
             {
                 if((i==0&&j==0)||
                             (i==0&&j==fieldsGridsSize+1)||
@@ -771,13 +771,17 @@ void updateE_nocurrent( Vector3**** gradPe_in, GridsPoints***** ptrArray_in, int
 {
     Vector3 tempGradPe;
 
+
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
         for( int j = 1; j < fieldsGridsSize+2; j++)
         {
-            for( int k = 1; k < fieldsGridsSize+2; k++)
+            for( int k = 1; k < fieldsGridsSize; k++)
             {
-                // curl B at gridspoint
+                         std::cout << std::endl << i << j << k << "-> ";
+                         std::cout << ptrArray_in[face_in][i][j][k]->Vel3().x() << " " <<
+                         ptrArray_in[face_in][i][j][k]->Vel3().y() << " " <<
+                         ptrArray_in[face_in][i][j][k]->Vel3().z() << "-> " ;// curl B at gridspoint
                 if(i==1&&j==1) 
                 {
                 // gradPe at gridspoints
@@ -848,6 +852,10 @@ void updateE_nocurrent( Vector3**** gradPe_in, GridsPoints***** ptrArray_in, int
                 tempGradPe = tempGradPe.PlusProduct(
                                     *gradPe_in[i][j][k]).ScaleProduct(1/8);
                 }
+            std::cout << ptrArray_in[face_in][i][j][k]->Vel3().x() << " " <<
+                         ptrArray_in[face_in][i][j][k]->Vel3().y() << " " <<
+                         ptrArray_in[face_in][i][j][k]->Vel3().z() << " " << 
+                         tempGradPe.x() << " " << tempGradPe.y() << " " << tempGradPe.z() << std::endl;
                 // update E
                 ptrArray_in[face_in][i][j][k]->updateE(ptrArray_in[face_in][i][j][k]->Vel3(), tempGradPe);
             }
@@ -873,7 +881,7 @@ void updateE( Vector3**** curlB_in, Vector3**** gradPe_in, GridsPoints***** ptrA
     {
         for( int j = 1; j < fieldsGridsSize+2; j++)
         {
-            for( int k = 1; k < fieldsGridsSize+2; k++)
+            for( int k = 1; k < fieldsGridsSize; k++)
             {
                 // curl B at gridspoint
                 if(i==1&&j==1) 
@@ -1022,14 +1030,14 @@ void updateE( Vector3**** curlB_in, Vector3**** gradPe_in, GridsPoints***** ptrA
 // Step 2: Update B at each gridpoints
 //************************************************************************
 //************************************************************************
-void updateE( Vector3**** curlE_in, GridsPoints***** ptrArray_in, int face_in)
+void updateB( Vector3**** curlE_in, GridsPoints***** ptrArray_in, int face_in)
 {
     Vector3 tempCurlE;
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
         for( int j = 1; j < fieldsGridsSize+2; j++)
         {
-            for( int k = 1; k < fieldsGridsSize+2; k++)
+            for( int k = 1; k < fieldsGridsSize; k++)
             {
                 // curl E at gridspoint
                 if(i==1&&j==1) 
@@ -1143,18 +1151,22 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in, list<Particles>* ptrParticle
         double tempMass = temp.WeightMi();
         // get the info of velocity
         Vector3 tempVel = temp.VelParticles();
-
-        // update density and velocity in the grids
+/*        std::cout << "checkUp "<< tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw << " " ;
+        std::cout << "checkUp "<< tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << " " ;
+        std::cout << "checkUp "<< tempVel.x() << " " << tempVel.y() << " " << tempVel.z() << " ";
+        std::cout << "checkUp "<< tempMass << std::endl;
+*/        // update density and velocity in the grids
   
         ptrArray_in[tempStr.face][tempStr.ig][tempStr.jg][tempStr.kg]->      UpdateDueToWgt( tempStr.iw,             tempStr.jw,             tempStr.kw,             tempMass, tempVel);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg][tempStr.kg]->    UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw,             tempStr.kw,             tempMass, tempVel);
         ptrArray_in[tempStr.face][tempStr.ig][tempStr.jg+1][tempStr.kg]->    UpdateDueToWgt( tempStr.iw,             cellSize1 - tempStr.jw, tempStr.kw,             tempMass, tempVel);
-        ptrArray_in[tempStr.face][tempStr.ig][tempStr.jg][tempStr.kg+1]->    UpdateDueToWgt( tempStr.iw,             tempStr.jw, cellSize1 - tempStr.kw,             tempMass, tempVel);
+        ptrArray_in[tempStr.face][tempStr.ig][tempStr.jg][tempStr.kg+1]->    UpdateDueToWgt( tempStr.iw,             tempStr.jw,             cellSize1 - tempStr.kw, tempMass, tempVel);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->  UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, tempStr.kw,             tempMass, tempVel);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg][tempStr.kg+1]->  UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw,             cellSize1 - tempStr.kw, tempMass, tempVel);
         ptrArray_in[tempStr.face][tempStr.ig][tempStr.jg+1][tempStr.kg+1]->  UpdateDueToWgt( tempStr.iw,             cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempMass, tempVel);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempMass, tempVel);
     }
+  
     for( int face = 0; face < totalFace; face++)
     {
         for( int i = 1; i < fieldsGridsSize+2; i++)
@@ -1164,12 +1176,13 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in, list<Particles>* ptrParticle
                 for( int k = 1; k < fieldsGridsSize; k++)
                 {
                     double volume = CellVolume( ptrArray_in, face , i, j, k);
-                    ptrArray_in[face][i][j][k]->UpdateDueToWgt(ptrArray_in, volume);
+                    std::cout << " volume " << volume << " pos " << face << i << j << k << std::endl;
+                    // ptrArray_in[face][i][j][k]->UpdateDueToWgt(ptrArray_in, volume);
                 }
             }
         }
     }   
-
+  
 }
 
 
@@ -1219,7 +1232,7 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
     // Apply for continus memory 
     GridsPoints_h5* data_mem = new GridsPoints_h5[totalFace* (1+fieldsGridsSize)* (1+fieldsGridsSize)* (1+fieldsGridsSize)];
-    GridsPoints_h5**** array_data = new GridsPoints_h5***[(1+fieldsGridsSize)* (1+fieldsGridsSize)* (1+fieldsGridsSize)];
+    GridsPoints_h5**** array_data = new GridsPoints_h5***[totalFace];
     for( int face=0; face<totalFace; face++)
     {
         array_data[face] = new GridsPoints_h5**[1+fieldsGridsSize];
@@ -1232,21 +1245,21 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
                 array_data[face][i][j] = data_mem + face*(1+fieldsGridsSize)*(1+fieldsGridsSize)*(1+fieldsGridsSize)+
                                          i*(1+fieldsGridsSize)*(1+fieldsGridsSize)+
                                          j*(1+fieldsGridsSize);
-                for( int k = 0; k < 1+fieldsGridsSize; k++)
+                for( int k = 0; k < 1 + fieldsGridsSize; k++)
                 {
                     array_data[face][i][j][k].pos3 
-                        = {ptrArray_in[face][i+1][j+1][k+1]->Pos3().x(), ptrArray_in[face][i+1][j+1][k+1]->Pos3().y(), ptrArray_in[face][i+1][j+1][k+1]->Pos3().z()} ;
+                        = {ptrArray_in[face][i+1][j+1][k]->Pos3().x(), ptrArray_in[face][i+1][j+1][k]->Pos3().y(), ptrArray_in[face][i+1][j+1][k]->Pos3().z()} ;
 
                     array_data[face][i][j][k].e3 
-                        = {ptrArray_in[face][i+1][j+1][k+1]->E3().x(), ptrArray_in[face][i+1][j+1][k+1]->E3().y(), ptrArray_in[face][i+1][j+1][k+1]->E3().z()} ;
+                        = {ptrArray_in[face][i+1][j+1][k]->E3().x(), ptrArray_in[face][i+1][j+1][k]->E3().y(), ptrArray_in[face][i+1][j+1][k]->E3().z()} ;
 
                     array_data[face][i][j][k].b3 
-                        = {ptrArray_in[face][i+1][j+1][k+1]->B3().x(), ptrArray_in[face][i+1][j+1][k+1]->B3().y(), ptrArray_in[face][i+1][j+1][k+1]->B3().z()} ;
+                        = {ptrArray_in[face][i+1][j+1][k]->B3().x(), ptrArray_in[face][i+1][j+1][k]->B3().y(), ptrArray_in[face][i+1][j+1][k]->B3().z()} ;
 
                     array_data[face][i][j][k].v3 
-                        = {ptrArray_in[face][i+1][j+1][k+1]->Vel3().x(), ptrArray_in[face][i+1][j+1][k+1]->Vel3().y(), ptrArray_in[face][i+1][j+1][k+1]->Vel3().z()} ;
+                        = {ptrArray_in[face][i+1][j+1][k]->Vel3().x(), ptrArray_in[face][i+1][j+1][k]->Vel3().y(), ptrArray_in[face][i+1][j+1][k]->Vel3().z()} ;
                     array_data[face][i][j][k].density
-                        = ptrArray_in[face][i+1][j+1][k+1]->Density();
+                        = ptrArray_in[face][i+1][j+1][k]->Density();
 
                  //   std::cout << array_data[face][i][j][k].b3.v_x << std::endl;
                 }
@@ -1313,7 +1326,33 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     
 }
 
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Create a array to store volume of cells needed to calculate density 
+// at each grids points
+//************************************************************************
+//************************************************************************
+double**** VolumeGridsField( GridsPoints***** ptrArray_in)
+{
+    double* mem_VolumeGridsArray = new double[(fieldsGridsSize+1)*(fieldsGridsSize+1)*(fieldsGridsSize+1)]; 
+    double*** VolumeGridsArray = new double **[fieldsGridsSize+1];
 
+    for( int i =0; i < fieldsGridsSize+1; i++)
+    {
+        VolumeGridsArray[i] = new double*[fieldsGridsSize+1];
+        for( int j =0; j < fieldsGridsSize+1; j++)
+        {
+            VolumeGridsArray[i][j]= new double [fieldsGridsSize+1];
+            VolumeGridsArray[i][j]= mem_VolumeGridsArray + i* (fieldsGridsSize+1)*(fieldsGridsSize+1) + j*(fieldsGridsSize+1);
+            for( int k = 0; k < fieldsGridsSize; k++)
+            {
+
+            }
+            
+        }
+    }
+}
 
 
 //************************************************************************
@@ -1327,22 +1366,25 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 //************************************************************************
 void ProcessFunc()
 {
-    static int timeLineLimit = 4;
-    static int printTimePeriod = 2;
-    static int updateInfoPeriod = 2;
+    static int timeLineLimit = 2;
+    static int printTimePeriod = 1;
+    static int updateInfoPeriod = 1;
     // Prerun 1.0 // Create Grids, including B and Pos. And then Velocity (corotation) and N (exponential )
     // Prerun 1.1 // And then E (electron momentum equation).
     cout << " Create Grids" << endl;
     GridsPoints***** ptrArray =  GridsCreation();
+
     // Prerun 1.2 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     list<Particles>* ptrParticlesList = ParticlesLists( ptrArray);
     // Prerun 1.3 // Create Cell centered field array for nesseary calculation
-    Vector3**** ptrCellArray = CellCenterField();
+    Vector3**** ptrCellArray = CellCenterField();  // notice notice may have problem
+    // Prerun 1.4 // Create grids field array of volum for one face
+  //  double**** ptrVolumeArray = VolumeGridsField( GridsPoints***** ptrArray_in);
     // Run 2.0
     for( int timeline = 0; timeline <= timeLineLimit; timeline++)
     {
-std::cout << "timeline" << timeline << std::endl;
+    std::cout << "timeline" << timeline << std::endl;
 
     // Run 2.1 // Particles in main domain
         for( list<Particles>::iterator iteratorM = ptrParticlesList->begin(); iteratorM != ptrParticlesList->end(); ++iteratorM)
@@ -1401,16 +1443,19 @@ std::cout << "timeline" << timeline << std::endl;
     // Run 2.5 // Update info in grids 
     if( timeline % updateInfoPeriod ==0)
     {
-        std::cout << " Update E and B " << std::endl;
         // Run 2.5.1 // Update density and velocity
         UpdateInfoGrids( ptrArray, ptrParticlesList);
         // Run 2.5.2 // Update E
-        for( int face = 0; face < 6; face++)
+/*        for( int face = 0; face < 6; face++)
         {
             ptrCellArray = ValueGradientPe( ptrCellArray, ptrArray, face);
-            updateE( ptrCellArray, ptrArray, face);
+            updateE_nocurrent( ptrCellArray, ptrArray, face);
+        int pause;
+        std::cin >> pause ;
         }
-    }
+*/    }
+    
+        std::cout << " Update E and B " << std::endl;
     // Postrun 3.0 // Printout info in grids points
     if( timeline % printTimePeriod ==0)
     {

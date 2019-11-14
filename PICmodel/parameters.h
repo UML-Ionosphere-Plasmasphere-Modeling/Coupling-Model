@@ -12,21 +12,21 @@
     const double dMoment = -8e15;
 
     // Simulation parameters
-    const double tstep = 10.0 ;
+    const double tstep = 0.1 ;
     // alpha
     const double alpha = 1.0;
     // Ni
     const double Ni = 1.0;
-    // charge
-    const double qi = 1.0;
+    // charge (C)
+    const double qi0 = 1.602e-19;
     // mass (kg)
-    const double mi = 1.66e-27;
+    const double mi0 = 1.66e-27;
     // electron kT
     const double ekT = 1.0;
     // ion kT k =  1.38 x 10−23 J·K−1, T = 1000 K
     const double ikT = 1.38e-20;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 2;
+    const int iniParticleNumberPerCell = 1;
     // g (m / s2)
     const double gravity = 9.8;
     // number density at base level ( / m^3)

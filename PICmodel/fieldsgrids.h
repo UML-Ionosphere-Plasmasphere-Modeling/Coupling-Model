@@ -48,7 +48,7 @@ inline void XYZtoE()
     Vector3 temp; // for calculating grad(Pe) term
     if( pos3.norm() > 0)
     {
-    temp = pos3.NormalizedVector().ScaleProduct( mi * gravity);
+    temp = pos3.NormalizedVector().ScaleProduct( mi0 * gravity);
     e3 = temp.PlusProduct( b3.CrossProduct(v3));
     }
 }
@@ -59,9 +59,9 @@ inline void XYZtoE()
 //************************************************************************
 inline void XYZtoDensity( )
 {
-    double scaleHeight = ikT / mi / gravity;
+    double scaleHeight = ikT / mi0 / gravity;
     if( pos3.norm() > 0)
-    density = N0_i * mi * exp(-1 * (pos3.norm() - radius) / scaleHeight);              
+    density = N0_i * mi0 * exp(-1 * (pos3.norm() - radius) / scaleHeight);              
 }
 
 //************************************************************************
@@ -132,10 +132,10 @@ inline void ResetParameters()
 //************************************************************************
 inline void UpdateDueToWgt( int iw, int jw, int kw, double mass_in, Vector3 vp_in)
 {
-    density += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
-    v3 = v3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
-                                  mass_in * vp_in.y() * iw * jw * kw / cellSize3,
-                                  mass_in * vp_in.z() * iw * jw * kw / cellSize3
+    density += mass_in * (iw+1) * (jw+1) * (kw+1) / cellSize3; // acutally is mass not density
+    v3 = v3.PlusProduct( Vector3( mass_in * vp_in.x() * (iw+1) * (jw+1) * (kw+1) / cellSize3,
+                                  mass_in * vp_in.y() * (iw+1) * (jw+1) * (kw+1) / cellSize3,
+                                  mass_in * vp_in.z() * (iw+1) * (jw+1) * (kw+1) / cellSize3
                                 ));
 }
 // After all simulation are calculated once, the density means the total 
