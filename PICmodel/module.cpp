@@ -714,12 +714,13 @@ Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray
 
                 temp = temp.ScaleProduct( 1.0 / volumetemp);
                 curlArray_in[i][j][k].SetVector3( temp); 
-
+/*
                 std::cout << face_in << field_in << i << j << k << " " << temp.norm() << std::endl;;
                 int pause;
                 if( temp.norm() !=0 ){
-                std::cin >> pause;}
-            }
+     //           std::cin >> pause;
+                    }
+ */           }
         }
     }
     return curlArray_in;
@@ -1633,8 +1634,11 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     using namespace H5;
     char filename[80];
     sprintf( filename, "ArrayOfGrids_%d", i_in);
+
     H5std_string FILE_NAME( "GridsData.h5");
     H5std_string DATASET_NAME( filename);
+    H5std_string DATASET_CONST_NAME( "ArrayOfGrids_const");
+
     H5std_string MEMBERx( "x");
     H5std_string MEMBERy( "y");
     H5std_string MEMBERz( "z");
@@ -1660,18 +1664,22 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     } Vector3_h5;
 
     typedef struct GridsPoints_h5{
-        Vector3_h5 pos3;
         Vector3_h5 e3;
 
-        Vector3_h5 b3;
         Vector3_h5 dB3;
 
         Vector3_h5 v3;
         Vector3_h5 ve3;
 
         double density;
-        double temperature;
     } GridsPoints_h5;
+
+    typedef struct GridsPoints_const_h5{
+        Vector3_h5 pos3;
+        Vector3_h5 b3;
+
+        double temperature;
+    } GridsPoints_const_h5;
 
 
     // Apply for continus memory 
@@ -1692,14 +1700,8 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
                 for( int k = 0; k < 1 + fieldsGridsSize; k++)
                 {
-                    array_data[face][i][j][k].pos3 
-                        = {ptrArray_in[face][i+1][j+1][k]->Pos3().x(), ptrArray_in[face][i+1][j+1][k]->Pos3().y(), ptrArray_in[face][i+1][j+1][k]->Pos3().z()} ;
-
                     array_data[face][i][j][k].e3 
                         = {ptrArray_in[face][i+1][j+1][k]->E3().x(), ptrArray_in[face][i+1][j+1][k]->E3().y(), ptrArray_in[face][i+1][j+1][k]->E3().z()} ;
-
-                    array_data[face][i][j][k].b3 
-                        = {ptrArray_in[face][i+1][j+1][k]->B3_base().x(), ptrArray_in[face][i+1][j+1][k]->B3_base().y(), ptrArray_in[face][i+1][j+1][k]->B3_base().z()} ;
 
                     array_data[face][i][j][k].dB3 
                         = {ptrArray_in[face][i+1][j+1][k]->DB3().x(), ptrArray_in[face][i+1][j+1][k]->DB3().y(), ptrArray_in[face][i+1][j+1][k]->DB3().z()} ;
@@ -1712,14 +1714,40 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
                     
                     array_data[face][i][j][k].density
                         = ptrArray_in[face][i+1][j+1][k]->Density();
-
-                    array_data[face][i][j][k].temperature = ptrArray_in[face][i+1][j+1][k]->Temperature();
-                //    std::cout << array_data[face][i][j][k].b3.v_x << std::endl;
+                    //    std::cout << array_data[face][i][j][k].b3.v_x << std::endl;
                 }
             }
         }
     }
     
+    GridsPoints_const_h5* data_mem_const = new GridsPoints_const_h5[totalFace* (1+fieldsGridsSize)* (1+fieldsGridsSize)* (1+fieldsGridsSize)];
+    GridsPoints_const_h5**** array_data_const = new GridsPoints_const_h5***[totalFace];
+    for( int face=0; face<totalFace; face++)
+    {
+        array_data_const[face] = new GridsPoints_const_h5**[1+fieldsGridsSize];
+        for( int i = 0; i< 1+fieldsGridsSize; i++)
+        {
+            array_data_const[face][i] = new GridsPoints_const_h5*[1+fieldsGridsSize];
+            for( int j=0; j< 1+fieldsGridsSize; j++)
+            {
+                array_data_const[face][i][j] = new GridsPoints_const_h5[1+fieldsGridsSize];
+                array_data_const[face][i][j] = data_mem_const + face*(1+fieldsGridsSize)*(1+fieldsGridsSize)*(1+fieldsGridsSize)+
+                                         i*(1+fieldsGridsSize)*(1+fieldsGridsSize)+
+                                         j*(1+fieldsGridsSize);
+
+                for( int k = 0; k < 1 + fieldsGridsSize; k++)
+                {       
+                    array_data_const[face][i][j][k].pos3 
+                        = {ptrArray_in[face][i+1][j+1][k]->Pos3().x(), ptrArray_in[face][i+1][j+1][k]->Pos3().y(), ptrArray_in[face][i+1][j+1][k]->Pos3().z()} ;
+                    array_data_const[face][i][j][k].b3 
+                        = {ptrArray_in[face][i+1][j+1][k]->B3_base().x(), ptrArray_in[face][i+1][j+1][k]->B3_base().y(), ptrArray_in[face][i+1][j+1][k]->B3_base().z()} ;
+                    array_data_const[face][i][j][k].temperature = ptrArray_in[face][i+1][j+1][k]->Temperature();
+                }
+            }
+        }
+    }            
+
+
 
     Exception::dontPrint();
 
@@ -1731,32 +1759,47 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     {
         H5File* file = new H5File( FILE_NAME, H5F_ACC_TRUNC);
         h5FileCheck = 1;
-
+        // non-const group variables
         CompType mtype_vector3( sizeof( Vector3_h5));
         mtype_vector3.insertMember( MEMBERx, HOFFSET(Vector3_h5,v_x), PredType::NATIVE_DOUBLE);
         mtype_vector3.insertMember( MEMBERy, HOFFSET(Vector3_h5,v_y), PredType::NATIVE_DOUBLE);
         mtype_vector3.insertMember( MEMBERz, HOFFSET(Vector3_h5,v_z), PredType::NATIVE_DOUBLE);
 
         CompType mtype_grids( sizeof( GridsPoints_h5));
-        mtype_grids.insertMember( MEMBER_pos3, HOFFSET(GridsPoints_h5,pos3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_e3, HOFFSET(GridsPoints_h5,e3), mtype_vector3);
 
-        mtype_grids.insertMember( MEMBER_b3, HOFFSET(GridsPoints_h5,b3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_dB3, HOFFSET(GridsPoints_h5,dB3), mtype_vector3);
         
         mtype_grids.insertMember( MEMBER_v3, HOFFSET(GridsPoints_h5,v3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
         
         mtype_grids.insertMember( MEMBER_density, HOFFSET(GridsPoints_h5,density), PredType::NATIVE_DOUBLE);
-        mtype_grids.insertMember( MEMBER_te, HOFFSET(GridsPoints_h5,temperature), PredType::NATIVE_DOUBLE);
 
         DataSet* dataset;
         dataset = new DataSet(file->createDataSet(DATASET_NAME, mtype_grids, space));
         dataset->write( array_data[0][0][0], mtype_grids);
 
+
+
+        // const group variables
+        CompType mtype_grids_const( sizeof( GridsPoints_const_h5));
+        mtype_grids_const.insertMember( MEMBER_pos3, HOFFSET(GridsPoints_const_h5,pos3), mtype_vector3);
+        mtype_grids_const.insertMember( MEMBER_b3, HOFFSET(GridsPoints_const_h5,b3), mtype_vector3);
+
+        mtype_grids_const.insertMember( MEMBER_te, HOFFSET(GridsPoints_const_h5,temperature), PredType::NATIVE_DOUBLE);
+
+
+        DataSet* dataset_const;
+        dataset_const = new DataSet(file->createDataSet( DATASET_CONST_NAME, mtype_grids_const, space));
+        dataset_const->write( array_data_const[0][0][0], mtype_grids_const);
+
         delete dataset;
-        delete file;
+        delete dataset_const;
         delete data_mem;
+        delete data_mem_const;
+
+        delete file;
+
     }
     else
     {
@@ -1768,17 +1811,14 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
         mtype_vector3.insertMember( MEMBERz, HOFFSET(Vector3_h5,v_z), PredType::NATIVE_DOUBLE);
 
         CompType mtype_grids( sizeof( GridsPoints_h5));
-        mtype_grids.insertMember( MEMBER_pos3, HOFFSET(GridsPoints_h5,pos3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_e3, HOFFSET(GridsPoints_h5,e3), mtype_vector3);
 
-        mtype_grids.insertMember( MEMBER_b3, HOFFSET(GridsPoints_h5,b3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_dB3, HOFFSET(GridsPoints_h5,dB3), mtype_vector3);
 
         mtype_grids.insertMember( MEMBER_v3, HOFFSET(GridsPoints_h5,v3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
 
         mtype_grids.insertMember( MEMBER_density, HOFFSET(GridsPoints_h5,density), PredType::NATIVE_DOUBLE);
-        mtype_grids.insertMember( MEMBER_te, HOFFSET(GridsPoints_h5,temperature), PredType::NATIVE_DOUBLE);
 
         DataSet* dataset;
         dataset = new DataSet(file->createDataSet(DATASET_NAME, mtype_grids, space));
@@ -2489,6 +2529,7 @@ void ProcessFunc()
                 
             }
         }
+        cout << "Particles H " << ptrParticlesList_H->size() << endl;
         }
         #pragma omp section
         {
@@ -2508,6 +2549,7 @@ void ProcessFunc()
                 iteratorM = ptrParticlesList_He->erase( iteratorM);
             }
         }
+        cout << "Particles He " << ptrParticlesList_He->size() << endl;
         }
         #pragma omp section
         {
@@ -2527,6 +2569,7 @@ void ProcessFunc()
                 iteratorM = ptrParticlesList_O->erase( iteratorM);
             }
         }
+        cout << "Particles O " << ptrParticlesList_O->size() << endl;
         }     
     }   
     #pragma omp barrier
@@ -2540,8 +2583,8 @@ void ProcessFunc()
     {
     #pragma omp sections
     {
-        #pragma omp section
-        {
+    #pragma omp section
+    {
         // Run 2.3 // Particles in temp domain
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)
         {
@@ -2557,11 +2600,10 @@ void ProcessFunc()
                 iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
-        }
-
-        #pragma omp section
-        {
-    
+    }
+    #pragma omp section
+    {  
+   
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_He->begin(); iterator != ptrParticlesListTemp_He->end(); ++iterator)
         {
             Particles temp = *iterator;
@@ -2576,10 +2618,9 @@ void ProcessFunc()
                 iterator = ptrParticlesListTemp_He->erase( iterator);
             }
         }
-        }
-
-        #pragma omp section
-        {
+    }
+    #pragma omp section
+    {    
     
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_O->begin(); iterator != ptrParticlesListTemp_O->end(); ++iterator)
         {
@@ -2595,14 +2636,13 @@ void ProcessFunc()
                 iterator = ptrParticlesListTemp_O->erase( iterator);
             }
         }
-        }
+        
     }
-    
+    }
     #pragma omp barrier
 
-}
+    }
               
-    std::cout << " Update gridspoints info" << std::endl;
     // Run 2.5 // Update info in grids 
     // Run 2.5.1 // Accumulate density and velocity per timestep and average them to get the
     // value of density and velocity per updatetimeperiod
@@ -2627,6 +2667,7 @@ void ProcessFunc()
 
     if( timeline % updateInfoPeriod ==0)
     {
+    std::cout << " Update gridspoints info" << std::endl;
         // Run 2.5.2 
         for( int face = 0; face < 6; face++)
         {
