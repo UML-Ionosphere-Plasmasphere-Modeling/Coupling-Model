@@ -1752,6 +1752,7 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     Exception::dontPrint();
 
 
+
     hsize_t dim[] = {totalFace,fieldsGridsSize+1,fieldsGridsSize+1,fieldsGridsSize+1};
     DataSpace space( RANK, dim);
 
