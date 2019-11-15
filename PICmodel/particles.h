@@ -7,6 +7,10 @@
 #include "vector3.h"
 #include "structdef.h"
 #include "fieldsgrids.h"
+<<<<<<< HEAD:PICmodel/particles.h
+=======
+#include <bitset>
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.h
 
 class Particles
 {
@@ -43,7 +47,16 @@ inline structg InttoStrp1()
     }
     strg.vx = vp.x(); strg.vy = vp.y(); strg.vz = vp.z();
     strg.mass = mass1;
+<<<<<<< HEAD:PICmodel/particles.h
     return strg;
+=======
+
+/*    std::cout << std::bitset<64>(posUint) << " "<< strg.face <<" "<< strg.ig<<" "<< strg.jg<<" "<< strg.kg << " "
+              << strg.iw << " " << strg.jw << " " << strg.kw << std::endl;
+    int pause ;
+    std::cin >> pause;
+*/  return strg;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.h
 }
 //************************************************************************
 //************************************************************************
@@ -91,7 +104,11 @@ Vector3 LocalB( struct structg *strg_in, GridsPoints***** ptrArray_in);
 //
 //************************************************************************
 //************************************************************************
+<<<<<<< HEAD:PICmodel/particles.h
 int BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in);
+=======
+int BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double mi0_in);
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.h
 
 //************************************************************************
 //************************************************************************
@@ -113,15 +130,29 @@ inline double WeightMi()
     return mi;
 }
 
+<<<<<<< HEAD:PICmodel/particles.h
 //////////////////////////////////Constructor//////////////////////////////
 
     Particles( uint_64 posInt_in, Vector3 vx_in, double mi_in);
+=======
+inline double MagneticIvarient()
+{
+    return mu;
+}
+//////////////////////////////////Constructor//////////////////////////////
+
+    Particles( uint_64 posInt_in, Vector3 vx_in, double mi_in, double mu_in);
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.h
     Particles();
 
 private:
     uint_64 posUint; // single unsigned int for position
     Vector3 vp; // velocity of particles
     double mi; // weight
+<<<<<<< HEAD:PICmodel/particles.h
+=======
+    double mu; // magnetic moment/ adiabatic invarient
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.h
     static constexpr double mass1 = 16;
     static constexpr double mass2 = 1;
 //    double px; double py; double pz;

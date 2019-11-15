@@ -11,11 +11,19 @@
 // Vector3 vp;
 
 // FUNCTION //Constructor
+<<<<<<< HEAD:PICmodel/particles.cpp
 Particles::Particles( uint_64 posUint_in, Vector3 vx_in, double mi_in)
+=======
+Particles::Particles( uint_64 posUint_in, Vector3 vx_in, double mi_in, double mu_in)
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
 {
     posUint = posUint_in;
     vp = vx_in; 
     mi = mi_in;
+<<<<<<< HEAD:PICmodel/particles.cpp
+=======
+    mu = mu_in;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
 }
 
 // FUNCTION //Default Constructor
@@ -24,6 +32,10 @@ Particles::Particles()
     posUint = 0;
     vp= Vector3(0.0, 0.0, 0.0);
     mi = 0.0;
+<<<<<<< HEAD:PICmodel/particles.cpp
+=======
+    mu = 0.0;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
 }
 
 //************************************************************************
@@ -40,7 +52,13 @@ int Particles::UpdateUint_64()
     double temp[2];
     int check=0;
     // 1. transfor Uint to face, ip, jp, kp
+<<<<<<< HEAD:PICmodel/particles.cpp
  //   std::cout << std::bitset<64>(posUint) << std::endl;
+=======
+
+//    std::cout << std::bitset<64>(posUint) << std::endl;
+    
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     face = posUint >> 61;
     for( int i = 0; i < particlesGridsLevel; i++) 
     {
@@ -48,7 +66,16 @@ int Particles::UpdateUint_64()
         jp = (jp << 1) + ((posUint >> 60-1 - i*3) & 1);
         kp = (kp << 1) + ((posUint >> 60-2 - i*3) & 1);
     }
+<<<<<<< HEAD:PICmodel/particles.cpp
 
+=======
+/*
+    std::cout << std::bitset<64>(face) << " " << face << std::endl;
+    std::cout << std::bitset<64>(ip) << " " << ip << std::endl;
+    std::cout << std::bitset<64>(jp) << " " << jp << std::endl;
+    std::cout << std::bitset<64>(kp) << " " << kp << std::endl << std::endl;
+*/
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     // 2. transfor to double x y z
     // 2.1 radial
 
@@ -57,7 +84,11 @@ int Particles::UpdateUint_64()
     double L = LMin * pow(10, logRatio *  ( (kp +0.5)/ cellSize1 )); 
     
 
+<<<<<<< HEAD:PICmodel/particles.cpp
     std:: cout << " 1pos " << L << " " << px << " " << py << " " << pz << std::endl;  
+=======
+//    std:: cout << " 1pos " << L << " " << px << " " << py << " " << pz << std::endl;  
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     // 2.2 IgJg to ST note 0<ST<1
     temp[0] = (1.0 / particlesGridsSize) * ip;
     temp[1] = (1.0 / particlesGridsSize) * jp;
@@ -84,18 +115,32 @@ int Particles::UpdateUint_64()
         case 4: px=temp[0];       py=-1.0;        pz=temp[1]; break;
         default:px=temp[1];       py=temp[0];     pz=-1.0;    break;
     }
+<<<<<<< HEAD:PICmodel/particles.cpp
     std:: cout << " 2pos " << L << " " << px << " " << py << " " << pz << std::endl; 
     px *= k; py *= k; pz *= k;
     // 3. update double x y z
     std:: cout << " 3pos " << L << " " << px << " " << py << " " << pz << std::endl; 
+=======
+//    std:: cout << " 2pos " << L << " " << px << " " << py << " " << pz << std::endl; 
+    px *= k; py *= k; pz *= k;
+    // 3. update double x y z
+//    std:: cout << " 3pos " << L << " " << px << " " << py << " " << pz << std::endl; 
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     px += vp.x() * tstep;
     py += vp.y() * tstep;
     pz += vp.z() * tstep;
     
+<<<<<<< HEAD:PICmodel/particles.cpp
     std:: cout << " 4pos " << L << " " << px << " " << py << " " << pz << std::endl; 
 
     std:: cout << vp.x() << " " << vp.y() << " " << vp.z() << " " << tstep << std::endl;
     std:: cout << " >>> "<< px << " " << py << " " << pz << std::endl;
+=======
+//    std:: cout << " 4pos " << L << " " << px << " " << py << " " << pz << std::endl; 
+
+//    std:: cout << vp.x() << " " << vp.y() << " " << vp.z() << " " << tstep << std::endl;
+//    std:: cout << " >>> "<< px << " " << py << " " << pz << std::endl;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     // 4. transfor to face ip kp jp
     // 4.1 radial kp
     L = sqrt(pow(px,2.0)+pow(py,2.0)+pow(pz,2.0))/radius;
@@ -109,7 +154,11 @@ int Particles::UpdateUint_64()
     else
     {
         kp = static_cast<uint_64>( floor( log10(L / LMin)/logRatio *cellSize1)); 
+<<<<<<< HEAD:PICmodel/particles.cpp
         std::cout << " kp" << kp << " " << L << std::endl;
+=======
+//        std::cout << " kp" << kp << " " << L << " ";
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
         // 4.2 XYZtoUV, note that -1<UV<1 
         face = Getface(px, py, pz);
         switch (face)
@@ -139,7 +188,19 @@ int Particles::UpdateUint_64()
                     + (((jp >> particlesGridsLevel-1-i) & 1 )<< 60-1 - i *3)
                     + (((kp >> particlesGridsLevel-1-i) & 1 )<< 60-2 - i *3) ;
         }
+<<<<<<< HEAD:PICmodel/particles.cpp
         return check;        
+=======
+/*        std::cout << " next " << std::endl;
+    std::cout << std::bitset<64>(face) << " " << face << std::endl;
+    std::cout << std::bitset<64>(ip) << " " << ip << std::endl;
+    std::cout << std::bitset<64>(jp) << " " << jp << std::endl;
+    std::cout << std::bitset<64>(kp) << " " << kp << std::endl << std::endl;
+    int pause;
+    std::cin >>pause;
+*/
+    return check;        
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     }
 }
 
@@ -227,6 +288,7 @@ Vector3 Particles::LocalB( struct structg *strg_in, GridsPoints***** ptrArray_in
 //
 //************************************************************************
 //************************************************************************
+<<<<<<< HEAD:PICmodel/particles.cpp
 int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in)
 {
     // 1. pre-set some variables
@@ -235,6 +297,16 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     // 1.2 local B and E
     std::cout << std::endl;
     std::cout << strg_in->face << strg_in->ig << strg_in->jg << strg_in->kg << std::endl;
+=======
+int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double mi0_in)
+{
+    // 1. pre-set some variables
+    // 1.1 qtm = q * dt / m /2 
+    double qtm = qi0 * tstep / mi0_in / 2;
+    // 1.2 local B and E
+//    std::cout << std::endl;
+//    std::cout << strg_in->face << strg_in->ig << strg_in->jg << strg_in->kg << std::endl;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
 
     Vector3 tempb1=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+1][strg_in->kg]->B3();
     Vector3 tempb2=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+1][strg_in->kg]->B3();
@@ -252,6 +324,18 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     Vector3 tempe6=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+1][strg_in->kg+1]->E3();
     Vector3 tempe7=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+2][strg_in->kg+1]->E3();
     Vector3 tempe8=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+2][strg_in->kg+1]->E3();
+<<<<<<< HEAD:PICmodel/particles.cpp
+=======
+    Vector3 gradB1=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+1][strg_in->kg]->GradB3();
+    Vector3 gradB2=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+1][strg_in->kg]->GradB3();
+    Vector3 gradB3=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+2][strg_in->kg]->GradB3();
+    Vector3 gradB4=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+2][strg_in->kg]->GradB3();
+    Vector3 gradB5=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+1][strg_in->kg+1]->GradB3();
+    Vector3 gradB6=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+1][strg_in->kg+1]->GradB3();
+    Vector3 gradB7=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+2][strg_in->kg+1]->GradB3();
+    Vector3 gradB8=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+2][strg_in->kg+1]->GradB3();
+    // iw jw kw are 0, 1, 2, ... , cellSize-1
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     double w1 = 1- (strg_in->iw +1) * (strg_in->jw +1) * (strg_in->kw +1) / cellSize3;
     double w2 = 1- (cellSize1- strg_in->iw)* (strg_in->jw +1) * (strg_in->kw +1) / cellSize3;
     double w3 = 1- (cellSize1- strg_in->iw) * (cellSize1- strg_in->jw) * (strg_in->kw +1) / cellSize3;
@@ -269,7 +353,11 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
                 
     tempb.Setz(tempb1.z()*w1 + tempb2.z()*w2 + tempb3.z()*w3 + tempb4.z()*w4 
                 + tempb5.z()*w5 + tempb6.z()*w6 + tempb7.z()*w7 + tempb8.z()*w8);
+<<<<<<< HEAD:PICmodel/particles.cpp
     std::cout << " tempb " << tempb.x() << " " << tempb.y() << " " << tempb.z() << " " << std::endl;
+=======
+//    std::cout << " tempb " << tempb.x() << " " << tempb.y() << " " << tempb.z() << " " << std::endl;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     
     Vector3 tempe;
     tempe.Setx(tempe1.x()*w1 + tempe2.x()*w2 + tempe3.x()*w3 + tempe4.x()*w4 
@@ -281,6 +369,7 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     tempe.Setz(tempe1.z()*w1 + tempe2.z()*w2 + tempe3.z()*w3 + tempe4.z()*w4 
                 + tempe5.z()*w5 + tempe6.z()*w6 + tempe7.z()*w7 + tempe8.z()*w8);
     
+<<<<<<< HEAD:PICmodel/particles.cpp
     std::cout << " tempe1 " << tempe.norm() <<" xyz "<< tempe.x() << " " << tempe.y() << " " << tempe.z() << " " << std::endl;
     
     // Revised E ( including gravity)
@@ -295,11 +384,42 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     std::cout << " tempPos2 " << tempPos.norm() << " xyz " << tempPos.x() << " " << tempPos.y() << " " << tempPos.z() << " " << std::endl;
     std::cout << " scale " << -1*gravity*radius*radius/tempPos.norm2() *mi0/qi0 << std::endl;
     std::cout << " tempe2 " << tempe.norm() <<" xyz " << tempe.x() << " " << tempe.y() << " " << tempe.z() << " " << std::endl;
+=======
+//    std::cout << " tempe1 " << tempe.norm() <<" xyz "<< tempe.x() << " " << tempe.y() << " " << tempe.z() << " " << std::endl;
+    
+    // 1 Revised E ( including gravity which is not accurate to the loation of unique particles)
+    Vector3 tempPos;
+    tempPos = ptrArray_in[strg_in->face][strg_in->ig +1][strg_in->jg +1][strg_in->kg]->Pos3();
+//    std::cout << " tempPos1 " << tempPos.norm() << " " << tempPos.norm2() << " xyz " << tempPos.x() << " " << tempPos.y() << " " << tempPos.z() << " " << std::endl;
+//    std::cout << std::endl << " L^2 " << radius*radius/tempPos.norm2() << " qtm " << qtm << std::endl;
+    
+    tempPos = tempPos.NormalizedVector().ScaleProduct(-1*gravity*radius*radius/tempPos.norm2() *mi0_in/qi0);
+    
+    // 2 Revised E ( including gradB at the location of unique particles)
+    Vector3 tempGradB;
+    tempGradB.Setx(gradB1.x()*w1 + gradB2.x()*w2 + gradB3.x()*w3 + gradB4.x()*w4 
+                + gradB5.x()*w5 + gradB6.x()*w6 + gradB7.x()*w7 + gradB8.x()*w8);
+    tempGradB.Sety(gradB1.x()*w1 + gradB2.x()*w2 + gradB3.x()*w3 + gradB4.x()*w4 
+                + gradB5.x()*w5 + gradB6.x()*w6 + gradB7.x()*w7 + gradB8.x()*w8);
+    tempGradB.Setz(gradB1.x()*w1 + gradB2.x()*w2 + gradB3.x()*w3 + gradB4.x()*w4 
+                + gradB5.x()*w5 + gradB6.x()*w6 + gradB7.x()*w7 + gradB8.x()*w8);
+
+    // mu / e , mu = m * v^2 / e / B
+    tempGradB = tempGradB.ScaleProduct( mu / qi0 );
+
+    // revised E including gravity and gradB
+    tempe = tempe.PlusProduct(tempPos).PlusProduct(tempGradB.ScaleProduct( -1.0));
+    
+//    std::cout << " tempPos2 " << tempPos.norm() << " xyz " << tempPos.x() << " " << tempPos.y() << " " << tempPos.z() << " " << std::endl;
+//    std::cout << " scale " << -1*gravity*radius*radius/tempPos.norm2() *mi0/qi0 << std::endl;
+//    std::cout << " tempe2 " << tempe.norm() <<" xyz " << tempe.x() << " " << tempe.y() << " " << tempe.z() << " " << std::endl;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     // 1.3 Vector3 t ; Vector3 s
     Vector3 t = tempb.ScaleProduct(qtm);
     Vector3 s = t.ScaleProduct(2/(1+t.norm2()));
     // 2. Boris equations
     
+<<<<<<< HEAD:PICmodel/particles.cpp
     std::cout << "t "<< t.x() << " " << t.y() << " " << t.z() << std::endl;
     std::cout << "s "<< s.x() << " " << s.y() << " " << s.z() << std::endl;
     std::cout << "vp1 "<< vp.x() << " " << vp.y() << " " << vp.z() << std::endl;
@@ -319,6 +439,17 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     
 //    int pause;
 //    std::cin >> pause;
+=======
+    // 2.1 equation I: v1 = v + E * qtm
+    Vector3 v1 = vp.PlusProduct(tempe.ScaleProduct(qtm));
+    // 2.2 equation II: v2 = v1 + v1 X t
+    Vector3 v2 = v1.PlusProduct(v1.CrossProduct(t));
+    // 2.3 equation III: v3 = v1 + v2 X s
+    Vector3 v3 = v1.PlusProduct(v2.CrossProduct(s));
+    // 2.4 equation IV: v = v3 + E * qtm
+    vp = v3.PlusProduct(tempe.ScaleProduct(qtm));
+
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/particles.cpp
     // 3. update the postion 
     return UpdateUint_64();
 

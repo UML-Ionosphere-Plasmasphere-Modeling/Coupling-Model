@@ -38,9 +38,25 @@ inline void XYZtoVel( )
 }
 //************************************************************************
 //************************************************************************
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
 // initialize Ex, Ey, Ez using electron momentum equation
 // with gradient Pe ( in r direction) and vel X B
 // - grad(Pe) / Ni = mi *g , quasi-neutrality He = Hi 
+=======
+// initialize vx, vy, vz of top boundary
+//************************************************************************
+//************************************************************************
+inline void SetVel_topBoundary( const Vector3& vel_in)
+{
+    v3 = vel_in;
+    ve3= vel_in;
+}
+
+//************************************************************************
+//************************************************************************
+// initialize Ex, Ey, Ez using electron momentum equation 
+// - vel X B
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 //************************************************************************
 //************************************************************************
 inline void XYZtoE()
@@ -48,10 +64,28 @@ inline void XYZtoE()
     Vector3 temp; // for calculating grad(Pe) term
     if( pos3.norm() > 0)
     {
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
     temp = pos3.NormalizedVector().ScaleProduct( mi0 * gravity);
     e3 = temp.PlusProduct( b3.CrossProduct(v3));
     }
 }
+=======
+//    temp = pos3.NormalizedVector().ScaleProduct( mi0_O * gravity);
+//    e3 = temp.PlusProduct( b3.CrossProduct(v3));
+    e3 = b3.CrossProduct(v3);
+    }
+}
+
+//************************************************************************
+//************************************************************************
+// initialize density
+//************************************************************************
+//************************************************************************
+inline void VeltoE_topBoundary()
+{
+    e3 = b3.CrossProduct(v3);
+}
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 //************************************************************************
 //************************************************************************
 // initialize density
@@ -59,9 +93,49 @@ inline void XYZtoE()
 //************************************************************************
 inline void XYZtoDensity( )
 {
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
     double scaleHeight = ikT / mi0 / gravity;
     if( pos3.norm() > 0)
     density = N0_i * mi0 * exp(-1 * (pos3.norm() - radius) / scaleHeight);              
+=======
+    double scaleHeight = ikT / mi0_H / gravity;
+    if( pos3.norm() > 0)
+    density_H = N0_H * mi0_H * exp(-1 * (pos3.norm() - radius) / scaleHeight);
+
+    scaleHeight = ikT / mi0_He / gravity;
+    if( pos3.norm() > 0)
+    density_He= N0_He * mi0_He * exp(-1 * (pos3.norm() - radius) / scaleHeight);
+    
+    scaleHeight = ikT / mi0_O / gravity;
+    if( pos3.norm() > 0)
+    density_O= N0_O * mi0_O * exp(-1 * (pos3.norm() - radius) / scaleHeight);  
+}
+//************************************************************************
+//************************************************************************
+// initialize GradBNorm
+//************************************************************************
+//************************************************************************
+inline void XYZtoGradBNorm()
+{
+    double r_xyz, r_xy;
+    double sintheta, costheta, sinphi, cosphi;
+    double fact_1, fact_2;
+
+    r_xyz = pos3.norm();
+    r_xy = pow( pow( pos3.x(), 2.0) + pow( pos3.y(), 2.0), 0.5);
+    sintheta = r_xy / r_xyz;
+    costheta = pos3.z() / r_xyz;
+    sinphi = pos3.y() / r_xy;
+    cosphi = pos3.x() / r_xy;
+
+    fact_1 = - 3.0 * pow( 1+ 3* pow(costheta,2.0), 0.5) / pow( r_xyz, 4.0);
+    fact_2 = - 3.0 * sintheta * costheta / pow( r_xyz, 4.0) / pow( 1+ 3* pow(costheta,2.0), 0.5);
+        
+    gradB3.Setx( fact_1 * sintheta * cosphi + fact_2 * costheta * cosphi);
+    gradB3.Sety( fact_1 * sintheta * sinphi + fact_2 * costheta * sinphi);
+    gradB3.Setz( fact_1 * costheta - fact_2 * sintheta);
+
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 }
 
 //************************************************************************
@@ -118,7 +192,13 @@ inline void InttoPos3( int face, int i, int j, int k)
 //************************************************************************
 inline void ResetParameters()
 {
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
     density = 0.0;
+=======
+    density_H = 0.0;
+    density_He = 0.0;
+    density_O = 0.0;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
     v3 = Vector3( 0.0, 0.0, 0.0);
 }
 
@@ -130,18 +210,42 @@ inline void ResetParameters()
 // Vector3 vp_in: velocity of each simulation particle
 //************************************************************************
 //************************************************************************
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
 inline void UpdateDueToWgt( int iw, int jw, int kw, double mass_in, Vector3 vp_in)
 {
     density += mass_in * (iw+1) * (jw+1) * (kw+1) / cellSize3; // acutally is mass not density
     v3 = v3.PlusProduct( Vector3( mass_in * vp_in.x() * (iw+1) * (jw+1) * (kw+1) / cellSize3,
                                   mass_in * vp_in.y() * (iw+1) * (jw+1) * (kw+1) / cellSize3,
                                   mass_in * vp_in.z() * (iw+1) * (jw+1) * (kw+1) / cellSize3
+=======
+inline void UpdateDueToWgt( int iw, int jw, int kw, double mass_in, Vector3 vp_in, int particle)
+{
+    switch (particle)
+    {
+    case 1: {
+    density_H  += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    break;}
+    case 4:{
+    density_He += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    break;}
+    case 16:{
+    density_O  += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    break;}
+    default:
+    break;
+    }
+    
+    v3 = v3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                  mass_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                  mass_in * vp_in.z() * iw * jw * kw / cellSize3
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
                                 ));
 }
 // After all simulation are calculated once, the density means the total 
 // mass at each grid points, and the v3 means the total momentum. 
 inline void UpdateDueToWgt( GridsPoints***** ptrArray_in, double volume_in)
 {
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
     v3 = v3.ScaleProduct(1/density);
 
     density = density / volume_in;
@@ -178,14 +282,64 @@ inline Vector3 divPe()
 inline void updateE( Vector3 Ve_in, Vector3 GradPe_in)
 {
     e3 = b3.CrossProduct(Ve_in).MinusProduct(GradPe_in.ScaleProduct(1/density));
+=======
+    if ( density_H != 0.0 || density_He != 0.0 || density_O != 0.0)
+    {
+    v3 = v3.ScaleProduct(1.0 / (density_H + density_He + density_O) / updateInfoPeriod);
+    density_H = density_H / volume_in / updateInfoPeriod;
+    density_He = density_He / volume_in / updateInfoPeriod;
+    density_O = density_O / volume_in / updateInfoPeriod;
+    }
+}
+
+// update E from electron's momentum equation
+// E = - Ve X B - grad Pe / N / qi0
+// input grad Pe at grids
+
+inline void updateE( Vector3 GradPe_in)
+{
+    if( update_type == 0)
+    {
+    e3 = b3.CrossProduct(v3).MinusProduct(GradPe_in.ScaleProduct(1 / (density_H / mi0_H + density_He / mi0_He + density_O / mi0_O) / qi0));
+    } else
+    {
+    e3 = b3.CrossProduct(ve3).MinusProduct(GradPe_in.ScaleProduct(1 / (density_H / mi0_H + density_He / mi0_He + density_O / mi0_O) / qi0));
+    }
+    
+}
+
+// Update ve from ampere's law
+// ve = vi - curl B / mu0 / qi0 / total number density
+// input curl B
+inline void updateve3( Vector3 curlB_in)
+{
+    ve3 = v3.MinusProduct( curlB_in.ScaleProduct( 1/ (density_H / mi0_H + density_He / mi0_He + density_O / mi0_O) / qi0 / mu0));
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 }
 
 // update B from Faraday's Law
 // B = B - tstep * (curl E)
 // input (curl E)
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
 void updateB( Vector3 E_in)
 {
     b3 = b3.PlusProduct( E_in.ScaleProduct(-1 * tstep));
+=======
+void updatedB( Vector3 E_in)
+{
+
+    dB3 = dB3.PlusProduct( E_in.ScaleProduct(-1 * tstep * updateInfoPeriod));
+}
+
+
+
+
+
+// return Vector3 gradB3
+inline Vector3 GradB3()
+{
+    return gradB3;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 }
 
 // return Vector3 e3
@@ -193,11 +347,29 @@ inline Vector3 E3()
 {
     return e3;
 }
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
 
 // return Vector3 B3
 inline Vector3 B3()
 { 
     return b3;
+=======
+// return Vector3 b3 only
+inline Vector3 B3_base()
+{
+    return b3;
+}
+// return Vector3 B3
+inline Vector3 B3()
+{ 
+    return b3.PlusProduct(dB3);
+}
+
+// return Vector3 dB3
+inline Vector3 DB3()
+{
+    return dB3;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 }
 
 // return Vector3 pos3
@@ -209,21 +381,99 @@ inline Vector3 Pos3()
 // return density
 inline double Density()
 {
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
     return density;
 }
 
+=======
+    return density_H + density_He + density_O;
+}
+
+// return density of H
+inline double Density_H()
+{
+    return density_H;
+}
+
+// return density of H
+inline double Density_He()
+{
+    return density_He;
+}
+
+// return density of H
+inline double Density_O()
+{
+    return density_O;
+}
+// set density 
+inline double Density_H( double den_in)
+{
+    density_H = den_in;
+}
+inline double Density_He( double den_in)
+{
+    density_He = den_in;
+}
+inline double Density_O( double den_in)
+{
+    density_O = den_in;
+}
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 // return velocity
 inline Vector3 Vel3()
 {
     return v3;
 }
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
+=======
+
+// return velocity e3
+inline Vector3 Vel_e3()
+{
+    return ve3;
+}
+
+// return stopSign
+inline int StopSign()
+{
+    return stopSign;
+}
+
+// set temperature
+inline void SetTemperature( double temperature_in)
+{
+    temperature = temperature_in;
+}
+inline double Temperature( )
+{
+    return temperature;
+}
+// set stopSign
+inline void SetStopSign( int stopSign_in)
+{
+    stopSign = stopSign_in;
+}
+
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 //////////////////////////    
     // Constructors
     GridsPoints( double px_in, double py_in, double pz_in,
                  double ex_in, double ey_in, double ez_in,
                  double bx_in, double by_in, double bz_in,
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
                  double vx_in, double vy_in, double vz_in,
                  double density_in);
+=======
+                 double dBx_in,double dBy_in,double dBz_in,
+                 double vx_in, double vy_in, double vz_in,
+                 double vex_in, double vey_in, double vez_in,
+                 double gradBx_in, double gradBy_in, double gradBz_in,
+                 double density_H_in, double density_He_in, double density_O_in,
+                 double temperature_in,
+                 int stopSign_in);
+                 
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
     GridsPoints( const GridsPoints& other);
 
     GridsPoints();
@@ -232,10 +482,28 @@ inline Vector3 Vel3()
     private:
     Vector3 pos3;            // pos3: position for vector 3
     Vector3 e3;             // e3
+<<<<<<< HEAD:PICmodel/fieldsgrids.h
     Vector3 b3;             // b3
     Vector3 v3;             // velocity3
 
     double density;
+=======
+
+    Vector3 b3;             // b3
+    Vector3 dB3;            // perturbation of b3
+    
+    Vector3 v3;             // average ions velocity3
+    Vector3 ve3;            // e velocity
+
+    Vector3 gradB3;          // gradB in which B is norm of vector3 B
+
+    double density_H;    // mass density
+    double density_He;   // mass density
+    double density_O;    // mass density
+
+    double temperature;     // electron temperature: Te
+    int stopSign;
+>>>>>>> 865083259b6dad8f4208c771b239bab419e7fcb4:PICmodel/fieldsgrids.h
 //    int face; int gi; int gj; int gk; //face, i, j, in fieldsgrids, radial
 };
 #endif
