@@ -220,6 +220,9 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0);
                 ptrArray[0][i][j][k]->InttoPos3( 0, i, j, k);                                        
                 ptrArray[0][i][j][k]->XYZtoB(ptrArray[0][i][j][k]->Pos3());
@@ -249,6 +252,9 @@ GridsPoints***** GridsCreation()
             for( int k = 0; k <= fieldsGridsSize; k++)
             {
                 ptrArray[1][i][j][k] = new GridsPoints( 0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
@@ -291,6 +297,9 @@ GridsPoints***** GridsCreation()
             for( int k = 0; k <= fieldsGridsSize; k++)
             {
                 ptrArray[2][i][j][k] = new GridsPoints( 0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
@@ -342,6 +351,9 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0);
                 ptrArray[4][i][j][k]->InttoPos3( 4, i, j, k);                                        
                 ptrArray[4][i][j][k]->XYZtoB(ptrArray[4][i][j][k]->Pos3());
@@ -385,6 +397,9 @@ GridsPoints***** GridsCreation()
             for( int k = 0; k <= fieldsGridsSize; k++)
             {
                 ptrArray[5][i][j][k] = new GridsPoints( 0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
@@ -444,6 +459,9 @@ GridsPoints***** GridsCreation()
             for( int k = 0; k <= fieldsGridsSize; k++)
             {
                 ptrArray[3][i][j][k] = new GridsPoints( 0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
@@ -544,8 +562,14 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0);
             ptrArray[face][0][fieldsGridsSize+2][k] = new GridsPoints( 0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
@@ -562,8 +586,14 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0);
             ptrArray[face][fieldsGridsSize+2][fieldsGridsSize+2][k] = new GridsPoints( 0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
+                                                        0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
                                                         0.0, 0.0, 0.0,
@@ -1650,8 +1680,14 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     H5std_string MEMBER_dB3( "dB3");
 
     H5std_string MEMBER_v3( "v3");
+    H5std_string MEMBER_vH3( "vH3");
+    H5std_string MEMBER_vHe3( "vHe3");
+    H5std_string MEMBER_vO3( "vO3");
     H5std_string MEMBER_ve3( "ve3");
 
+    H5std_string MEMBER_densityH( "densityH");
+    H5std_string MEMBER_densityHe( "densityHe");
+    H5std_string MEMBER_densityO( "densityO");
     H5std_string MEMBER_density( "density");
     H5std_string MEMBER_te( "temperature");
 
@@ -1669,17 +1705,20 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
         Vector3_h5 dB3;
 
         Vector3_h5 v3;
+        Vector3_h5 vH3;
+        Vector3_h5 vHe3;
+        Vector3_h5 vO3;
         Vector3_h5 ve3;
 
         double density;
-    } GridsPoints_h5;
+    } GridsPoints_h5;   // varies with timeline
 
     typedef struct GridsPoints_const_h5{
         Vector3_h5 pos3;
         Vector3_h5 b3;
 
         double temperature;
-    } GridsPoints_const_h5;
+    } GridsPoints_const_h5;     // dont varies with timeline
 
 
     // Apply for continus memory 
@@ -1708,6 +1747,12 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
                     array_data[face][i][j][k].v3 
                         = {ptrArray_in[face][i+1][j+1][k]->Vel3().x(), ptrArray_in[face][i+1][j+1][k]->Vel3().y(), ptrArray_in[face][i+1][j+1][k]->Vel3().z()} ;
+                    array_data[face][i][j][k].vH3 
+                        = {ptrArray_in[face][i+1][j+1][k]->VelH3().x(), ptrArray_in[face][i+1][j+1][k]->VelH3().y(), ptrArray_in[face][i+1][j+1][k]->VelH3().z()} ;
+                    array_data[face][i][j][k].vHe3 
+                        = {ptrArray_in[face][i+1][j+1][k]->VelHe3().x(), ptrArray_in[face][i+1][j+1][k]->VelHe3().y(), ptrArray_in[face][i+1][j+1][k]->VelHe3().z()} ;
+                    array_data[face][i][j][k].vO3 
+                        = {ptrArray_in[face][i+1][j+1][k]->VelO3().x(), ptrArray_in[face][i+1][j+1][k]->VelO3().y(), ptrArray_in[face][i+1][j+1][k]->VelO3().z()} ;
 
                     array_data[face][i][j][k].ve3 
                         = {ptrArray_in[face][i+1][j+1][k]->Vel_e3().x(), ptrArray_in[face][i+1][j+1][k]->Vel_e3().y(), ptrArray_in[face][i+1][j+1][k]->Vel_e3().z()} ;
@@ -1772,6 +1817,9 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
         mtype_grids.insertMember( MEMBER_dB3, HOFFSET(GridsPoints_h5,dB3), mtype_vector3);
         
         mtype_grids.insertMember( MEMBER_v3, HOFFSET(GridsPoints_h5,v3), mtype_vector3);
+        mtype_grids.insertMember( MEMBER_vH3, HOFFSET(GridsPoints_h5,vH3), mtype_vector3);
+        mtype_grids.insertMember( MEMBER_vHe3, HOFFSET(GridsPoints_h5,vHe3), mtype_vector3);
+        mtype_grids.insertMember( MEMBER_vO3, HOFFSET(GridsPoints_h5,vO3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
         
         mtype_grids.insertMember( MEMBER_density, HOFFSET(GridsPoints_h5,density), PredType::NATIVE_DOUBLE);
@@ -1817,6 +1865,9 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
         mtype_grids.insertMember( MEMBER_dB3, HOFFSET(GridsPoints_h5,dB3), mtype_vector3);
 
         mtype_grids.insertMember( MEMBER_v3, HOFFSET(GridsPoints_h5,v3), mtype_vector3);
+        mtype_grids.insertMember( MEMBER_vH3, HOFFSET(GridsPoints_h5,vH3), mtype_vector3);
+        mtype_grids.insertMember( MEMBER_vHe3, HOFFSET(GridsPoints_h5,vHe3), mtype_vector3);
+        mtype_grids.insertMember( MEMBER_vO3, HOFFSET(GridsPoints_h5,vO3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
 
         mtype_grids.insertMember( MEMBER_density, HOFFSET(GridsPoints_h5,density), PredType::NATIVE_DOUBLE);

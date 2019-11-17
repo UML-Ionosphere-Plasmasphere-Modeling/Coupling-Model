@@ -177,6 +177,9 @@ inline void ResetParameters()
     density_He = 0.0;
     density_O = 0.0;
     v3 = Vector3( 0.0, 0.0, 0.0);
+    vH3 = Vector3( 0.0, 0.0, 0.0);
+    vHe3 = Vector3( 0.0, 0.0, 0.0);
+    vO3 = Vector3( 0.0, 0.0, 0.0);
 }
 
 //************************************************************************
@@ -193,12 +196,21 @@ inline void UpdateDueToWgt( int iw, int jw, int kw, double mass_in, Vector3 vp_i
     {
     case 1: {
     density_H  += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    vH3 = vH3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                     mass_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                    mass_in * vp_in.z() * iw * jw * kw / cellSize3 ));
     break;}
     case 4:{
     density_He += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    vHe3 = vHe3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                     mass_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                    mass_in * vp_in.z() * iw * jw * kw / cellSize3 ));
     break;}
     case 16:{
     density_O  += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    vO3 = vO3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                     mass_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                    mass_in * vp_in.z() * iw * jw * kw / cellSize3 ));
     break;}
     default:
     break;
@@ -215,10 +227,38 @@ inline void UpdateDueToWgt( GridsPoints***** ptrArray_in, double volume_in)
 {
     if ( density_H != 0.0 || density_He != 0.0 || density_O != 0.0)
     {
-    v3 = v3.ScaleProduct(1.0 / (density_H + density_He + density_O) / updateInfoPeriod);
-    density_H = density_H / volume_in / updateInfoPeriod;
-    density_He = density_He / volume_in / updateInfoPeriod;
-    density_O = density_O / volume_in / updateInfoPeriod;
+        v3 = v3.ScaleProduct(1.0 / (density_H + density_He + density_O) / updateInfoPeriod);
+       
+        if( density_H != 0)
+        {
+            vH3= vH3.ScaleProduct(1.0 / density_H / updateInfoPeriod);
+        } else
+        {
+            vH3 = Vector3( 0.0, 0.0, 0.0);
+        }
+
+        if( density_He !=0)
+        {
+        vHe3= vHe3.ScaleProduct(1.0 / density_He / updateInfoPeriod);
+        } else
+        {
+            vHe3 = Vector3( 0.0, 0.0, 0.0);
+        }
+
+        if( density_O !=0)
+        {
+            vO3= vO3.ScaleProduct(1.0 / density_O / updateInfoPeriod);
+        } else
+        {
+            vO3 = Vector3( 0.0, 0.0, 0.0);
+        }
+        
+        density_H = density_H / volume_in / updateInfoPeriod;
+        density_He = density_He / volume_in / updateInfoPeriod;
+        density_O = density_O / volume_in / updateInfoPeriod;
+    } else
+    {
+        v3 = Vector3( 0.0, 0.0, 0.0);
     }
 }
 
@@ -335,6 +375,21 @@ inline Vector3 Vel3()
     return v3;
 }
 
+inline Vector3 VelH3()
+{
+    return vH3;
+}
+
+inline Vector3 VelHe3()
+{
+    return vHe3;
+}
+
+inline Vector3 VelO3()
+{
+    return vO3;
+}
+
 // return velocity e3
 inline Vector3 Vel_e3()
 {
@@ -369,6 +424,9 @@ inline void SetStopSign( int stopSign_in)
                  double bx_in, double by_in, double bz_in,
                  double dBx_in,double dBy_in,double dBz_in,
                  double vx_in, double vy_in, double vz_in,
+                 double vHx_in, double vHy_in, double vHz_in,
+                 double vHex_in, double vHey_in, double vHez_in,
+                 double vOx_in, double vOy_in, double vOz_in,
                  double vex_in, double vey_in, double vez_in,
                  double gradBx_in, double gradBy_in, double gradBz_in,
                  double density_H_in, double density_He_in, double density_O_in,
@@ -388,6 +446,10 @@ inline void SetStopSign( int stopSign_in)
     Vector3 dB3;            // perturbation of b3
     
     Vector3 v3;             // average ions velocity3
+    Vector3 vH3;
+    Vector3 vHe3;
+    Vector3 vO3;
+
     Vector3 ve3;            // e velocity
 
     Vector3 gradB3;          // gradB in which B is norm of vector3 B
