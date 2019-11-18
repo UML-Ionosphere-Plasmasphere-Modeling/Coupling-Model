@@ -715,11 +715,11 @@ Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray
                             continue;
 
 
-                Vector3 test = AreaVectorL( ptrArray_in, face_in, i, j, k);
+        /*        Vector3 test = AreaVectorL( ptrArray_in, face_in, i, j, k);
                 std::cout << test.x() << " " << test.y() << " " << test.z() << " " << test.norm();
                 int pause;
                 std::cin >> pause;
-        
+        */
                 // for each cell, calculate sum(n X B( on face)) and devided by
                 // Volume to get the curl B at the center of cell
                 Vector3 temp = AreaVectorL( ptrArray_in, face_in, i, j, k).CrossProduct(
@@ -2729,6 +2729,9 @@ void ProcessFunc()
             if( update_type == 0)
             {
             // Update E without current
+            // Calculate curl dB update ve3, ve3 = v3
+            ptrVectorCellArray = ValueCurlField( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'D');
+            UpdateVe3( ptrVectorCellArray, ptrArray, face);
             // Calculate the gradient of Pe
             ptrVectorCellArray = ValueGradient( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'P');
             UpdateE3( ptrVectorCellArray, ptrArray, face); // update E
