@@ -715,12 +715,11 @@ Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray
                             continue;
 
 
-        /*        Vector3 test = AreaVectorL( ptrArray_in, face_in, i, j, k).CrossProduct(
-                               FaceFieldVectorL(ptrArray_in, face_in, i, j, k, field_in));
-                std::cout << test.x() << " " << test.y() << " " << test.z();
+                Vector3 test = AreaVectorL( ptrArray_in, face_in, i, j, k);
+                std::cout << test.x() << " " << test.y() << " " << test.z() << " " << test.norm();
                 int pause;
                 std::cin >> pause;
-        */
+        
                 // for each cell, calculate sum(n X B( on face)) and devided by
                 // Volume to get the curl B at the center of cell
                 Vector3 temp = AreaVectorL( ptrArray_in, face_in, i, j, k).CrossProduct(
@@ -1967,7 +1966,11 @@ double*** VolumeCellsField( GridsPoints***** ptrArray_in)
             for( int k = 0; k< fieldsGridsSize; k++)
             {
                 VolumeCellsArray[i][j][k] = CellVolume( ptrArray_in, 0, i, j, k);
-    //            std::cout << s<< " " << i << j << k << std::endl;
+            /*  if( VolumeCellsArray[i][j][k] == 0){
+                std::cout << i << " " << j << " " << k << std::endl;
+                std::cout << VolumeCellsArray[i][j][k] << std::endl;
+                }
+            */
             }
         }
     }

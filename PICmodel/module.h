@@ -528,10 +528,13 @@ inline double CellVolume(GridsPoints***** ptrArray_in, int face_in, int i_in, in
    
     double avgArea = AreaVectorBack(ptrArray_in, face_in, i_in, j_in, k_in).PlusProduct(
                      AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).ScaleProduct(-1.0)).norm()/2.0;
-//    std::cout << " test" << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).x() << " " 
-//              << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).y() << " "
-//              << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).z() << " ";
-    return normV * avgArea;
+/*    std::cout << " test" << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).x() << " " 
+                << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).y() << " "
+                << AreaVectorF(ptrArray_in, face_in, i_in, j_in, k_in).z() << " "
+                << normV * avgArea;
+    int pause;
+    std::cin >> pause;
+*/    return normV * avgArea;
 }
 
 //************************************************************************
