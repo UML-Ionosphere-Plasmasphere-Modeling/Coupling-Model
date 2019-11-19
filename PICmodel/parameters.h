@@ -79,6 +79,10 @@
  //   const int numMin = round(log10(LMin)/logRatio);
 //    const int numMax = numMin + radialGridsSize;
     const double LMax = LMin * pow(ratio, fieldsGridsSize);
+
+    
+    const double LMin_maindomain = LMin * pow(ratio, 1.0);
+    const double LMax_maindomain = LMin * pow(ratio, fieldsGridsSize-1);
 //************************************************************************
 //************************************************************************
 // run time control

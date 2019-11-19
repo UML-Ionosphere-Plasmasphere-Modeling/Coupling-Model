@@ -110,7 +110,7 @@ int Particles::UpdateUint_64()
     L = sqrt(pow(px,2.0)+pow(py,2.0)+pow(pz,2.0))/radius;
 
     // check if in the main domain
-    if( L > LMax || L < LMin) 
+    if( L > LMax_maindomain || L < LMin_maindomain) 
     {
         check = 1;
         return check;

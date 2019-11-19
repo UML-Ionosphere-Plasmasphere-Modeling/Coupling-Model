@@ -1678,15 +1678,15 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     H5std_string MEMBER_b3( "b3");
     H5std_string MEMBER_dB3( "dB3");
 
+    H5std_string MEMBER_ve3( "ve3");
     H5std_string MEMBER_v3( "v3");
     H5std_string MEMBER_vH3( "vH3");
     H5std_string MEMBER_vHe3( "vHe3");
     H5std_string MEMBER_vO3( "vO3");
-    H5std_string MEMBER_ve3( "ve3");
 
-    H5std_string MEMBER_densityH( "densityH");
-    H5std_string MEMBER_densityHe( "densityHe");
-    H5std_string MEMBER_densityO( "densityO");
+    H5std_string MEMBER_density_H( "densityH");
+    H5std_string MEMBER_density_He( "densityHe");
+    H5std_string MEMBER_density_O( "densityO");
     H5std_string MEMBER_density( "density");
     H5std_string MEMBER_te( "temperature");
 
@@ -1700,16 +1700,18 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
     typedef struct GridsPoints_h5{
         Vector3_h5 e3;
-
         Vector3_h5 dB3;
 
+        Vector3_h5 ve3;
         Vector3_h5 v3;
         Vector3_h5 vH3;
         Vector3_h5 vHe3;
         Vector3_h5 vO3;
-        Vector3_h5 ve3;
 
         double density;
+        double density_H;
+        double density_He;
+        double density_O;
     } GridsPoints_h5;   // varies with timeline
 
     typedef struct GridsPoints_const_h5{
@@ -1743,7 +1745,10 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
                     array_data[face][i][j][k].dB3 
                         = {ptrArray_in[face][i+1][j+1][k]->DB3().x(), ptrArray_in[face][i+1][j+1][k]->DB3().y(), ptrArray_in[face][i+1][j+1][k]->DB3().z()} ;
-
+                    
+                    array_data[face][i][j][k].ve3 
+                        = {ptrArray_in[face][i+1][j+1][k]->Vel_e3().x(), ptrArray_in[face][i+1][j+1][k]->Vel_e3().y(), ptrArray_in[face][i+1][j+1][k]->Vel_e3().z()} ;
+                    
                     array_data[face][i][j][k].v3 
                         = {ptrArray_in[face][i+1][j+1][k]->Vel3().x(), ptrArray_in[face][i+1][j+1][k]->Vel3().y(), ptrArray_in[face][i+1][j+1][k]->Vel3().z()} ;
                     array_data[face][i][j][k].vH3 
@@ -1753,11 +1758,14 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
                     array_data[face][i][j][k].vO3 
                         = {ptrArray_in[face][i+1][j+1][k]->VelO3().x(), ptrArray_in[face][i+1][j+1][k]->VelO3().y(), ptrArray_in[face][i+1][j+1][k]->VelO3().z()} ;
 
-                    array_data[face][i][j][k].ve3 
-                        = {ptrArray_in[face][i+1][j+1][k]->Vel_e3().x(), ptrArray_in[face][i+1][j+1][k]->Vel_e3().y(), ptrArray_in[face][i+1][j+1][k]->Vel_e3().z()} ;
-                    
                     array_data[face][i][j][k].density
                         = ptrArray_in[face][i+1][j+1][k]->Density();
+                    array_data[face][i][j][k].density
+                        = ptrArray_in[face][i+1][j+1][k]->Density_H();
+                    array_data[face][i][j][k].density
+                        = ptrArray_in[face][i+1][j+1][k]->Density_He();
+                    array_data[face][i][j][k].density
+                        = ptrArray_in[face][i+1][j+1][k]->Density_O();
                     //    std::cout << array_data[face][i][j][k].b3.v_x << std::endl;
                 }
             }
@@ -1800,10 +1808,7 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     hsize_t dim[] = {totalFace,fieldsGridsSize+1,fieldsGridsSize+1,fieldsGridsSize+1};
     DataSpace space( RANK, dim);
 
-    if(h5FileCheck_in == 0)
-    {
-        H5File* file = new H5File( FILE_NAME, H5F_ACC_TRUNC);
-        h5FileCheck = 1;
+
         // non-const group variables
         CompType mtype_vector3( sizeof( Vector3_h5));
         mtype_vector3.insertMember( MEMBERx, HOFFSET(Vector3_h5,v_x), PredType::NATIVE_DOUBLE);
@@ -1815,19 +1820,17 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
         mtype_grids.insertMember( MEMBER_dB3, HOFFSET(GridsPoints_h5,dB3), mtype_vector3);
         
+        mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_v3, HOFFSET(GridsPoints_h5,v3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_vH3, HOFFSET(GridsPoints_h5,vH3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_vHe3, HOFFSET(GridsPoints_h5,vHe3), mtype_vector3);
         mtype_grids.insertMember( MEMBER_vO3, HOFFSET(GridsPoints_h5,vO3), mtype_vector3);
-        mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
         
         mtype_grids.insertMember( MEMBER_density, HOFFSET(GridsPoints_h5,density), PredType::NATIVE_DOUBLE);
 
-        DataSet* dataset;
-        dataset = new DataSet(file->createDataSet(DATASET_NAME, mtype_grids, space));
-        dataset->write( array_data[0][0][0], mtype_grids);
-
-
+        mtype_grids.insertMember( MEMBER_density_H, HOFFSET(GridsPoints_h5,density_H), PredType::NATIVE_DOUBLE);
+        mtype_grids.insertMember( MEMBER_density_He, HOFFSET(GridsPoints_h5,density_He), PredType::NATIVE_DOUBLE);
+        mtype_grids.insertMember( MEMBER_density_O, HOFFSET(GridsPoints_h5,density_O), PredType::NATIVE_DOUBLE);
 
         // const group variables
         CompType mtype_grids_const( sizeof( GridsPoints_const_h5));
@@ -1836,6 +1839,15 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
         mtype_grids_const.insertMember( MEMBER_te, HOFFSET(GridsPoints_const_h5,temperature), PredType::NATIVE_DOUBLE);
 
+
+
+    if(h5FileCheck_in == 0)
+    {
+        H5File* file = new H5File( FILE_NAME, H5F_ACC_TRUNC);
+        h5FileCheck = 1;
+        DataSet* dataset;
+        dataset = new DataSet(file->createDataSet(DATASET_NAME, mtype_grids, space));
+        dataset->write( array_data[0][0][0], mtype_grids);
 
         DataSet* dataset_const;
         dataset_const = new DataSet(file->createDataSet( DATASET_CONST_NAME, mtype_grids_const, space));
@@ -1852,25 +1864,7 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     else
     {
         H5File* file = new H5File( FILE_NAME, H5F_ACC_RDWR);
-
-        CompType mtype_vector3( sizeof( Vector3_h5));
-        mtype_vector3.insertMember( MEMBERx, HOFFSET(Vector3_h5,v_x), PredType::NATIVE_DOUBLE);
-        mtype_vector3.insertMember( MEMBERy, HOFFSET(Vector3_h5,v_y), PredType::NATIVE_DOUBLE);
-        mtype_vector3.insertMember( MEMBERz, HOFFSET(Vector3_h5,v_z), PredType::NATIVE_DOUBLE);
-
-        CompType mtype_grids( sizeof( GridsPoints_h5));
-        mtype_grids.insertMember( MEMBER_e3, HOFFSET(GridsPoints_h5,e3), mtype_vector3);
-
-        mtype_grids.insertMember( MEMBER_dB3, HOFFSET(GridsPoints_h5,dB3), mtype_vector3);
-
-        mtype_grids.insertMember( MEMBER_v3, HOFFSET(GridsPoints_h5,v3), mtype_vector3);
-        mtype_grids.insertMember( MEMBER_vH3, HOFFSET(GridsPoints_h5,vH3), mtype_vector3);
-        mtype_grids.insertMember( MEMBER_vHe3, HOFFSET(GridsPoints_h5,vHe3), mtype_vector3);
-        mtype_grids.insertMember( MEMBER_vO3, HOFFSET(GridsPoints_h5,vO3), mtype_vector3);
-        mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
-
-        mtype_grids.insertMember( MEMBER_density, HOFFSET(GridsPoints_h5,density), PredType::NATIVE_DOUBLE);
-
+  
         DataSet* dataset;
         dataset = new DataSet(file->createDataSet(DATASET_NAME, mtype_grids, space));
         dataset->write( array_data[0][0][0], mtype_grids);
@@ -2204,7 +2198,7 @@ double  MLON12=atan(sin(PLAT)*tan(GLONR-PLON));
         {
             for( int j = 1; j < fieldsGridsSize+2; j++)
             {
-                for( int k = 1; k < fieldsGridsSize; k++)
+                for( int k = 0; k < fieldsGridsSize+1; k++)
                 {           
                     // set stopSign  
                     ptrArray_in[face][i][j][k]->SetStopSign(0);
@@ -2232,6 +2226,7 @@ void SetBotBoundary( GridsPoints***** ptrArray_in)
 */
     // Set the dawn and equatorial point as zero point
     
+    std::cout << " Set Bot boundary " << std::endl;
     for( int face = 0; face < totalFace; face++)
     {
         for( int i = 1; i < fieldsGridsSize+2; i++)
@@ -2240,6 +2235,7 @@ void SetBotBoundary( GridsPoints***** ptrArray_in)
             {
                 int k = 0;
     if( ptrArray_in[face][i][j][k]->StopSign() == 1) continue;
+
     double x = ptrArray_in[face][i][j][k]->Pos3().x();
     double y = ptrArray_in[face][i][j][k]->Pos3().y();
     double z = ptrArray_in[face][i][j][k]->Pos3().z();
@@ -2311,6 +2307,7 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double c0 = radius * cos( c0_latitude);
     double t0 = t0_convection;
 
+    std::cout << " Set Top boundary " << std::endl;
     //non-circle
     for( int face = 0; face < totalFace; face++)
     {
