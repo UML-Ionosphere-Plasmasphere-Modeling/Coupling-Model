@@ -231,7 +231,11 @@ GridsPoints***** GridsCreation()
                 ptrArray[0][i][j][k]->XYZtoDensity();
                 ptrArray[0][i][j][k]->SetStopSign(0);
                 ptrArray[0][i][j][k]->SetTemperature(0.0);
-            }
+        /*        if( k == fieldsGridsSize) std::cout << ptrArray[0][i][j][k]->Vel3().x() <<
+                    " " <<ptrArray[0][i][j][k]->Vel3().x() << " "
+                    << ptrArray[0][i][j][k]->Vel3().y() << " "
+                    << ptrArray[0][i][j][k]->Vel3().z() << std::endl;
+        */    }
         }
     }
     
@@ -1760,11 +1764,11 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
                     array_data[face][i][j][k].density
                         = ptrArray_in[face][i+1][j+1][k]->Density();
-                    array_data[face][i][j][k].density
+                    array_data[face][i][j][k].density_H
                         = ptrArray_in[face][i+1][j+1][k]->Density_H();
-                    array_data[face][i][j][k].density
+                    array_data[face][i][j][k].density_He
                         = ptrArray_in[face][i+1][j+1][k]->Density_He();
-                    array_data[face][i][j][k].density
+                    array_data[face][i][j][k].density_O
                         = ptrArray_in[face][i+1][j+1][k]->Density_O();
                     //    std::cout << array_data[face][i][j][k].b3.v_x << std::endl;
                 }
@@ -2439,10 +2443,10 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     ptrArray_in[face][i][j][k]->Density_H( N_H * mi0_H);
          
     double N_He = N0_He * exp(-1.0 * (ptrArray_in[face][i][j][k]->Pos3().norm() - radius) / (ikT / mi0_He / gravity));
-    ptrArray_in[face][i][j][k]->Density_H( N_He * mi0_He);
+    ptrArray_in[face][i][j][k]->Density_He( N_He * mi0_He);
 
     double N_O = N0_O * exp(-1.0 * (ptrArray_in[face][i][j][k]->Pos3().norm() - radius) / (ikT / mi0_O / gravity));
-    ptrArray_in[face][i][j][k]->Density_H( N_O * mi0_O);   
+    ptrArray_in[face][i][j][k]->Density_O( N_O * mi0_O);   
 
     // set stopSign
     ptrArray_in[face][i][j][k]->SetStopSign(1);
@@ -2530,8 +2534,11 @@ void ProcessFunc()
     // Prerun 1.1 // And then E (electron momentum equation).
     cout << " Create Grids" << endl;
     GridsPoints***** ptrArray =  GridsCreation();
+
     Titheridge_Te( ptrArray); // initial Temprature of electron
+std::cout << ptrArray[0][0][1][fieldsGridsSize]->Vel3().x() << endl;
     SetTopBoundary( ptrArray);
+std::cout << ptrArray[0][0][1][fieldsGridsSize]->Vel3().x() << endl;
     SetBotBoundary( ptrArray);
 
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
