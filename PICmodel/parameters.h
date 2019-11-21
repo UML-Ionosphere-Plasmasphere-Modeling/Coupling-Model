@@ -56,7 +56,7 @@
     // fieldGridsLevel max shouble better be 9 
     // particlesGridsLevel max should be 10 greater than fieldGridsLevel
     
-    const int fieldsGridsLevel = 4;
+    const int fieldsGridsLevel = 3;
     const int particlesGridsLevel = fieldsGridsLevel + 10;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
@@ -121,11 +121,12 @@
 //************************************************************************
 //************************************************************************
 // For top boundary initialization, in degree
+// c0_latitude > r0_latitude
 //************************************************************************
 //************************************************************************ 
     const double r0_latitude = 60.0;
     const double c0_latitude = 65.0;
-    const double t0_convection = 1800.0;
+    const double t0_convection = 18000.0;
 //************************************************************************
 //************************************************************************
 // For bpt boundary initialization, in degree

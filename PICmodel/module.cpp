@@ -231,11 +231,10 @@ GridsPoints***** GridsCreation()
                 ptrArray[0][i][j][k]->XYZtoDensity();
                 ptrArray[0][i][j][k]->SetStopSign(0);
                 ptrArray[0][i][j][k]->SetTemperature(0.0);
-        /*        if( k == fieldsGridsSize) std::cout << ptrArray[0][i][j][k]->Vel3().x() <<
-                    " " <<ptrArray[0][i][j][k]->Vel3().x() << " "
+    /*            if( k == fieldsGridsSize) std::cout << ptrArray[0][i][j][k]->Vel3().x() << " "
                     << ptrArray[0][i][j][k]->Vel3().y() << " "
                     << ptrArray[0][i][j][k]->Vel3().z() << std::endl;
-        */    }
+    */      }
         }
     }
     
@@ -1721,8 +1720,14 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     typedef struct GridsPoints_const_h5{
         Vector3_h5 pos3;
         Vector3_h5 b3;
-
         double temperature;
+        
+        Vector3_h5 v3;
+
+        double density_H;
+        double density_He;
+        double density_O;
+
     } GridsPoints_const_h5;     // dont varies with timeline
 
 
@@ -1798,6 +1803,16 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
                     array_data_const[face][i][j][k].b3 
                         = {ptrArray_in[face][i+1][j+1][k]->B3_base().x(), ptrArray_in[face][i+1][j+1][k]->B3_base().y(), ptrArray_in[face][i+1][j+1][k]->B3_base().z()} ;
                     array_data_const[face][i][j][k].temperature = ptrArray_in[face][i+1][j+1][k]->Temperature();
+                    array_data_const[face][i][j][k].v3 
+                        = {ptrArray_in[face][i+1][j+1][k]->Vel3().x(), ptrArray_in[face][i+1][j+1][k]->Vel3().y(), ptrArray_in[face][i+1][j+1][k]->Vel3().z()} ;
+                    array_data_const[face][i][j][k].density_H
+                        = ptrArray_in[face][i+1][j+1][k]->Density_H();
+                    array_data_const[face][i][j][k].density_He
+                        = ptrArray_in[face][i+1][j+1][k]->Density_He();
+                    array_data_const[face][i][j][k].density_O
+                        = ptrArray_in[face][i+1][j+1][k]->Density_O();
+                    
+
                 }
             }
         }
@@ -1813,15 +1828,28 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     DataSpace space( RANK, dim);
 
 
-        // non-const group variables
+        // vector elements
         CompType mtype_vector3( sizeof( Vector3_h5));
         mtype_vector3.insertMember( MEMBERx, HOFFSET(Vector3_h5,v_x), PredType::NATIVE_DOUBLE);
         mtype_vector3.insertMember( MEMBERy, HOFFSET(Vector3_h5,v_y), PredType::NATIVE_DOUBLE);
         mtype_vector3.insertMember( MEMBERz, HOFFSET(Vector3_h5,v_z), PredType::NATIVE_DOUBLE);
 
+        // const group variables
+        CompType mtype_grids_const( sizeof( GridsPoints_const_h5));
+        mtype_grids_const.insertMember( MEMBER_pos3, HOFFSET(GridsPoints_const_h5,pos3), mtype_vector3);
+        mtype_grids_const.insertMember( MEMBER_b3, HOFFSET(GridsPoints_const_h5,b3), mtype_vector3);
+
+        mtype_grids_const.insertMember( MEMBER_te, HOFFSET(GridsPoints_const_h5,temperature), PredType::NATIVE_DOUBLE);
+
+        mtype_grids_const.insertMember( MEMBER_v3, HOFFSET(GridsPoints_const_h5,v3), mtype_vector3);
+
+        mtype_grids_const.insertMember( MEMBER_density_H, HOFFSET(GridsPoints_const_h5,density_H), PredType::NATIVE_DOUBLE);
+        mtype_grids_const.insertMember( MEMBER_density_He, HOFFSET(GridsPoints_const_h5,density_He), PredType::NATIVE_DOUBLE);
+        mtype_grids_const.insertMember( MEMBER_density_O, HOFFSET(GridsPoints_const_h5,density_O), PredType::NATIVE_DOUBLE);
+
+        // non-const group variables
         CompType mtype_grids( sizeof( GridsPoints_h5));
         mtype_grids.insertMember( MEMBER_e3, HOFFSET(GridsPoints_h5,e3), mtype_vector3);
-
         mtype_grids.insertMember( MEMBER_dB3, HOFFSET(GridsPoints_h5,dB3), mtype_vector3);
         
         mtype_grids.insertMember( MEMBER_ve3, HOFFSET(GridsPoints_h5,ve3), mtype_vector3);
@@ -1836,30 +1864,17 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
         mtype_grids.insertMember( MEMBER_density_He, HOFFSET(GridsPoints_h5,density_He), PredType::NATIVE_DOUBLE);
         mtype_grids.insertMember( MEMBER_density_O, HOFFSET(GridsPoints_h5,density_O), PredType::NATIVE_DOUBLE);
 
-        // const group variables
-        CompType mtype_grids_const( sizeof( GridsPoints_const_h5));
-        mtype_grids_const.insertMember( MEMBER_pos3, HOFFSET(GridsPoints_const_h5,pos3), mtype_vector3);
-        mtype_grids_const.insertMember( MEMBER_b3, HOFFSET(GridsPoints_const_h5,b3), mtype_vector3);
-
-        mtype_grids_const.insertMember( MEMBER_te, HOFFSET(GridsPoints_const_h5,temperature), PredType::NATIVE_DOUBLE);
-
-
-
     if(h5FileCheck_in == 0)
     {
+
         H5File* file = new H5File( FILE_NAME, H5F_ACC_TRUNC);
         h5FileCheck = 1;
-        DataSet* dataset;
-        dataset = new DataSet(file->createDataSet(DATASET_NAME, mtype_grids, space));
-        dataset->write( array_data[0][0][0], mtype_grids);
 
         DataSet* dataset_const;
         dataset_const = new DataSet(file->createDataSet( DATASET_CONST_NAME, mtype_grids_const, space));
         dataset_const->write( array_data_const[0][0][0], mtype_grids_const);
 
-        delete dataset;
         delete dataset_const;
-        delete data_mem;
         delete data_mem_const;
 
         delete file;
@@ -1867,6 +1882,7 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     }
     else
     {
+
         H5File* file = new H5File( FILE_NAME, H5F_ACC_RDWR);
   
         DataSet* dataset;
@@ -1874,8 +1890,9 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
         dataset->write( array_data[0][0][0], mtype_grids);
 
         delete dataset;
-        delete file;
         delete data_mem;
+        
+        delete file;
     }
     
 }
@@ -2376,7 +2393,7 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double vx_earth, vy_earth;
     double L;
 
-// cout << xx << " " << yy << endl;
+// cout << xx << " " << yy << " " << r0 << endl;
 
     double x_prime, y_prime;    // used for region 2
     if( x_earth < 0.0) 
@@ -2386,14 +2403,14 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
 
     if( yy <= r0 - r0 *xx / c0 && yy >= -1.0 * r0 + xx * r0 / c0)       // region 1
     {
-    //    cout << " test 1 " << endl;
+//        cout << " test 1 " << endl;
         L = 2.0 * r0 * ( 1 - xx / c0);
         vy_earth = -1.0 * PI * L / t0 * sqrt( 0.25 - yy*yy / L / L);
         vx_earth = 0.0;
     }
-    else if( yy > r0 - r0 *xx / c0 && yy < -1.0 * r0 + xx * r0 / c0 && xx *xx + yy* yy <= r0) // region 2
+    else if( xx *xx + yy* yy <= r0 * r0) // region 2
     {
-        cout << " test 2 " << endl;
+//        cout << " test 2 " << endl;
         x_prime = -1.0 * ( xx - r0*r0/c0 + sqrt( (xx-r0*r0/c0)*(xx-r0*r0/c0) - (r0*r0/c0/c0 -1.0)*(r0*r0-xx*xx-yy*yy))) / (r0*r0/c0/c0 - 1.0);
         y_prime = r0 * ( 1.0- x_prime / c0);
         
@@ -2408,7 +2425,7 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     }
     else // other places
     {
-        cout << " test 3 " << endl;
+//        cout << " test 3 " << endl;
         vx_earth = 0.0;
         vy_earth = 0.0;
     }
@@ -2422,7 +2439,7 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
 
 // cout << phi_earth << " " << theta_earth << " " << vx_earth << " " << vy_earth << endl; // vx_earth & vy_earth are zero
 
-    // Step 4
+       // Step 4
     // find the related velocity on the arbitrary shell as we want using the equation A21 and A22 of 
     // Rasmussen et.al 1992
     double sinchi_top = 2.0 * cos( theta_top) / sqrt( 1.0+ 3.0* cos( theta_top)* cos( theta_top));
@@ -2555,6 +2572,7 @@ void ProcessFunc()
     SetTopBoundary( ptrArray);
     SetBotBoundary( ptrArray);
 
+
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     Vector3*** ptrVectorCellArray = VectorCellField();  
 
@@ -2577,6 +2595,10 @@ void ProcessFunc()
     cout << " Start" << endl;
     for( int timeline = 1; timeline <= timeLineLimit; timeline++)   // timeline start with 1
     {
+    if( timeline==1){
+    // Printout the initial condition 
+    PrintOutHdf5( ptrArray, timeline, h5FileCheck);}
+
     std::cout << "timeline" << timeline << std::endl;
 #pragma omp parallel
 {
@@ -2719,7 +2741,7 @@ void ProcessFunc()
     // Run 2.5 // Update info in grids 
     // Run 2.5.1 // Accumulate density and velocity per timestep and average them to get the
     // value of density and velocity per updatetimeperiod
-    UpdateInfoGrids( ptrArray, 
+   UpdateInfoGrids( ptrArray, 
                      ptrParticlesList_H,
                      ptrParticlesList_He,
                      ptrParticlesList_O, 
