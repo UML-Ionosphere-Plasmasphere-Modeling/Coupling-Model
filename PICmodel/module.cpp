@@ -2307,9 +2307,11 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
 {
     double PI = 3.1415926535897;
     // input two const
-    double r0 = radius * cos( r0_latitude);
-    double c0 = radius * cos( c0_latitude);
+    double r0 = radius * cos( r0_latitude * PI / 180.0);
+    double c0 = radius * cos( c0_latitude * PI / 180.0);
     double t0 = t0_convection;
+    
+    double r_earth = radius;
 
     std::cout << " Set Top boundary " << std::endl;
     //non-circle
@@ -2355,7 +2357,6 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
    
     // Step 1
     // find related point on the earth shell in the north
-    double r_earth;
     double theta_earth = asin( sin( theta_top) * sqrt( r_earth / r_top));
     double phi_earth = phi_top;
     double x_earth = r_earth * sin( theta_earth) * cos(phi_earth);
@@ -2375,20 +2376,24 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double vx_earth, vy_earth;
     double L;
 
+// cout << xx << " " << yy << endl;
+
     double x_prime, y_prime;    // used for region 2
     if( x_earth < 0.0) 
     {
-        xx = -1.0 * x_earth;
+        xx = -1.0 * xx;
     }
 
     if( yy <= r0 - r0 *xx / c0 && yy >= -1.0 * r0 + xx * r0 / c0)       // region 1
     {
+    //    cout << " test 1 " << endl;
         L = 2.0 * r0 * ( 1 - xx / c0);
         vy_earth = -1.0 * PI * L / t0 * sqrt( 0.25 - yy*yy / L / L);
         vx_earth = 0.0;
     }
     else if( yy > r0 - r0 *xx / c0 && yy < -1.0 * r0 + xx * r0 / c0 && xx *xx + yy* yy <= r0) // region 2
     {
+        cout << " test 2 " << endl;
         x_prime = -1.0 * ( xx - r0*r0/c0 + sqrt( (xx-r0*r0/c0)*(xx-r0*r0/c0) - (r0*r0/c0/c0 -1.0)*(r0*r0-xx*xx-yy*yy))) / (r0*r0/c0/c0 - 1.0);
         y_prime = r0 * ( 1.0- x_prime / c0);
         
@@ -2403,15 +2408,19 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     }
     else // other places
     {
+        cout << " test 3 " << endl;
         vx_earth = 0.0;
         vy_earth = 0.0;
     }
 
+// cout << vx_earth << " " << vy_earth << endl;
     // Step 3
     // find the realted velocity on the earth ( x_earth, y_earth, z_earth) or ( r_earth, theta_earth, phi_earth)
     // the velocity on the x and y direction is known as ( vx_earth, vy_earth)
     double vtheta_earth = (vx_earth * cos( phi_earth) + vy_earth * sin( phi_earth)) / cos( theta_earth);
     double vphi_earth = vy_earth * cos( phi_earth) - vx_earth * sin( phi_earth);
+
+// cout << phi_earth << " " << theta_earth << " " << vx_earth << " " << vy_earth << endl; // vx_earth & vy_earth are zero
 
     // Step 4
     // find the related velocity on the arbitrary shell as we want using the equation A21 and A22 of 
@@ -2423,6 +2432,12 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double vtheta_top = r_top * sinchi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth);
     double vphi_top = r_top * sin( theta_top) * vphi_earth;
 
+//  cout << vr_top <<  " " << vtheta_top << " " << vphi_top << endl; // all are zero
+//  cout << " => " << r_top << " " << coschi_top << " " << r_earth << " " << vtheta_earth << " " << theta_earth << endl; // vtheta_earth is zero
+
+
+//  cout << vr_top << " " << vtheta_top << " " << vphi_top << endl; // all are zero
+
     double vx_top = vr_top * sin( theta_top) * cos( phi_top) + 
                     vtheta_top * cos(theta_top) * cos( phi_top) -
                     vphi_top * sin(phi_top);
@@ -2432,6 +2447,7 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double vz_top = vr_top * cos( theta_top) -
                     vtheta_top* sin(theta_top);
 
+// cout << vx_top << " " << vy_top << " " << vz_top << endl;
     Vector3 temp = Vector3( vx_top, vy_top, vz_top);
     Vector3 original_vel = ptrArray_in[face][i][j][k]->Vel3();
     ptrArray_in[face][i][j][k]->SetVel_topBoundary( original_vel.PlusProduct( temp));
@@ -2536,9 +2552,7 @@ void ProcessFunc()
     GridsPoints***** ptrArray =  GridsCreation();
 
     Titheridge_Te( ptrArray); // initial Temprature of electron
-std::cout << ptrArray[0][0][1][fieldsGridsSize]->Vel3().x() << endl;
     SetTopBoundary( ptrArray);
-std::cout << ptrArray[0][0][1][fieldsGridsSize]->Vel3().x() << endl;
     SetBotBoundary( ptrArray);
 
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
