@@ -2447,10 +2447,19 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double sinchi_top = 2.0 * cos( theta_top) / sqrt( 1.0+ 3.0* cos( theta_top)* cos( theta_top));
     double coschi_top = sin( theta_top) / sqrt( 1.0 + 3.0* cos( theta_top)* cos( theta_top));
 
-    double vr_top = r_top * coschi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth);
-    double vtheta_top = r_top * sinchi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth); // theta_earth is zero
-    double vphi_top = vphi_earth * r_top / r_earth;
-
+    double vr_top, vtheta_top, vphi_top;
+    if ( theta_earth > 1e-5)
+    {
+    vr_top = r_top * coschi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth);
+    vtheta_top = r_top * sinchi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth); 
+    vphi_top = vphi_earth / r_earth  * r_top ;
+    } else
+    {
+        vr_top = 0.0;
+        vtheta_top = r_top * vtheta_earth / r_earth;
+        vphi_top = vphi_earth / r_earth  * r_top ;
+    }
+    
 //  cout << " r_top " << r_top << " theta_top " << theta_top << " >>> "; // vtheta_earth is zero
 
 
