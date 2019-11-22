@@ -2430,14 +2430,14 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
         vy_earth = 0.0;
     }
 
-// cout << vx_earth << " " << vy_earth << endl;
+ cout << vx_earth << " " << vy_earth << " >> ";
     // Step 3
     // find the realted velocity on the earth ( x_earth, y_earth, z_earth) or ( r_earth, theta_earth, phi_earth)
     // the velocity on the x and y direction is known as ( vx_earth, vy_earth)
     double vtheta_earth = (vx_earth * cos( phi_earth) + vy_earth * sin( phi_earth)) / cos( theta_earth);
     double vphi_earth = vy_earth * cos( phi_earth) - vx_earth * sin( phi_earth);
 
-// cout << phi_earth << " " << theta_earth << " " << vx_earth << " " << vy_earth << endl; // vx_earth & vy_earth are zero
+// cout << " vtheta_earth " << vtheta_earth << " vphi_earth " << vphi_earth ; // vx_earth & vy_earth are zero
 
        // Step 4
     // find the related velocity on the arbitrary shell as we want using the equation A21 and A22 of 
@@ -2447,13 +2447,12 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
 
     double vr_top = r_top * coschi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth);
     double vtheta_top = r_top * sinchi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth);
-    double vphi_top = r_top * sin( theta_top) * vphi_earth;
+    double vphi_top = vphi_earth * r_top / r_earth;
 
-//  cout << vr_top <<  " " << vtheta_top << " " << vphi_top << endl; // all are zero
-//  cout << " => " << r_top << " " << coschi_top << " " << r_earth << " " << vtheta_earth << " " << theta_earth << endl; // vtheta_earth is zero
+//  cout << " r_top " << r_top << " theta_top " << theta_top << " >>> "; // vtheta_earth is zero
 
 
-//  cout << vr_top << " " << vtheta_top << " " << vphi_top << endl; // all are zero
+//  cout << " vr_top " << vr_top << " vtheta_top " << vtheta_top << " vphi_top " << vphi_top << " >>>> " << endl; //
 
     double vx_top = vr_top * sin( theta_top) * cos( phi_top) + 
                     vtheta_top * cos(theta_top) * cos( phi_top) -
@@ -2464,7 +2463,7 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double vz_top = vr_top * cos( theta_top) -
                     vtheta_top* sin(theta_top);
 
-// cout << vx_top << " " << vy_top << " " << vz_top << endl;
+ cout << vx_top << " " << vy_top << " " << vz_top << endl;
     Vector3 temp = Vector3( vx_top, vy_top, vz_top);
     Vector3 original_vel = ptrArray_in[face][i][j][k]->Vel3();
     ptrArray_in[face][i][j][k]->SetVel_topBoundary( original_vel.PlusProduct( temp));
