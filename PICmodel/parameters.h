@@ -35,7 +35,7 @@
     // Boltzmann_k constant in unit J·K−1
     const double boltzmann_k = 1.38e-23;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 100;
+    const int iniParticleNumberPerCell = 10;
     // g (m / s2)
     const double gravity = 9.8;
     // number density at base level ( / m^3) for H
@@ -56,7 +56,7 @@
     // fieldGridsLevel max shouble better be 9 
     // particlesGridsLevel max should be 10 greater than fieldGridsLevel
     
-    const int fieldsGridsLevel = 3;
+    const int fieldsGridsLevel = 5;
     const int particlesGridsLevel = fieldsGridsLevel + 10;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);

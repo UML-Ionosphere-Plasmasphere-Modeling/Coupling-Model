@@ -2,9 +2,11 @@ clear all;clc
 
 close all
 clearvars -except inputyear mode    
-h5_files=dir(['c:\Users\Yifan\Documents\GITM-M-Modeling\PICmodel\*.h5']);
+h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
 h5_files=struct2cell(h5_files);
 h5_files=h5_files(1,:)';
+
+
 for roll=1:numel(h5_files)
 close all
 clear global
@@ -16,6 +18,10 @@ filesinfo=h5info(h5_files{roll});
 data_const = h5read(h5_files{roll},'/ArrayOfGrids_const');
 data=h5read(h5_files{roll},'/ArrayOfGrids_1');
 toc;
+
+% control panel
+gridsize = 33;
+
 for face=[3,6]
 posx=data_const.pos3.x(:,:,:,face)/1e3/(6371);
 posy=data_const.pos3.y(:,:,:,face)/1e3/(6371);
@@ -39,28 +45,28 @@ Vy=data.v3.y(:,:,:,face);
 Vz=data.v3.z(:,:,:,face);
 N=data.density(:,:,:,face);
 figure(1)
-plot3(reshape(posx,9*9*9,1),reshape(posy,9*9*9,1),reshape(posz,9*9*9,1),'*');hold on
+plot3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),'*');hold on
 grid on
 box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
 figure(2)
-quiver3(reshape(posx,9*9*9,1),reshape(posy,9*9*9,1),reshape(posz,9*9*9,1),reshape(Bx,9*9*9,1),reshape(By,9*9*9,1),reshape(Bz,9*9*9,1),3,'b');hold on
+quiver3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),reshape(Bx,gridsize*gridsize*gridsize,1),reshape(By,gridsize*gridsize*gridsize,1),reshape(Bz,gridsize*gridsize*gridsize,1),3,'b');hold on
 grid on
 box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
 figure(3)
-quiver3(reshape(posx,9*9*9,1),reshape(posy,9*9*9,1),reshape(posz,9*9*9,1),reshape(Ex,9*9*9,1),reshape(Ey,9*9*9,1),reshape(Ez,9*9*9,1),3,'b');hold on
+quiver3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),reshape(Ex,gridsize*gridsize*gridsize,1),reshape(Ey,gridsize*gridsize*gridsize,1),reshape(Ez,gridsize*gridsize*gridsize,1),3,'b');hold on
 grid on
 box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
 figure(4)
-quiver3(reshape(posx_const,1,9*9,1),reshape(posy_const,1,9*9,1),reshape(posz_const,1,9*9,1),reshape(Vx_const,1,9*9,1),reshape(Vy_const,1,9*9,1),reshape(Vz_const,1,9*9,1),3,'b');hold on
+quiver3(reshape(posx_const,1,gridsize*gridsize,1),reshape(posy_const,1,gridsize*gridsize,1),reshape(posz_const,1,gridsize*gridsize,1),reshape(Vx_const,1,gridsize*gridsize,1),reshape(Vy_const,1,gridsize*gridsize,1),reshape(Vz_const,1,gridsize*gridsize,1),3,'b');hold on
 grid on
 box on
 xlabel('X')

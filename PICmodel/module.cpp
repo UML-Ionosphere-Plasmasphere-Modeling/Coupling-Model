@@ -2239,12 +2239,13 @@ double  MLON12=atan(sin(PLAT)*tan(GLONR-PLON));
 void SetBotBoundary( GridsPoints***** ptrArray_in)
 {
     double PI = 3.1415926535897;
-/*  double rho_max; 
-    double rho_min;
-    double ratioH = 0.05;
-    double ratioHe = 0.05;
-    double ratioO = 0.9;
-*/
+    // input two const
+    double r0 = radius * cos( r0_latitude * PI / 180.0);
+    double c0 = radius * cos( c0_latitude * PI / 180.0);
+    double t0 = t0_convection;
+    
+    double r_earth = radius;
+
     // Set the dawn and equatorial point as zero point
     
     std::cout << " Set Bot boundary " << std::endl;
@@ -2261,7 +2262,7 @@ void SetBotBoundary( GridsPoints***** ptrArray_in)
     double y = ptrArray_in[face][i][j][k]->Pos3().y();
     double z = ptrArray_in[face][i][j][k]->Pos3().z();
 
-
+    //Set density
     double longtitude;
     double latitude;
 
@@ -2291,6 +2292,162 @@ void SetBotBoundary( GridsPoints***** ptrArray_in)
     ptrArray_in[face][i][j][k]->Density_H( rho * ratioH);
     ptrArray_in[face][i][j][k]->Density_He( rho * ratioHe);
     ptrArray_in[face][i][j][k]->Density_O( rho * ratioO);
+
+
+    // Set velocity
+    double r_top = sqrt( x * x + y * y + z * z);
+    double theta_top = acos( z / r_top); 
+    double phi_top;
+    if( x != 0.0)
+    {
+        phi_top = atan( y/x );
+        if( x < 0) 
+        {
+            phi_top = phi_top + PI;
+        }
+    }
+    else if ( x == 0.0 && y > 0.0)
+    {
+        phi_top = PI / 2.0;
+    }
+    else if ( x == 0.0 && y < 0.0)
+    {
+        phi_top = PI / 2.0 * ( - 1.0);
+    }
+    else if ( x ==0.0 && y == 0.0)
+    {
+        phi_top = 0.0; // special points
+    }
+
+   
+    // Step 1
+    // find related point on the earth shell in the north
+    double theta_earth = asin( sin( theta_top) * sqrt( r_earth / r_top));
+    double phi_earth = phi_top;
+    double x_earth = r_earth * sin( theta_earth) * cos(phi_earth);
+    double y_earth = r_earth * sin( theta_earth) * sin(phi_earth);
+    double z_earth = r_earth * cos( theta_earth);
+
+    if( x==0.0 && y == 0.0)
+    {
+        x_earth = 0.0;
+        y_earth = 0.0;
+    }
+
+    // Step 2
+    // find the velocity of the point ( |x_earth|, y_earth) on the x-y plane
+    double xx = x_earth;
+    double yy = y_earth;
+    double vx_earth, vy_earth;
+    double L;   // distance, half of period for sin function
+
+// cout << xx << " " << yy << " " << r0 << endl;
+
+    double x_prime, y_prime;    // used for region 2
+    if( x_earth < 0.0) 
+    {
+        xx = -1.0 * xx;
+    }
+
+    if( yy <= r0 - r0 *xx / c0 && yy >= -1.0 * r0 + xx * r0 / c0)       // region 1
+    {
+    //    cout << " test 1 " << endl;
+        L = 2.0 * r0 * ( 1.0 - xx / c0);
+        vy_earth = -1.0 * PI * L / t0 * sqrt( 0.25 - yy*yy / L / L);
+        vx_earth = 0.0;
+    }
+    else if( xx *xx + yy* yy <= r0 * r0) // region 2
+    {
+    //    cout << " test 2 " << endl;
+        x_prime = -1.0 * ( xx - r0*r0/c0 + sqrt( (xx-r0*r0/c0)*(xx-r0*r0/c0) - (r0*r0/c0/c0 -1.0)*(r0*r0-xx*xx-yy*yy))) / (r0*r0/c0/c0 - 1.0);
+        y_prime = r0 * ( 1.0- x_prime / c0);
+        
+        L = 2.0 * y_prime;  // y direction
+        if( L != 0.0)
+        {
+            vy_earth = PI * L / t0 * sqrt( 0.25 - yy * yy / L / L);
+        } else
+        {
+            vy_earth = 0.0;
+        }
+        L = y_prime; // x direction
+        if( L != 0.0)
+        {
+            vx_earth = PI * L / t0 * sqrt( (xx - x_prime) / L * ( 1.0 - ( xx - x_prime) / L));
+        } else
+        {
+            vx_earth = 0.0;
+        }
+        
+        if( yy > 0.0)
+        {
+            vx_earth = -1.0 * vx_earth;
+        }
+    }
+    else // other places
+    {
+//        cout << " test 3 " << endl;
+        vx_earth = 0.0;
+        vy_earth = 0.0;
+    }
+    if( x_earth < 0.0) 
+    {
+       vx_earth *= -1.0 ;
+    }
+
+// cout << vx_earth << " " << vy_earth << " >> " << endl;
+
+    // Step 3
+    // find the realted velocity on the earth ( x_earth, y_earth, z_earth) or ( r_earth, theta_earth, phi_earth)
+    // the velocity on the x and y direction is known as ( vx_earth, vy_earth)
+    double vtheta_earth = (vx_earth * cos( phi_earth) + vy_earth * sin( phi_earth)) / cos( theta_earth);
+    double vphi_earth = vy_earth * cos( phi_earth) - vx_earth * sin( phi_earth);
+
+// cout << " vtheta_earth " << vtheta_earth << " vphi_earth " << vphi_earth ; // vx_earth & vy_earth are zero
+
+       // Step 4
+    // find the related velocity on the arbitrary shell as we want using the equation A21 and A22 of 
+    // Rasmussen et.al 1992
+    double sinchi_top = 2.0 * cos( theta_top) / sqrt( 1.0+ 3.0* cos( theta_top)* cos( theta_top));
+    double coschi_top = sin( theta_top) / sqrt( 1.0 + 3.0* cos( theta_top)* cos( theta_top));
+
+    double vr_top, vtheta_top, vphi_top;
+    if ( theta_earth > 1e-5)
+    {
+    vr_top = r_top * coschi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth);
+    vtheta_top = r_top * sinchi_top * coschi_top * vtheta_earth / r_earth * 2.0 * cos(theta_earth) / sin( theta_earth); 
+    vphi_top = vphi_earth / r_earth  * r_top ;
+    } else
+    {
+        vr_top = 0.0;
+        vtheta_top = r_top * vtheta_earth / r_earth;
+        vphi_top = vphi_earth / r_earth  * r_top ;
+    }
+    
+//  cout << " r_top " << r_top << " theta_top " << theta_top << " >>> "; // vtheta_earth is zero
+
+
+//  cout << " vr_top " << vr_top << " vtheta_top " << vtheta_top << " vphi_top " << vphi_top << " >>>> " << endl; //
+
+    double vx_top = vr_top * sin( theta_top) * cos( phi_top) + 
+                    vtheta_top * cos(theta_top) * cos( phi_top) -
+                    vphi_top * sin(phi_top);
+    double vy_top = vr_top * sin( theta_top) * sin(phi_top) +
+                    vtheta_top * cos(theta_top) * sin(phi_top) +
+                    vphi_top * cos(phi_top);
+    double vz_top = vr_top * cos( theta_top) -
+                    vtheta_top* sin(theta_top);
+
+// cout << vx_top << " " << vy_top << " " << vz_top << endl;
+    Vector3 temp = Vector3( vx_top, vy_top, vz_top);
+    Vector3 original_vel = ptrArray_in[face][i][j][k]->Vel3();
+    ptrArray_in[face][i][j][k]->SetVel_topBoundary( original_vel.PlusProduct( temp));
+
+
+
+
+
+
 
     ptrArray_in[face][i][j][k]->SetStopSign(1);
             }
