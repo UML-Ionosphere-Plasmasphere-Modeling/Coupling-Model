@@ -1011,7 +1011,7 @@ void GradBNorm( GridsPoints***** ptrArray_in);
 // Generate lists of particles for bot and top region temp
 //************************************************************************
 //************************************************************************
-list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0);
+list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, int ionType_in);
 
 
 //************************************************************************

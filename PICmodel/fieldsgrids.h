@@ -82,15 +82,15 @@ inline void XYZtoDensity( )
 {
     double scaleHeight = ikT / mi0_H / gravity;
     if( pos3.norm() > 0)
-    density_H = N0_H * mi0_H * exp(-1 * (pos3.norm() - radius) / scaleHeight);
+    density_H = N0_H * exp(-1 * (pos3.norm() - radius) / scaleHeight);
 
     scaleHeight = ikT / mi0_He / gravity;
     if( pos3.norm() > 0)
-    density_He= N0_He * mi0_He * exp(-1 * (pos3.norm() - radius) / scaleHeight);
+    density_He= N0_He * exp(-1 * (pos3.norm() - radius) / scaleHeight);
     
     scaleHeight = ikT / mi0_O / gravity;
     if( pos3.norm() > 0)
-    density_O= N0_O * mi0_O * exp(-1 * (pos3.norm() - radius) / scaleHeight);  
+    density_O= N0_O * exp(-1 * (pos3.norm() - radius) / scaleHeight);  
 }
 //************************************************************************
 //************************************************************************
@@ -186,46 +186,44 @@ inline void ResetParameters()
 //************************************************************************
 // Calculate weighting of density on grids as well as velocity
 // weight: iw, jw, kw
-// double mass_in: weight of each simualtion particle
+// double number_in: number weight of each simualtion particle
 // Vector3 vp_in: velocity of each simulation particle
 //************************************************************************
 //************************************************************************
-inline void UpdateDueToWgt( int iw, int jw, int kw, double mass_in, Vector3 vp_in, int particle)
+inline void UpdateDueToWgt( int iw, int jw, int kw, double number_in, Vector3 vp_in, int ionType_in)
 {
-    switch (particle)
+    switch (ionType_in)
     {
     case 1: {
-    density_H  += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
-    vH3 = vH3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
-                                     mass_in * vp_in.y() * iw * jw * kw / cellSize3,
-                                    mass_in * vp_in.z() * iw * jw * kw / cellSize3 ));
+    density_H  += number_in * iw * jw * kw / cellSize3; // acutally is number not number density
+    vH3 = vH3.PlusProduct( Vector3( number_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                     number_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                    number_in * vp_in.z() * iw * jw * kw / cellSize3 ));
     break;}
     case 4:{
-    density_He += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
-    vHe3 = vHe3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
-                                     mass_in * vp_in.y() * iw * jw * kw / cellSize3,
-                                    mass_in * vp_in.z() * iw * jw * kw / cellSize3 ));
+    density_He += number_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    vHe3 = vHe3.PlusProduct( Vector3( number_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                     number_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                    number_in * vp_in.z() * iw * jw * kw / cellSize3 ));
     break;}
-    case 16:{
-    density_O  += mass_in * iw * jw * kw / cellSize3; // acutally is mass not density
-    vO3 = vO3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
-                                     mass_in * vp_in.y() * iw * jw * kw / cellSize3,
-                                    mass_in * vp_in.z() * iw * jw * kw / cellSize3 ));
+    default:{
+    density_O  += number_in * iw * jw * kw / cellSize3; // acutally is mass not density
+    vO3 = vO3.PlusProduct( Vector3( number_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                     number_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                    number_in * vp_in.z() * iw * jw * kw / cellSize3 ));
     break;}
-    default:
-    break;
     }
     
-    v3 = v3.PlusProduct( Vector3( mass_in * vp_in.x() * iw * jw * kw / cellSize3,
-                                  mass_in * vp_in.y() * iw * jw * kw / cellSize3,
-                                  mass_in * vp_in.z() * iw * jw * kw / cellSize3
+    v3 = v3.PlusProduct( Vector3( number_in * vp_in.x() * iw * jw * kw / cellSize3,
+                                  number_in * vp_in.y() * iw * jw * kw / cellSize3,
+                                  number_in * vp_in.z() * iw * jw * kw / cellSize3
                                 ));
 }
 // After all simulation are calculated once, the density means the total 
 // mass at each grid points, and the v3 means the total momentum. 
 inline void UpdateDueToWgt( GridsPoints***** ptrArray_in, double volume_in)
 {
-    if ( density_H != 0.0 || density_He != 0.0 || density_O != 0.0)
+    if ( density_H != 0 || density_He != 0 || density_O != 0)
     {
         v3 = v3.ScaleProduct(1.0 / (density_H + density_He + density_O) / updateInfoPeriod);
        
@@ -270,10 +268,10 @@ inline void updateE( Vector3 GradPe_in)
 {
     if( update_type == 0)
     {
-    e3 = b3.CrossProduct(v3).MinusProduct(GradPe_in.ScaleProduct(1 / (density_H / mi0_H + density_He / mi0_He + density_O / mi0_O) / qi0));
+    e3 = b3.CrossProduct(v3).MinusProduct(GradPe_in.ScaleProduct(1.0 / (density_H + density_He + density_O ) / qi0));
     } else
     {
-    e3 = b3.CrossProduct(ve3).MinusProduct(GradPe_in.ScaleProduct(1 / (density_H / mi0_H + density_He / mi0_He + density_O / mi0_O) / qi0));
+    e3 = b3.CrossProduct(ve3).MinusProduct(GradPe_in.ScaleProduct(1.0 / (density_H + density_He + density_O ) / qi0));
     }
     
 }
@@ -283,7 +281,7 @@ inline void updateE( Vector3 GradPe_in)
 // input curl B
 inline void updateve3( Vector3 curlB_in)
 {
-    ve3 = v3.MinusProduct( curlB_in.ScaleProduct( 1/ (density_H / mi0_H + density_He / mi0_He + density_O / mi0_O) / qi0 / mu0));
+    ve3 = v3.MinusProduct( curlB_in.ScaleProduct( 1/ (density_H + density_He + density_O ) / qi0 / mu0));
 }
 
 // update B from Faraday's Law

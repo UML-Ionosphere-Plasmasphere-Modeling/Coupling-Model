@@ -109,14 +109,19 @@ int BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double m
 //************************************************************************
 int UpdateUint_64();
 
+inline uint_64 PosUint()
+{
+    return posUint;
+}
+
 inline Vector3 VelParticles()
 {
     return vp;
 }
 
-inline double WeightMi()
+inline double WeightNi()
 {
-    return mi;
+    return weightNi;
 }
 
 inline double MagneticIvarient()
@@ -125,13 +130,13 @@ inline double MagneticIvarient()
 }
 //////////////////////////////////Constructor//////////////////////////////
 
-    Particles( uint_64 posInt_in, Vector3 vx_in, double mi_in, double mu_in);
+    Particles( uint_64 posInt_in, Vector3 vx_in, double weightNi_in, double mu_in);
     Particles();
 
 private:
     uint_64 posUint; // single unsigned int for position
     Vector3 vp; // velocity of particles
-    double mi; // weight
+    double weightNi; // weight for number of real particles
     double mu; // magnetic moment/ adiabatic invarient
     static constexpr double mass1 = 16;
     static constexpr double mass2 = 1;

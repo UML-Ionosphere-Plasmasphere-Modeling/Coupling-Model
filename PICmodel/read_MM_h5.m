@@ -2,8 +2,8 @@ clear all;clc
 
 close all
 clearvars -except inputyear mode    
- h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
-%h5_files=dir(['c:\Users\Yifan\Documents\GITM-M-Modeling\PICmodel\*.h5']);
+% h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
+h5_files=dir(['c:\Users\Yifan\Documents\GITM-M-Modeling\PICmodel\*.h5']);
 h5_files=struct2cell(h5_files);
 h5_files=h5_files(1,:)';
 
@@ -21,10 +21,11 @@ data=h5read(h5_files{roll},'/ArrayOfGrids_1');
 toc;
 
 % control panel
-gridsize = 33;
+gridsize = 17;
 showsize = 1;
+%%%%%%%%%%%%%%
 
-for face=[3,6]
+for face=1:3
 posx=data_const.pos3.x(:,:,:,face)/1e3/(6371);
 posy=data_const.pos3.y(:,:,:,face)/1e3/(6371);
 posz=data_const.pos3.z(:,:,:,face)/1e3/(6371);

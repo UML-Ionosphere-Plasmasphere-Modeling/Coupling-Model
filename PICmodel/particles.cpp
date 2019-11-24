@@ -11,11 +11,11 @@
 // Vector3 vp;
 
 // FUNCTION //Constructor
-Particles::Particles( uint_64 posUint_in, Vector3 vx_in, double mi_in, double mu_in)
+Particles::Particles( uint_64 posUint_in, Vector3 vx_in, double weightNi_in, double mu_in)
 {
     posUint = posUint_in;
     vp = vx_in; 
-    mi = mi_in;
+    weightNi = weightNi_in;
     mu = mu_in;
 }
 
@@ -24,7 +24,7 @@ Particles::Particles()
 {
     posUint = 0;
     vp= Vector3(0.0, 0.0, 0.0);
-    mi = 0.0;
+    weightNi = 0.0;
     mu = 0.0;
 }
 
