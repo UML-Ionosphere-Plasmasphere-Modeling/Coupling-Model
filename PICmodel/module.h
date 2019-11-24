@@ -1017,6 +1017,16 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
 //************************************************************************
 //************************************************************************
 // FUNCTION
+// Sec convection velocity due to a ideal convectional cell and a dipole
+// magnetic field
+//************************************************************************
+//************************************************************************
+void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int k_in, int j_in);
+
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
 // Initialization the particles for the magnetic moment / adiabatic invarient
 // 
 //************************************************************************
