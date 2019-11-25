@@ -22,10 +22,10 @@ toc;
 
 % control panel
 gridsize = 17;
-showsize = 1;
+showsize = 17;
 %%%%%%%%%%%%%%
 
-for face=1:3
+for face=[3,6]
 posx=data_const.pos3.x(:,:,:,face)/1e3/(6371);
 posy=data_const.pos3.y(:,:,:,face)/1e3/(6371);
 posz=data_const.pos3.z(:,:,:,face)/1e3/(6371);

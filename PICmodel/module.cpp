@@ -30,7 +30,7 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolu
 //    auto listsPtr = make_shared<list<Particles>>();
     list<Particles>* listsPtr = new list<Particles>;
 //   shared_ptr<Particles> p1 = make_shared<Particles> (); // test
-    double scaleHeight = ikT / mi0 / gravity; // assume the T is const for initiallization
+//    double scaleHeight = ikT / mi0 / gravity; // assume the T is const for initiallization
 
     for( int i = 0; i < totalFace; i++)
     {
@@ -41,7 +41,9 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolu
                 for( int s = 1; s <= fieldsGridsSize-2; s++)
                 {
                     // number of real particles ( notice the unit is number density)
-                    double N = N0 * exp(-1.0 * (ptrArray_in[i][j][k][s]->Pos3().norm() - radius) / scaleHeight);
+                    //double N = N0 * exp(-1.0 * (ptrArray_in[i][j][k][s]->Pos3().norm() - radius) / scaleHeight);
+                    double r = ptrArray_in[i][j][k][s]->Pos3().norm() / radius;
+                    double N = N0 / r * ( 1.0 - tanh( r - 6.5));
                     // weightNi of each simulation particle
                     double Ni_simu = N / iniParticleNumberPerCell * ptrVolumeCellArray_in[j][k][s];
 
@@ -1152,162 +1154,6 @@ void UpdateE3( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
 }
 
 
-//************************************************************************
-//************************************************************************
-// FUNCTION
-// Each calculation are on the girds.
-// Step 1: Setup Ve for each gridpoint
-// Step 2: Update E at each gridpoints
-//************************************************************************
-//************************************************************************
-void update__( Vector3**** curlB_in, Vector3**** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
-{
-    Vector3 tempCurlB;
-    Vector3 tempGradPe;
-
-    for( int i = 1; i < fieldsGridsSize+2; i++)
-    {
-        for( int j = 1; j < fieldsGridsSize+2; j++)
-        {
-            for( int k = 1; k < fieldsGridsSize; k++)
-            {
-                // curl B at gridspoint
-                if(i==1&&j==1) 
-                {
-                tempCurlB = curlB_in[1][0][k-1]->PlusProduct(
-                                    *curlB_in[1][1][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(           
-                                    *curlB_in[0][1][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[1][0][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[1][1][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[0][1][k]).ScaleProduct(1/6);
-                // gradPe at gridspoints
-                tempGradPe = gradPe_in[1][0][k-1]->PlusProduct(
-                                    *gradPe_in[1][1][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(           
-                                    *gradPe_in[0][1][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[1][0][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[1][1][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[0][1][k]).ScaleProduct(1/6);            
-                }
-                else if(i==1&&j==fieldsGridsSize+1) 
-                {
-                tempCurlB = curlB_in[1][fieldsGridsSize+1][k-1]->PlusProduct(
-                                    *curlB_in[1][fieldsGridsSize][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(           
-                                    *curlB_in[0][fieldsGridsSize][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[1][fieldsGridsSize+1][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[1][fieldsGridsSize][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[0][fieldsGridsSize][k]).ScaleProduct(1/6);
-                
-                tempGradPe = gradPe_in[1][fieldsGridsSize+1][k-1]->PlusProduct(
-                                    *gradPe_in[1][fieldsGridsSize][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(           
-                                    *gradPe_in[0][fieldsGridsSize][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[1][fieldsGridsSize+1][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[1][fieldsGridsSize][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[0][fieldsGridsSize][k]).ScaleProduct(1/6);
-                }
-                else if(i==fieldsGridsSize+1&&j==fieldsGridsSize+1)
-                {
-                tempCurlB = curlB_in[fieldsGridsSize][fieldsGridsSize+1][k-1]->PlusProduct(
-                                    *curlB_in[fieldsGridsSize][fieldsGridsSize][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(           
-                                    *curlB_in[fieldsGridsSize+1][fieldsGridsSize][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[fieldsGridsSize][fieldsGridsSize+1][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[fieldsGridsSize][fieldsGridsSize][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[fieldsGridsSize+1][fieldsGridsSize][k]).ScaleProduct(1/6);
-                
-                tempGradPe = gradPe_in[fieldsGridsSize][fieldsGridsSize+1][k-1]->PlusProduct(
-                                    *gradPe_in[fieldsGridsSize][fieldsGridsSize][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(           
-                                    *gradPe_in[fieldsGridsSize+1][fieldsGridsSize][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[fieldsGridsSize][fieldsGridsSize+1][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[fieldsGridsSize][fieldsGridsSize][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[fieldsGridsSize+1][fieldsGridsSize][k]).ScaleProduct(1/6);
-                }
-                else if(i==fieldsGridsSize+1&&j==1) 
-                {
-                tempCurlB = curlB_in[fieldsGridsSize][0][k-1]->PlusProduct(
-                                    *curlB_in[fieldsGridsSize][1][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(           
-                                    *curlB_in[fieldsGridsSize+1][1][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[fieldsGridsSize][0][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[fieldsGridsSize][1][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[fieldsGridsSize+1][1][k]).ScaleProduct(1/6);
-                
-                tempGradPe = gradPe_in[fieldsGridsSize][0][k-1]->PlusProduct(
-                                    *gradPe_in[fieldsGridsSize][1][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(           
-                                    *gradPe_in[fieldsGridsSize+1][1][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[fieldsGridsSize][0][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[fieldsGridsSize][1][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[fieldsGridsSize+1][1][k]).ScaleProduct(1/6);                
-                } else
-                {
-                tempCurlB = curlB_in[i-1][j-1][k-1]->PlusProduct(
-                                    *curlB_in[i][j-1][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(           
-                                    *curlB_in[i-1][j][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[i][j][k-1]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[i-1][j-1][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[i][j-1][k]);
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[i-1][j][k]);    
-                tempCurlB = tempCurlB.PlusProduct(
-                                    *curlB_in[i][j][k]).ScaleProduct(1/8);
-
-                tempGradPe = gradPe_in[i-1][j-1][k-1]->PlusProduct(
-                                    *gradPe_in[i][j-1][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(           
-                                    *gradPe_in[i-1][j][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[i][j][k-1]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[i-1][j-1][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[i][j-1][k]);
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[i-1][j][k]);    
-                tempGradPe = tempGradPe.PlusProduct(
-                                    *gradPe_in[i][j][k]).ScaleProduct(1/8);
-                }
-                Vector3 Ve = ptrArray_in[face_in][i][j][k]->Vel3().MinusProduct(
-                                    tempCurlB.ScaleProduct(1/alpha/
-                                    ptrArray_in[face_in][i][j][k]->Density()));
-                // update E
-                ptrArray_in[face_in][i][j][k]->updateE(tempGradPe);
-            }
-        }
-    }        
-}
 
 
 //************************************************************************
@@ -1757,6 +1603,7 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
         Vector3_h5 b3;
         double temperature;
         
+        Vector3_h5 e3;
         Vector3_h5 v3;
 
         double density_H;
@@ -1835,15 +1682,24 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
                 {       
                     array_data_const[face][i][j][k].pos3 
                         = {ptrArray_in[face][i+1][j+1][k]->Pos3().x(), ptrArray_in[face][i+1][j+1][k]->Pos3().y(), ptrArray_in[face][i+1][j+1][k]->Pos3().z()} ;
+                    
                     array_data_const[face][i][j][k].b3 
                         = {ptrArray_in[face][i+1][j+1][k]->B3_base().x(), ptrArray_in[face][i+1][j+1][k]->B3_base().y(), ptrArray_in[face][i+1][j+1][k]->B3_base().z()} ;
+                    
                     array_data_const[face][i][j][k].temperature = ptrArray_in[face][i+1][j+1][k]->Temperature();
+                    
+                    array_data_const[face][i][j][k].e3 
+                        = {ptrArray_in[face][i+1][j+1][k]->E3().x(), ptrArray_in[face][i+1][j+1][k]->E3().y(), ptrArray_in[face][i+1][j+1][k]->E3().z()} ;
+                    
                     array_data_const[face][i][j][k].v3 
                         = {ptrArray_in[face][i+1][j+1][k]->Vel3().x(), ptrArray_in[face][i+1][j+1][k]->Vel3().y(), ptrArray_in[face][i+1][j+1][k]->Vel3().z()} ;
+                    
                     array_data_const[face][i][j][k].density_H
                         = ptrArray_in[face][i+1][j+1][k]->Density_H();
+                    
                     array_data_const[face][i][j][k].density_He
                         = ptrArray_in[face][i+1][j+1][k]->Density_He();
+                    
                     array_data_const[face][i][j][k].density_O
                         = ptrArray_in[face][i+1][j+1][k]->Density_O();
                     
@@ -1876,6 +1732,7 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
         mtype_grids_const.insertMember( MEMBER_te, HOFFSET(GridsPoints_const_h5,temperature), PredType::NATIVE_DOUBLE);
 
+        mtype_grids_const.insertMember( MEMBER_e3, HOFFSET(GridsPoints_const_h5,e3), mtype_vector3);
         mtype_grids_const.insertMember( MEMBER_v3, HOFFSET(GridsPoints_const_h5,v3), mtype_vector3);
 
         mtype_grids_const.insertMember( MEMBER_density_H, HOFFSET(GridsPoints_const_h5,density_H), PredType::NATIVE_DOUBLE);
@@ -2372,21 +2229,19 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
                 int k = fieldsGridsSize;
                 
     if( ptrArray_in[face][i][j][k]->StopSign() == 1) continue;
-
     SetConvectionVel(ptrArray_in, face, i, j, k);
 
     Vector3 temp_gradPe = Vector3( 0.0, 0.0, 0.0);
     ptrArray_in[face][i][j][k]->updateE( temp_gradPe);
 
-    double N_H = N0_H * exp(-1.0 * (ptrArray_in[face][i][j][k]->Pos3().norm() - radius) / (ikT / mi0_H / gravity));
-    ptrArray_in[face][i][j][k]->Density_H( N_H );
+    double r = ptrArray_in[face][i][j][k]->Pos3().norm() / radius;
+    if( r > 0){
+    ptrArray_in[face][i][j][k]->Density_H( N0_H / r * ( 1.0 - tanh( r - 6.5)));
          
-    double N_He = N0_He * exp(-1.0 * (ptrArray_in[face][i][j][k]->Pos3().norm() - radius) / (ikT / mi0_He / gravity));
-    ptrArray_in[face][i][j][k]->Density_He( N_He );
+    ptrArray_in[face][i][j][k]->Density_He( N0_He / r * ( 1.0 - tanh( r - 6.5)));
 
-    double N_O = N0_O * exp(-1.0 * (ptrArray_in[face][i][j][k]->Pos3().norm() - radius) / (ikT / mi0_O / gravity));
-    ptrArray_in[face][i][j][k]->Density_O( N_O );   
-
+    ptrArray_in[face][i][j][k]->Density_O( N0_O / r * ( 1.0 - tanh( r - 6.5)));   
+    }
     // set stopSign
     ptrArray_in[face][i][j][k]->SetStopSign(1);
         
@@ -2577,14 +2432,14 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
         vy_top = vtheta_top;
         vz_top = 0.0;
     }
-
+/*
 //  cout << " r_top " << r_top << " theta_top " << theta_top << " >>> "; // vtheta_earth is zero
-/* if( k_in == 0 && j_in == fieldsGridsSize / 2 +1 )
+if( k_in == 16 && j_in == fieldsGridsSize / 2 && face_in == 5 )
 {
-    cout <<endl<< x << " " << y << " " << z << endl;
+    cout <<endl<< face_in << " " << i_in << " " << j_in << " " << k_in << endl;
     cout << vx_earth << " " << vy_earth << " theta " << theta_earth << " " << theta_top << " phi " << phi_earth << " " << phi_top
     << " phi_top " << phi_top << " vtheta " << vtheta_earth << " vr " << vr_top* sin(theta_top) << " vphi_top " << vphi_top
-    << " vy_top " << vy_top << endl; //
+    << " v_top " << vx_top << " " << vy_top << " " << vz_top << endl;//
 }
 */
 
@@ -2592,6 +2447,7 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
     Vector3 temp = Vector3( vx_top, vy_top, vz_top);
     Vector3 original_vel = ptrArray_in[face_in][i_in][j_in][k_in]->Vel3();
     ptrArray_in[face_in][i_in][j_in][k_in]->SetVel_topBoundary( original_vel.PlusProduct( temp));
+
 
 }
 
@@ -2660,9 +2516,24 @@ void ProcessFunc()
     GridsPoints***** ptrArray =  GridsCreation();
 
     Titheridge_Te( ptrArray); // initial Temprature of electron
+    
     SetTopBoundary( ptrArray);
     SetBotBoundary( ptrArray);
-
+    for( int face = 0; face < totalFace; face++)
+    {
+        for( int i = 1; i < fieldsGridsSize+2; i++)
+        {
+            for( int j = 1; j < fieldsGridsSize+2; j++)
+            {
+                for( int k = 0; k < fieldsGridsSize+1; k++)
+                { 
+if( k == 16 && face == 5 )
+{
+    cout << i << " " << j << " " << k << " " << ptrArray[face][i][j][k]->Vel3().x() << " " << ptrArray[face][i][j][k]->E3().x()<< endl;//
+}
+                }}}};
+                int paupau;
+               std::cin >> paupau;
 
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     Vector3*** ptrVectorCellArray = VectorCellField();  
@@ -2703,12 +2574,12 @@ void ProcessFunc()
         {
 //std::cout << " check 0" << std::endl;
             Particles temp = *iteratorM;
-            struct structg tempStruct = temp.InttoStrp1();
+            struct structg tempStr = temp.InttoStrp1();
             
             int check; // check whether in the main domain or not, "0" means in "1" means out
             //test function//  double xxx= temp.VelParticles().x();    //cout << xxx << " ";
             // update velocity // update position
-            check = temp.BorisMethod( &tempStruct, ptrArray, mi0_H);
+            check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
             // check if still in the main domain
             if( check == 1) // out of the domain
             {
@@ -2725,12 +2596,12 @@ void ProcessFunc()
         {
 //std::cout << " check 0" << std::endl;
             Particles temp = *iteratorM;
-            struct structg tempStruct = temp.InttoStrp1();
+            struct structg tempStr = temp.InttoStrp1();
             
             int check; // check whether in the main domain or not, "0" means in "1" means out
             //test function//  double xxx= temp.VelParticles().x();    //cout << xxx << " ";
             // update velocity // update position
-            check = temp.BorisMethod( &tempStruct, ptrArray, mi0_He);
+ //           check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
             // check if still in the main domain
             if( check == 1) // out of the domain
             {
@@ -2745,12 +2616,12 @@ void ProcessFunc()
         {
 //std::cout << " check 0" << std::endl;
             Particles temp = *iteratorM;
-            struct structg tempStruct = temp.InttoStrp1();
+            struct structg tempStr = temp.InttoStrp1();
             
             int check; // check whether in the main domain or not, "0" means in "1" means out
             //test function//  double xxx= temp.VelParticles().x();    //cout << xxx << " ";
             // update velocity // update position
-            check = temp.BorisMethod( &tempStruct, ptrArray, mi0_O);
+    //        check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
             // check if still in the main domain
             if( check == 1) // out of the domain
             {
@@ -2762,6 +2633,7 @@ void ProcessFunc()
     }   
     #pragma omp barrier
 }
+
         // Run 2.2 // Create temp particle lists    
         list<Particles>* ptrParticlesListTemp_H = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);
         list<Particles>* ptrParticlesListTemp_He = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
@@ -2783,11 +2655,14 @@ void ProcessFunc()
         // get the info of mass(weight of each simulation particle)
         double tempNumber = temp.WeightNi();
 
-        cout << " vx = " << tempStr.vx << std::endl;
-
+  /*      cout << " H in main before = " << std::bitset<64>(temp.PosUint()) << " vel " << temp.VelParticles().x() << " " << temp.VelParticles().y()
+            << " " << temp.VelParticles().z() << " Ni " << temp.WeightNi() << " mu " << temp.MagneticIvarient() 
+            << "             " << tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw
+            <<std::endl;
+*/
     }
 
-        cout << "Particles H " << ptrParticlesList_H->size() << endl;
+        cout << "Particles H before boris " << ptrParticlesList_H->size() << endl;
     int pause33;
     std::cin >> pause33;
 
@@ -2796,27 +2671,32 @@ void ProcessFunc()
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)
         {
             Particles temp = *iterator;
-            struct structg tempStruct = temp.InttoStrp1();
+            struct structg tempStr = temp.InttoStrp1();
 
 
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-            check = temp.BorisMethod( &tempStruct, ptrArray, mi0_H);
+            check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
+
+  /*          cout << " temp = " << check << " " << std::bitset<64>(temp.PosUint()) << " vel " << temp.VelParticles().x() << " " << temp.VelParticles().y()
+            << " " << temp.VelParticles().z() << " Ni " << temp.WeightNi() << " mu " << temp.MagneticIvarient()
+            << "             " << tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw
+            <<std::endl;
+   */         
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                Particles temptemp = Particles( temp.PosUint(), temp.VelParticles(), temp.WeightNi(), temp.MagneticIvarient());
-            cout << " pushback = " << tempStruct.ig << " vel = " << tempStruct.vx << std::endl; 
-                ptrParticlesList_H->push_back( temptemp);
+                Particles temp1 = Particles( temp.PosUint(), Vector3( 999.999,999.999,999.999), temp.WeightNi(), temp.MagneticIvarient());
+
+
+                ptrParticlesList_H->push_back( temp1);
                 iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
 
 
-        cout << "Particles H_main " << ptrParticlesList_H->size() << endl;
+        cout << "Particles H_main after boris " << ptrParticlesList_H->size() << endl;
 
-        int pause31;
-        std::cin >> pause31;
 
         
         for( list<Particles>::iterator iter= ptrParticlesList_H->begin(); iter!=ptrParticlesList_H->end(); ++iter)
@@ -2828,13 +2708,15 @@ void ProcessFunc()
         // get the info of mass(weight of each simulation particle)
         double tempNumber = temp.WeightNi();
 
-        cout << " vx = " << tempStr.vx << std::endl;
+    /*    cout << " H in main after = " << std::bitset<64>(temp.PosUint()) << " vel " << temp.VelParticles().x() << " " << temp.VelParticles().y()
+            << " " << temp.VelParticles().z() << " Ni " << temp.WeightNi() << " mu " << temp.MagneticIvarient() 
+            << "             " << tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw
+            <<std::endl;
+    */        
 
     }
 
-        cout << "Particles H after " << ptrParticlesList_H->size() << endl;
-    int pause32;
-    std::cin >> pause32;
+        cout << "Particles H after go through main " << ptrParticlesList_H->size() << endl;
 
     }
     #pragma omp section
@@ -2843,10 +2725,10 @@ void ProcessFunc()
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_He->begin(); iterator != ptrParticlesListTemp_He->end(); ++iterator)
         {
             Particles temp = *iterator;
-            struct structg tempStruct = temp.InttoStrp1();
+            struct structg tempStr = temp.InttoStrp1();
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-            check = temp.BorisMethod( &tempStruct, ptrArray, mi0_He);
+   //         check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
@@ -2861,10 +2743,10 @@ void ProcessFunc()
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_O->begin(); iterator != ptrParticlesListTemp_O->end(); ++iterator)
         {
             Particles temp = *iterator;
-            struct structg tempStruct = temp.InttoStrp1();
+            struct structg tempStr = temp.InttoStrp1();
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-            check = temp.BorisMethod( &tempStruct, ptrArray, mi0_O);
+     //       check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
@@ -2878,6 +2760,7 @@ void ProcessFunc()
     #pragma omp barrier
 
     }
+
     // Run 2.5 // Update info in grids 
     // Run 2.5.1 // Accumulate density and velocity per timestep and average them to get the
     // value of density and velocity per updatetimeperiod
@@ -2897,7 +2780,6 @@ void ProcessFunc()
     delete ptrParticlesListTemp_H;
     delete ptrParticlesListTemp_He;
     delete ptrParticlesListTemp_O;
-
 
 
 
@@ -2941,8 +2823,9 @@ void ProcessFunc()
     {
         PrintOutHdf5( ptrArray, timeline, h5FileCheck);
     }
+    cout<< "endend "<<std::endl;
+std::cin >> paupau;
     }
-
     delete ptrVectorCellArray;
     delete ptrArray;
     delete ptrParticlesList_H;

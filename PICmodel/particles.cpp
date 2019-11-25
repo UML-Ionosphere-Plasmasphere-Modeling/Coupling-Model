@@ -43,6 +43,8 @@ int Particles::UpdateUint_64()
     int check=0;
     // 1. transfor Uint to face, ip, jp, kp
 
+
+
 //    std::cout << std::bitset<64>(posUint) << std::endl;
     
     face = posUint >> 61;
@@ -65,6 +67,7 @@ int Particles::UpdateUint_64()
     // particles located at center of cell
     double L = LMin * pow(10, logRatio *  ( (kp +0.5)/ cellSize1 )); 
     
+ //   std:: cout <<  " 1pos " << L << " " << ip << " " << jp << " " << kp << " vel " << vp.x() << " " << vp.y() << " " << vp.z() << std::endl; 
 
 //    std:: cout << " 1pos " << L << " " << px << " " << py << " " << pz << std::endl;  
     // 2.2 IgJg to ST note 0<ST<1
@@ -100,14 +103,15 @@ int Particles::UpdateUint_64()
     px += vp.x() * tstep;
     py += vp.y() * tstep;
     pz += vp.z() * tstep;
-    
-//    std:: cout << " 4pos " << L << " " << px << " " << py << " " << pz << std::endl; 
 
 //    std:: cout << vp.x() << " " << vp.y() << " " << vp.z() << " " << tstep << std::endl;
 //    std:: cout << " >>> "<< px << " " << py << " " << pz << std::endl;
     // 4. transfor to face ip kp jp
     // 4.1 radial kp
     L = sqrt( px*px + py*py + pz*pz )/radius;
+
+
+ //   std:: cout << " 2pos " << L << " " << px << " " << py << " " << pz << std::endl; 
 
     // check if in the main domain
     if( L > LMax_maindomain || L < LMin_maindomain) 
@@ -342,6 +346,8 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
                 + gradB5.x()*w5 + gradB6.x()*w6 + gradB7.x()*w7 + gradB8.x()*w8);
     tempGradB.Setz(gradB1.x()*w1 + gradB2.x()*w2 + gradB3.x()*w3 + gradB4.x()*w4 
                 + gradB5.x()*w5 + gradB6.x()*w6 + gradB7.x()*w7 + gradB8.x()*w8);
+
+//    std::cout << std::endl << "e " << tempe.x() << " b " << tempb.x() << " pos " << tempPos.x() << " gradB " << tempGradB.x() << std::endl; 
 
     // mu / e , mu = m * v^2 / e / B
     tempGradB = tempGradB.ScaleProduct( mu / qi0 );

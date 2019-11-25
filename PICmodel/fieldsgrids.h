@@ -80,7 +80,7 @@ inline void VeltoE_topBoundary()
 //************************************************************************
 inline void XYZtoDensity( )
 {
-    double scaleHeight = ikT / mi0_H / gravity;
+/*    double scaleHeight = ikT / mi0_H / gravity;
     if( pos3.norm() > 0)
     density_H = N0_H * exp(-1 * (pos3.norm() - radius) / scaleHeight);
 
@@ -91,6 +91,13 @@ inline void XYZtoDensity( )
     scaleHeight = ikT / mi0_O / gravity;
     if( pos3.norm() > 0)
     density_O= N0_O * exp(-1 * (pos3.norm() - radius) / scaleHeight);  
+*/
+    double r = pos3.norm() / radius;
+    if( r > 0){
+    density_H = N0_H / r * ( 1.0 - tanh( r - 6.5));
+    density_He= N0_He / r * ( 1.0 - tanh( r - 6.5));
+    density_O = N0_O / r * ( 1.0 - tanh( r - 6.5));
+    }
 }
 //************************************************************************
 //************************************************************************
@@ -464,9 +471,9 @@ inline void SetStopSign( int stopSign_in)
 
     Vector3 gradB3;          // gradB in which B is norm of vector3 B
 
-    double density_H;    // mass density
-    double density_He;   // mass density
-    double density_O;    // mass density
+    double density_H;    // number density
+    double density_He;   // number density
+    double density_O;    // number density
 
     double temperature;     // electron temperature: Te
     int stopSign;

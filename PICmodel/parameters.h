@@ -12,11 +12,7 @@
     const double dMoment = -8e15;
 
     // Simulation parameters (unit) s
-    const double tstep = 0.1 ;
-    // alpha
-    const double alpha = 1.0;
-    // Ni
-    const double Ni = 1.0;
+    const double tstep = 0.01 ;
     // charge (C)
     const double qi0 = 1.602e-19;
     // mass of ion in unit of (kg) for Hydrogen
@@ -28,8 +24,6 @@
     // Vacuum permeability mu0
     const double mu0 = 1.256637e-6;
 
-    // electron kT
-    const double ekT = 1.0;
     // ion kT k =  1.38 x 10−23 J·K−1, T = 1000 K
     const double ikT = 1.38e-20;
     // Boltzmann_k constant in unit J·K−1
