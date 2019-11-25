@@ -1451,9 +1451,6 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         struct structg tempStr = temp.InttoStrp1();
         // get the info of mass(weight of each simulation particle)
         double tempNumber = temp.WeightNi();
-        if( tempStr.iw ==0 && tempStr.jw ==0 && tempStr.kw==0)
-            {cout << "infofoin1 " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << endl; 
-            }
     }
 
 // For H particles in main domain    
@@ -1640,9 +1637,6 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         }
     }
 
-    cout << " testinUpdate " << ptrArray_in[5][1][1][1]->Vel3().x()<< endl;
-    int pause;
-    std::cin >> pause;
 
 // finish culmulating and average the density and velocity
     if( timeline_in % updateInfoPeriod_in == 0)
@@ -2698,7 +2692,6 @@ void ProcessFunc()
 
     std::cout << "timeline" << timeline << std::endl;
 
-    cout << " test1   " << ptrArray[5][1][1][1]->Vel3().x() << endl;
 #pragma omp parallel
 {
     #pragma omp sections
@@ -2724,24 +2717,8 @@ void ProcessFunc()
             }
         }
         cout << "Particles H " << ptrParticlesList_H->size() << endl;
-
-        
-    for( list<Particles>::iterator iter= ptrParticlesList_H->begin(); iter!=ptrParticlesList_H->end(); ++iter)
-    {
-        // locate the particle
-        Particles temp = *iter;
-        // get the weighting info of this particle
-        struct structg tempStr = temp.InttoStrp1();
-        // get the info of mass(weight of each simulation particle)
-        double tempNumber = temp.WeightNi();
-        if( tempStr.iw ==0 && tempStr.jw ==0 && tempStr.kw==0)
-            {cout << "infofoout1 " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << endl; 
-            }
-    }
-    int pause;
-    std::cin >> pause;
-        
         }
+
         #pragma omp section
         {
         for( list<Particles>::iterator iteratorM = ptrParticlesList_He->begin(); iteratorM != ptrParticlesList_He->end(); ++iteratorM)
@@ -2806,11 +2783,8 @@ void ProcessFunc()
         // get the info of mass(weight of each simulation particle)
         double tempNumber = temp.WeightNi();
 
+        cout << " vx = " << tempStr.vx << std::endl;
 
-
-        if( tempStr.iw ==0 && tempStr.jw ==0 && tempStr.kw==0)
-            {cout << "infofoinout33 " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << endl; 
-            }
     }
 
         cout << "Particles H " << ptrParticlesList_H->size() << endl;
@@ -2823,10 +2797,6 @@ void ProcessFunc()
         {
             Particles temp = *iterator;
             struct structg tempStruct = temp.InttoStrp1();
-            
-        if( tempStruct.iw ==0 && tempStruct.jw ==0 && tempStruct.kw==0)
-            {cout << "infoininin " << tempStruct.ig << " " << tempStruct.jg << " " << tempStruct.kg << endl; 
-            }
 
 
             int check; // check whether in the main domain or not, "0" means in "1" means out
@@ -2836,17 +2806,19 @@ void ProcessFunc()
             if( check == 0) // in the domain
             {   
                 Particles temptemp = Particles( temp.PosUint(), temp.VelParticles(), temp.WeightNi(), temp.MagneticIvarient());
-                cout <<  
-                " weight "  << tempStruct.ig << " " << tempStruct.jg << " " << tempStruct.kg <<
-                 " vel " << tempStruct.vx << endl; 
-                
+            cout << " pushback = " << tempStruct.ig << " vel = " << tempStruct.vx << std::endl; 
                 ptrParticlesList_H->push_back( temptemp);
                 iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
 
 
-        cout << "Particles Hnew " << ptrParticlesList_H->size() << endl;
+        cout << "Particles H_main " << ptrParticlesList_H->size() << endl;
+
+        int pause31;
+        std::cin >> pause31;
+
+        
         for( list<Particles>::iterator iter= ptrParticlesList_H->begin(); iter!=ptrParticlesList_H->end(); ++iter)
     {
         // locate the particle
@@ -2855,29 +2827,14 @@ void ProcessFunc()
         struct structg tempStr = temp.InttoStrp1();
         // get the info of mass(weight of each simulation particle)
         double tempNumber = temp.WeightNi();
-        if( tempStr.iw ==0 && tempStr.jw ==0 && tempStr.kw==0)
-            {cout << "infofoinout3 " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << endl; 
-            }
-    }
-    cout << "Particles Hnewnew " << ptrParticlesList_H->size() << endl;
 
-        for( list<Particles>::iterator iter= ptrParticlesListTemp_H->begin(); iter!=ptrParticlesListTemp_H->end(); ++iter)
-    {
-        // locate the particle
-        Particles temp = *iter;
-        // get the weighting info of this particle
-        struct structg tempStr = temp.InttoStrp1();
-        // get the info of mass(weight of each simulation particle)
-        double tempNumber = temp.WeightNi();
-        if( tempStr.iw ==0 && tempStr.jw ==0 && tempStr.kw==0)
-            {cout << "infofoinout3temp " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << endl; 
-            }
+        cout << " vx = " << tempStr.vx << std::endl;
+
     }
 
-    cout << " end test point " << endl;
-    int pause3;
-    std::cin >> pause3;
-    
+        cout << "Particles H after " << ptrParticlesList_H->size() << endl;
+    int pause32;
+    std::cin >> pause32;
 
     }
     #pragma omp section
@@ -2935,9 +2892,6 @@ void ProcessFunc()
                      timeline, 
                      updateInfoPeriod);
     
-    cout << " test2   " << ptrArray[5][0][0][0]->Vel3().x() << endl;
-    int pause ;
-    std::cin >> pause;
 
     // Run 2.4 // delete temp particlesLists
     delete ptrParticlesListTemp_H;
@@ -2980,6 +2934,7 @@ void ProcessFunc()
             }
         }
     }
+
     std::cout << " PrintOut " << std::endl;
     // Postrun 3.0 // Printout info in grids points
     if( timeline % printTimePeriod ==0)

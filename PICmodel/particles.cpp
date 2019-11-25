@@ -107,7 +107,7 @@ int Particles::UpdateUint_64()
 //    std:: cout << " >>> "<< px << " " << py << " " << pz << std::endl;
     // 4. transfor to face ip kp jp
     // 4.1 radial kp
-    L = sqrt(pow(px,2.0)+pow(py,2.0)+pow(pz,2.0))/radius;
+    L = sqrt( px*px + py*py + pz*pz )/radius;
 
     // check if in the main domain
     if( L > LMax_maindomain || L < LMin_maindomain) 
@@ -277,6 +277,14 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     Vector3 gradB6=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+1][strg_in->kg+1]->GradB3();
     Vector3 gradB7=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+2][strg_in->kg+1]->GradB3();
     Vector3 gradB8=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+2][strg_in->kg+1]->GradB3();
+    Vector3 tempPos1=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+1][strg_in->kg]->Pos3();
+    Vector3 tempPos2=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+1][strg_in->kg]->Pos3();
+    Vector3 tempPos3=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+2][strg_in->kg]->Pos3();
+    Vector3 tempPos4=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+2][strg_in->kg]->Pos3();
+    Vector3 tempPos5=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+1][strg_in->kg+1]->Pos3();
+    Vector3 tempPos6=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+1][strg_in->kg+1]->Pos3();
+    Vector3 tempPos7=ptrArray_in[strg_in->face][strg_in->ig+2][strg_in->jg+2][strg_in->kg+1]->Pos3();
+    Vector3 tempPos8=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+2][strg_in->kg+1]->Pos3();
     // iw jw kw are 0, 1, 2, ... , cellSize-1
     double w1 = 1- (strg_in->iw +1) * (strg_in->jw +1) * (strg_in->kw +1) / cellSize3;
     double w2 = 1- (cellSize1- strg_in->iw)* (strg_in->jw +1) * (strg_in->kw +1) / cellSize3;
@@ -311,7 +319,16 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     
     // 1 Revised E ( including gravity which is not accurate to the loation of unique particles)
     Vector3 tempPos;
-    tempPos = ptrArray_in[strg_in->face][strg_in->ig +1][strg_in->jg +1][strg_in->kg]->Pos3();
+
+    tempPos.Setx(tempPos1.x()*w1 + tempPos2.x()*w2 + tempPos3.x()*w3 + tempPos4.x()*w4 
+                + tempPos5.x()*w5 + tempPos6.x()*w6 + tempPos7.x()*w7 + tempPos8.x()*w8);
+                
+    tempPos.Sety(tempPos1.y()*w1 + tempPos2.y()*w2 + tempPos3.y()*w3 + tempPos4.y()*w4 
+                + tempPos5.y()*w5 + tempPos6.y()*w6 + tempPos7.y()*w7 + tempPos8.y()*w8);
+                
+    tempPos.Setz(tempPos1.z()*w1 + tempPos2.z()*w2 + tempPos3.z()*w3 + tempPos4.z()*w4 
+                + tempPos5.z()*w5 + tempPos6.z()*w6 + tempPos7.z()*w7 + tempPos8.z()*w8);
+
 //    std::cout << " tempPos1 " << tempPos.norm() << " " << tempPos.norm2() << " xyz " << tempPos.x() << " " << tempPos.y() << " " << tempPos.z() << " " << std::endl;
 //    std::cout << std::endl << " L^2 " << radius*radius/tempPos.norm2() << " qtm " << qtm << std::endl;
     
@@ -348,7 +365,6 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     Vector3 v3 = v1.PlusProduct(v2.CrossProduct(s));
     // 2.4 equation IV: v = v3 + E * qtm
     vp = v3.PlusProduct(tempe.ScaleProduct(qtm));
-
     // 3. update the postion 
     return UpdateUint_64();
 

@@ -268,10 +268,22 @@ inline void updateE( Vector3 GradPe_in)
 {
     if( update_type == 0)
     {
-    e3 = b3.CrossProduct(v3).MinusProduct(GradPe_in.ScaleProduct(1.0 / (density_H + density_He + density_O ) / qi0));
+        if( density_H >0.0 || density_He > 0.0 || density_O > 0.0){
+            e3 = b3.CrossProduct(v3).MinusProduct(GradPe_in.ScaleProduct(1.0 / (density_H + density_He + density_O ) / qi0));
+        } else
+        {
+            e3 = Vector3( 0.0, 0.0, 0.0);
+        }
+        
     } else
     {
-    e3 = b3.CrossProduct(ve3).MinusProduct(GradPe_in.ScaleProduct(1.0 / (density_H + density_He + density_O ) / qi0));
+        if( density_H > 0.0 || density_He > 0.0 || density_O > 0.0){
+            e3 = b3.CrossProduct(ve3).MinusProduct(GradPe_in.ScaleProduct(1.0 / (density_H + density_He + density_O ) / qi0));
+        } else
+        {
+            e3 = Vector3( 0.0, 0.0, 0.0);
+        }
+        
     }
     
 }
