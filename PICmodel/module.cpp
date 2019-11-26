@@ -2663,18 +2663,32 @@ void ProcessFunc()
             Particles temp = *iterator;
             struct structg tempStr = temp.InttoStrp1();
 
+       
 
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
             check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
    
+
             // check if still in the main domain
             if( check == 0) // in the domain
-            {   
+            {    
+        
+        std::cout << std::endl << std::bitset<64>(temp.PosUint()) << " info " <<
+        tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg <<" vel " << tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << std::endl;
+
+        tempStr = temp.InttoStrp1();
+        
+        std::cout << std::bitset<64>(temp.PosUint()) << " info " << 
+        tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " vel " << tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << std::endl;
+
+
                 ptrParticlesList_H->push_back( temp);
-                iterator = ptrParticlesListTemp_H->erase( iterator);
+        //        iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
+        int pause;
+        std::cin >> pause;
     }
     #pragma omp section
     {  
@@ -2689,7 +2703,7 @@ void ProcessFunc()
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                ptrParticlesList_He->push_back( temp);
+           //     ptrParticlesList_He->push_back( temp);
                 iterator = ptrParticlesListTemp_He->erase( iterator);
             }
         }
@@ -2707,7 +2721,7 @@ void ProcessFunc()
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                ptrParticlesList_O->push_back( temp);
+         //       ptrParticlesList_O->push_back( temp);
                 iterator = ptrParticlesListTemp_O->erase( iterator);
             }
         }

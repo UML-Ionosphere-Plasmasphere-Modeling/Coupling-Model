@@ -2,8 +2,8 @@ clear all;clc
 
 close all
 clearvars -except inputyear mode    
-h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
-%h5_files=dir(['c:\Users\Yifan\Documents\GITM-M-Modeling\PICmodel\*.h5']);
+% h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
+h5_files=dir(['c:\Users\Yifan\Documents\GITM-M-Modeling\PICmodel\*.h5']);
 h5_files=struct2cell(h5_files);
 h5_files=h5_files(1,:)';
 
@@ -22,10 +22,10 @@ toc;
 
 % control panel
 gridsize = 17;
-showsize = 17;
+showsize = 1;
 %%%%%%%%%%%%%%
 
-for face=[3,6]
+for face=[1:6]
 posx=data_const.pos3.x(:,:,:,face)/1e3/(6371);
 posy=data_const.pos3.y(:,:,:,face)/1e3/(6371);
 posz=data_const.pos3.z(:,:,:,face)/1e3/(6371);
@@ -36,6 +36,9 @@ posz_const=data_const.pos3.z(showsize,:,:,face)/1e3/(6371);
 Vx_const=data_const.v3.x(showsize,:,:,face);
 Vy_const=data_const.v3.y(showsize,:,:,face);
 Vz_const=data_const.v3.z(showsize,:,:,face);
+Ex_const=data_const.e3.x(showsize,:,:,face);
+Ey_const=data_const.e3.y(showsize,:,:,face);
+Ez_const=data_const.e3.z(showsize,:,:,face);
 
 Ex=data.e3.x(:,:,:,face);
 Ey=data.e3.y(:,:,:,face);
@@ -62,7 +65,7 @@ xlabel('X')
 ylabel('Y')
 zlabel('Z')
 figure(3)
-quiver3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),reshape(Ex,gridsize*gridsize*gridsize,1),reshape(Ey,gridsize*gridsize*gridsize,1),reshape(Ez,gridsize*gridsize*gridsize,1),3,'b');hold on
+quiver3(reshape(posx_const,1,gridsize*gridsize,1),reshape(posy_const,1,gridsize*gridsize,1),reshape(posz_const,1,gridsize*gridsize,1),reshape(Ex_const,1,gridsize*gridsize,1),reshape(Ey_const,1,gridsize*gridsize,1),reshape(Ez_const,1,gridsize*gridsize,1),3,'b');hold on
 grid on
 box on
 xlabel('X')

@@ -300,7 +300,13 @@ inline void updateE( Vector3 GradPe_in)
 // input curl B
 inline void updateve3( Vector3 curlB_in)
 {
-    ve3 = v3.MinusProduct( curlB_in.ScaleProduct( 1/ (density_H + density_He + density_O ) / qi0 / mu0));
+    if( density_H > 0.0 || density_He > 0.0 || density_O > 0.0){
+    ve3 = v3.MinusProduct( curlB_in.ScaleProduct( 1.0 / (density_H + density_He + density_O ) / qi0 / mu0));
+    } else
+    {
+        ve3 = Vector3( 0.0, 0.0, 0.0);
+    }
+    
 }
 
 // update B from Faraday's Law
