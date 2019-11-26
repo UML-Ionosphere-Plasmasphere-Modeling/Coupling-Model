@@ -2278,7 +2278,7 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
     double x = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().x();
     double y = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().y();
     double z = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3().z();
-    
+
     // Set velocity
     double r_top = sqrt( x * x + y * y + z * z);
     double theta_top = acos( z / r_top); 
@@ -2323,7 +2323,8 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
     // find the velocity of the point ( |x_earth|, y_earth) on the x-y plane
     double xx = x_earth;
     double yy = y_earth;
-    double vx_earth, vy_earth;
+    double vx_earth = 0.0;
+    double vy_earth = 0.0;
     double L;   // distance, half of period for sin function
 
 // cout << xx << " " << yy << " " << r0 << endl;
@@ -2333,13 +2334,18 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
     {
         xx = -1.0 * xx;
     }
-
+/*
+        if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
+        cout << " test0 " << face_in << " " << i_in << " " << j_in << " " << k_in << " xx " << xx << " yy " << yy <<
+        " pos " << x << " " << y << " " << z << endl;}
+*/
     if( yy <= r0 - r0 *xx / c0 && yy >= -1.0 * r0 + xx * r0 / c0)       // region 1
     {
     //    cout << " test 1 " << endl;
         L = 2.0 * r0 * ( 1.0 - xx / c0);
         vy_earth = -1.0 * PI * L / t0 * sqrt( 0.25 - yy*yy / L / L);
         vx_earth = 0.0;
+
     }
     else if( xx *xx + yy* yy <= r0 * r0) // region 2
     {
@@ -2348,17 +2354,30 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
         y_prime = r0 * ( 1.0- x_prime / c0);
         
         L = 2.0 * y_prime;  // y direction
-        if( L != 0.0)
+        if( L != 0.0 && yy < y_prime - 1e-6)
         {
             vy_earth = PI * L / t0 * sqrt( 0.25 - yy * yy / L / L);
         } else
         {
             vy_earth = 0.0;
         }
+/*        
+        if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
+        cout << " test1.5 " << face_in << " " << i_in << " " << j_in << " " << k_in << " vel_earth " << vx_earth << " " << vy_earth <<
+        " prime " << x_prime << " " << y_prime << 
+        " pos " << x << " " << y << " " << z << endl;}
+*/
         L = y_prime; // x direction
-        if( L != 0.0)
+        if( L != 0.0 && (xx - x_prime) / L < 1.0 - 1e-6)
         {
             vx_earth = PI * L / t0 * sqrt( (xx - x_prime) / L * ( 1.0 - ( xx - x_prime) / L));
+            
+/*      if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
+        cout << " test2 " << face_in << " " << i_in << " " << j_in << " " << k_in << " vel_earth " << vx_earth << " " << vy_earth <<
+        " prime " << x_prime << " " << y_prime << 
+        " check " << (xx - x_prime) / L * ( 1.0 - ( xx - x_prime) / L) << " " << ( xx - x_prime) / L << 
+        " pos " << x << " " << y << " " << z << endl;}
+*/
         } else
         {
             vx_earth = 0.0;
@@ -2368,6 +2387,8 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
         {
             vx_earth = -1.0 * vx_earth;
         }
+
+
     }
     else // other places
     {
@@ -2381,7 +2402,10 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
     }
 
 // cout << vx_earth << " " << vy_earth << " >> " << endl;
-
+/*    if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
+    cout << face_in << " " << i_in << " " << j_in << " " << k_in << " vel_earth " << vx_earth << " " << vy_earth <<
+     " pos " << x << " " << y << " " << z << endl;}
+ */
     // Step 3
     // find the realted velocity on the earth ( x_earth, y_earth, z_earth) or ( r_earth, theta_earth, phi_earth)
     // the velocity on the x and y direction is known as ( vx_earth, vy_earth)
@@ -2415,6 +2439,11 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
         vphi_top = 0.0;
     }
     
+/*    
+    if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
+    cout << face_in << " " << i_in << " " << j_in << " " << k_in << " vr_top " << vr_top << " vtheta_top " << vtheta_top << " vphi_top " << vphi_top << " " <<
+     " pos " << x << " " << y << " " << z << endl;}
+*/
 //  cout << " vr_top " << vr_top << " vtheta_top " << vtheta_top << " vphi_top " << vphi_top << " >>>> " << endl; //
 
     double vx_top = vr_top * sin( theta_top) * cos( phi_top) + 
@@ -2447,8 +2476,11 @@ if( k_in == 16 && j_in == fieldsGridsSize / 2 && face_in == 5 )
     Vector3 temp = Vector3( vx_top, vy_top, vz_top);
     Vector3 original_vel = ptrArray_in[face_in][i_in][j_in][k_in]->Vel3();
     ptrArray_in[face_in][i_in][j_in][k_in]->SetVel_topBoundary( original_vel.PlusProduct( temp));
-
-
+/*
+    if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
+    cout << face_in << " " << i_in << " " << j_in << " " << k_in << " vel " << vx_top << " " << vy_top << " " << vz_top << " " <<
+     " pos " << x << " " << y << " " << z << endl;}
+*/
 }
 
 //************************************************************************
@@ -2519,21 +2551,6 @@ void ProcessFunc()
     
     SetTopBoundary( ptrArray);
     SetBotBoundary( ptrArray);
-    for( int face = 0; face < totalFace; face++)
-    {
-        for( int i = 1; i < fieldsGridsSize+2; i++)
-        {
-            for( int j = 1; j < fieldsGridsSize+2; j++)
-            {
-                for( int k = 0; k < fieldsGridsSize+1; k++)
-                { 
-if( k == 16 && face == 5 )
-{
-    cout << i << " " << j << " " << k << " " << ptrArray[face][i][j][k]->Vel3().x() << " " << ptrArray[face][i][j][k]->E3().x()<< endl;//
-}
-                }}}};
-                int paupau;
-               std::cin >> paupau;
 
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     Vector3*** ptrVectorCellArray = VectorCellField();  
@@ -2572,12 +2589,10 @@ if( k == 16 && face == 5 )
     // Run 2.1 // Particles in main domain
         for( list<Particles>::iterator iteratorM = ptrParticlesList_H->begin(); iteratorM != ptrParticlesList_H->end(); ++iteratorM)
         {
-//std::cout << " check 0" << std::endl;
             Particles temp = *iteratorM;
             struct structg tempStr = temp.InttoStrp1();
             
             int check; // check whether in the main domain or not, "0" means in "1" means out
-            //test function//  double xxx= temp.VelParticles().x();    //cout << xxx << " ";
             // update velocity // update position
             check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
             // check if still in the main domain
@@ -2594,14 +2609,13 @@ if( k == 16 && face == 5 )
         {
         for( list<Particles>::iterator iteratorM = ptrParticlesList_He->begin(); iteratorM != ptrParticlesList_He->end(); ++iteratorM)
         {
-//std::cout << " check 0" << std::endl;
             Particles temp = *iteratorM;
             struct structg tempStr = temp.InttoStrp1();
             
             int check; // check whether in the main domain or not, "0" means in "1" means out
             //test function//  double xxx= temp.VelParticles().x();    //cout << xxx << " ";
             // update velocity // update position
- //           check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
+            check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
             // check if still in the main domain
             if( check == 1) // out of the domain
             {
@@ -2614,14 +2628,12 @@ if( k == 16 && face == 5 )
         {
         for( list<Particles>::iterator iteratorM = ptrParticlesList_O->begin(); iteratorM != ptrParticlesList_O->end(); ++iteratorM)
         {
-//std::cout << " check 0" << std::endl;
             Particles temp = *iteratorM;
             struct structg tempStr = temp.InttoStrp1();
             
             int check; // check whether in the main domain or not, "0" means in "1" means out
-            //test function//  double xxx= temp.VelParticles().x();    //cout << xxx << " ";
             // update velocity // update position
-    //        check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
+            check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
             // check if still in the main domain
             if( check == 1) // out of the domain
             {
@@ -2645,28 +2657,6 @@ if( k == 16 && face == 5 )
     {
     #pragma omp section
     {        
-        
-        for( list<Particles>::iterator iter= ptrParticlesList_H->begin(); iter!=ptrParticlesList_H->end(); ++iter)
-    {
-        // locate the particle
-        Particles temp = *iter;
-        // get the weighting info of this particle
-        struct structg tempStr = temp.InttoStrp1();
-        // get the info of mass(weight of each simulation particle)
-        double tempNumber = temp.WeightNi();
-
-  /*      cout << " H in main before = " << std::bitset<64>(temp.PosUint()) << " vel " << temp.VelParticles().x() << " " << temp.VelParticles().y()
-            << " " << temp.VelParticles().z() << " Ni " << temp.WeightNi() << " mu " << temp.MagneticIvarient() 
-            << "             " << tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw
-            <<std::endl;
-*/
-    }
-
-        cout << "Particles H before boris " << ptrParticlesList_H->size() << endl;
-    int pause33;
-    std::cin >> pause33;
-
-
         // Run 2.3 // Particles in temp domain
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)
         {
@@ -2677,47 +2667,14 @@ if( k == 16 && face == 5 )
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
             check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
-
-  /*          cout << " temp = " << check << " " << std::bitset<64>(temp.PosUint()) << " vel " << temp.VelParticles().x() << " " << temp.VelParticles().y()
-            << " " << temp.VelParticles().z() << " Ni " << temp.WeightNi() << " mu " << temp.MagneticIvarient()
-            << "             " << tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw
-            <<std::endl;
-   */         
+   
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                Particles temp1 = Particles( temp.PosUint(), Vector3( 999.999,999.999,999.999), temp.WeightNi(), temp.MagneticIvarient());
-
-
-                ptrParticlesList_H->push_back( temp1);
+                ptrParticlesList_H->push_back( temp);
                 iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
-
-
-        cout << "Particles H_main after boris " << ptrParticlesList_H->size() << endl;
-
-
-        
-        for( list<Particles>::iterator iter= ptrParticlesList_H->begin(); iter!=ptrParticlesList_H->end(); ++iter)
-    {
-        // locate the particle
-        Particles temp = *iter;
-        // get the weighting info of this particle
-        struct structg tempStr = temp.InttoStrp1();
-        // get the info of mass(weight of each simulation particle)
-        double tempNumber = temp.WeightNi();
-
-    /*    cout << " H in main after = " << std::bitset<64>(temp.PosUint()) << " vel " << temp.VelParticles().x() << " " << temp.VelParticles().y()
-            << " " << temp.VelParticles().z() << " Ni " << temp.WeightNi() << " mu " << temp.MagneticIvarient() 
-            << "             " << tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw
-            <<std::endl;
-    */        
-
-    }
-
-        cout << "Particles H after go through main " << ptrParticlesList_H->size() << endl;
-
     }
     #pragma omp section
     {  
@@ -2728,7 +2685,7 @@ if( k == 16 && face == 5 )
             struct structg tempStr = temp.InttoStrp1();
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-   //         check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
+            check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
@@ -2746,7 +2703,7 @@ if( k == 16 && face == 5 )
             struct structg tempStr = temp.InttoStrp1();
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-     //       check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
+            check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
@@ -2823,8 +2780,6 @@ if( k == 16 && face == 5 )
     {
         PrintOutHdf5( ptrArray, timeline, h5FileCheck);
     }
-    cout<< "endend "<<std::endl;
-std::cin >> paupau;
     }
     delete ptrVectorCellArray;
     delete ptrArray;

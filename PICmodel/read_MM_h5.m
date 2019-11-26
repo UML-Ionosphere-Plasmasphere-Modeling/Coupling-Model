@@ -2,8 +2,8 @@ clear all;clc
 
 close all
 clearvars -except inputyear mode    
-% h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
-h5_files=dir(['c:\Users\Yifan\Documents\GITM-M-Modeling\PICmodel\*.h5']);
+h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
+%h5_files=dir(['c:\Users\Yifan\Documents\GITM-M-Modeling\PICmodel\*.h5']);
 h5_files=struct2cell(h5_files);
 h5_files=h5_files(1,:)';
 
