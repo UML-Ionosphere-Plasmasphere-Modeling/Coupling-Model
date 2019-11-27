@@ -56,6 +56,7 @@
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
     const int fieldsGridsSize = 1 << fieldsGridsLevel;
     const int particlesGridsSize = 1 << particlesGridsLevel;
+    const int tempGridsCellLevel = 1;
   //  extern uint_64 fieldsGridsSize;
    // extern uint_64 particlesGridsSize;
     //extern uint_64 radialGridsSize;

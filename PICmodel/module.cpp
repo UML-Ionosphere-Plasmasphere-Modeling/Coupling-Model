@@ -159,6 +159,7 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
             for( int k =1; k<= fieldsGridsSize; k++)
             {
                 int s = fieldsGridsSize - 1;
+
                 // number density
                 switch (ionType_in)
                 {
@@ -172,6 +173,8 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
                     N = ptrArray_in[i][j][k][s]->Density_O();
                     break;
                 }
+                
+
                 // mass of each simulation particle 
                 Ni_simu = N / iniParticleNumberPerCell *mi0 * ptrVolumeCellArray_in[j][k][s];
                 for ( int t = 1; t <= iniParticleNumberPerCell; t++)
@@ -1289,16 +1292,6 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         }
     }
 
-    for( list<Particles>::iterator iter= ptrParticlesList_H_in->begin(); iter!=ptrParticlesList_H_in->end(); ++iter)
-    {
-        // locate the particle
-        Particles temp = *iter;
-        // get the weighting info of this particle
-        struct structg tempStr = temp.InttoStrp1();
-        // get the info of mass(weight of each simulation particle)
-        double tempNumber = temp.WeightNi();
-    }
-
 // For H particles in main domain    
     for( list<Particles>::iterator iter= ptrParticlesList_H_in->begin(); iter!=ptrParticlesList_H_in->end(); ++iter)
     {
@@ -1324,16 +1317,19 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
 */        
         Vector3 tempVel = temp.VelParticles();
         // update density and velocity in the grids
+
+        if( tempStr.kg > tempGridsCellLevel ){
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
-        
+        }
+        if( tempStr.kg < fieldsGridsSize - 1 - tempGridsCellLevel ){
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 1);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 1);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 1);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 1);
-    
+        }
 /*     
         std::cout << ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->Density() << " "
         << ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg]->Density() << " "
@@ -1361,15 +1357,18 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         // get the info of velocity
         Vector3 tempVel = temp.VelParticles();
         // update density and velocity in the grids
+        if( tempStr.kg > tempGridsCellLevel ){
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 4);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 4);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 4);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 4);
-        
+        }
+        if( tempStr.kg < fieldsGridsSize - 1 - tempGridsCellLevel ){
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 4);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 4);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 4);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 4);
+        }
     }
 
 
@@ -1385,18 +1384,21 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         // get the info of velocity
         Vector3 tempVel = temp.VelParticles();
         // update density and velocity in the grids
+        if( tempStr.kg > tempGridsCellLevel ){
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 16);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 16);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 16);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 16);
-        
+        }
+        if( tempStr.kg < fieldsGridsSize - 1 - tempGridsCellLevel ){
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 16);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 16);
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 16);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 16);
+        }
     }
 
-
+/*
 // For H particles in temp domain    
     for( list<Particles>::iterator iter= ptrParticlesListTemp_H_in->begin(); iter!=ptrParticlesListTemp_H_in->end(); ++iter)
     {
@@ -1406,6 +1408,8 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         struct structg tempStr = temp.InttoStrp1();
         // get the info of mass(weight of each simulation particle)
         double tempNumber = temp.WeightNi();
+
+        cout << tempNumber << endl;
 
         Vector3 tempVel = temp.VelParticles();
    
@@ -1423,8 +1427,8 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
         ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
         }
-
     }
+
 
 // For He particles in temp domain    
     for( list<Particles>::iterator iter= ptrParticlesListTemp_He_in->begin(); iter!=ptrParticlesListTemp_He_in->end(); ++iter)
@@ -1483,7 +1487,7 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
         }
     }
 
-
+*/
 // finish culmulating and average the density and velocity
     if( timeline_in % updateInfoPeriod_in == 0)
     {
@@ -2576,7 +2580,8 @@ void ProcessFunc()
     {
     if( timeline==1){
     // Printout the initial condition 
-    PrintOutHdf5( ptrArray, timeline, h5FileCheck);}
+    PrintOutHdf5( ptrArray, timeline, h5FileCheck);
+    }
 
     std::cout << "timeline" << timeline << std::endl;
 
