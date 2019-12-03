@@ -260,74 +260,74 @@ inline double FaceDensityBack(GridsPoints***** ptrArray_in, int face_in, int i_i
 inline double FaceNumberDensityL(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     double temp1, temp2;
-    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density_H() / mi0_H + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in][j_in][k_in]->Density_He() / mi0_He + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in][j_in][k_in]->Density_O() / mi0_O + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_O() / mi0_O;
-    temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_H() / mi0_H + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_He() / mi0_He + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_O() / mi0_O + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_O() / mi0_O;
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density_H() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_H() +
+            ptrArray_in[face_in][i_in][j_in][k_in]->Density_He() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_He() +
+            ptrArray_in[face_in][i_in][j_in][k_in]->Density_O() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_O();
+    temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_H() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_H() +
+            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_He() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_He() +
+            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_O() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_O();
     return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceNumberDensityT(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     double temp1, temp2;
-    temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_H() / mi0_H + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_He() / mi0_He + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_O() / mi0_O + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_O() / mi0_O;
-    temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_H() / mi0_H + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_He()/ mi0_He + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_O() / mi0_O + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_O() / mi0_O;
+    temp1 = ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_H() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_H() +
+            ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_He() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_He() +
+            ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_O() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_O();
+    temp2 = ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_H() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_H() +
+            ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_He() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_He() +
+            ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_O() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_O();
     return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceNumberDensityR(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     double temp1, temp2;
-    temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_H() / mi0_H +  ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_H() / mi0_H + 
-            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_He() / mi0_He +  ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_O() / mi0_O +  ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_O() / mi0_O;
+    temp1 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_H() +  ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_H() + 
+            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_He() +  ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_He() +
+            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_O() +  ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_O();
     
-    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_H() / mi0_H + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_He() / mi0_He + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_O() / mi0_O + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_O() / mi0_O ;
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_H() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_H() +
+            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_He() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_He() +
+            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_O() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_O();
     return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceNumberDensityBot(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     double temp1, temp2;
-    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density_H() / mi0_H + ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in][j_in][k_in]->Density_He() / mi0_He + ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in][j_in][k_in]->Density_O() / mi0_O+ ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_O() / mi0_O;
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density_H() + ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_H() +
+            ptrArray_in[face_in][i_in][j_in][k_in]->Density_He() + ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_He() +
+            ptrArray_in[face_in][i_in][j_in][k_in]->Density_O() + ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_O();
 
-    temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_H() / mi0_H + ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_H() / mi0_H + 
-            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_He() / mi0_He + ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_O() / mi0_O + ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_O() / mi0_O;
+    temp2 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_H() + ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_H() + 
+            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_He() + ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_He() +
+            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_O() + ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_O();
     return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceNumberDensityF(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     double temp1, temp2;
-    temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_H() / mi0_H + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_H() / mi0_H + 
-            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_He() / mi0_He + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_He() / mi0_He + 
-            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_O() / mi0_O + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_O() / mi0_O;
-    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_H() / mi0_H + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_He() / mi0_He + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_O() /mi0_O + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_O() / mi0_O;
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_H() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_H() + 
+            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_He() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_He() + 
+            ptrArray_in[face_in][i_in][j_in][k_in+1]->Density_O() + ptrArray_in[face_in][i_in][j_in+1][k_in+1]->Density_O();
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_H() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_H() +
+            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_He() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_He() +
+            ptrArray_in[face_in][i_in+1][j_in][k_in+1]->Density_O() + ptrArray_in[face_in][i_in+1][j_in+1][k_in+1]->Density_O();
     return (temp1 + temp2) * (1.0/4.0);
 };
 
 inline double FaceNumberDensityBack(GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     double temp1, temp2;
-    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density_H() / mi0_H + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in][j_in][k_in]->Density_He() / mi0_He + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in][j_in][k_in]->Density_O() / mi0_O + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_O() / mi0_O;
-    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_H() / mi0_H + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_H() / mi0_H +
-            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_He() / mi0_He + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_He() / mi0_He +
-            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_O() / mi0_O + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_O() / mi0_O;
+    temp1 = ptrArray_in[face_in][i_in][j_in][k_in]->Density_H() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_H() +
+            ptrArray_in[face_in][i_in][j_in][k_in]->Density_He() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_He() +
+            ptrArray_in[face_in][i_in][j_in][k_in]->Density_O() + ptrArray_in[face_in][i_in][j_in+1][k_in]->Density_O();
+    temp2 = ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_H() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_H() +
+            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_He() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_He() +
+            ptrArray_in[face_in][i_in+1][j_in][k_in]->Density_O() + ptrArray_in[face_in][i_in+1][j_in+1][k_in]->Density_O() ;
     return (temp1 + temp2) * (1.0/4.0);
 };
 
@@ -1023,6 +1023,13 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
 //************************************************************************
 void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int k_in, int j_in);
 
+//************************************************************************
+//************************************************************************
+// Function
+// Set initial condition
+//************************************************************************
+//************************************************************************
+void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCellArray_in, double*** ptrVolumeCellArray_in);
 
 //************************************************************************
 //************************************************************************

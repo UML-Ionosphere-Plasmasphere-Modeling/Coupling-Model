@@ -810,7 +810,7 @@ Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArr
 
                 Vector3 temp;
 
-                if( char_in == 'P')
+                if( char_in == 'P') // electron pressure Pe
                 {
                 // for each cell, calculate sum of n(face vector) * densities and devided by
                 // Volume to get the gradient at the center of cell  
@@ -837,7 +837,7 @@ Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArr
      //           std::cout << " --> " << temp.x() << " " << temp.y() << " " << temp.z() << std::endl;
                 gradientArray_in[i][j][k].SetVector3(temp); 
                 } 
-                else
+                else    // gradient |B|
                 {
                 temp = AreaVectorL( ptrArray_in, face_in, i, j, k).ScaleProduct( FaceNormBL(ptrArray_in, face_in, i, j, k) );
                 temp = temp.PlusProduct(
@@ -2219,7 +2219,6 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
     double r0 = radius * cos( r0_latitude * PI / 180.0);
     double c0 = radius * cos( c0_latitude * PI / 180.0);
     double t0 = t0_convection;
-    
     double r_earth = radius;
 
     std::cout << " Set Top boundary " << std::endl;
@@ -2269,6 +2268,97 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
 
 }
 
+
+//************************************************************************
+//************************************************************************
+// Function
+// Set initial condition
+//************************************************************************
+//************************************************************************
+void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCellArray_in, double*** ptrVolumeCellArray_in)
+{
+    double PI = 3.1415926535897;
+
+    for( int face = 0; face < totalFace; face++)
+    {
+        for( int i = 1; i < fieldsGridsSize+2; i++)
+        {
+            for( int j = 1; j < fieldsGridsSize+2; j++)
+            {
+                for( int k = 0; k < fieldsGridsSize+1; j++)
+                {
+                    if( ptrArray_in[face][i][j][k]->SetStopSign() == 1) continue;
+
+                    // Set velocity
+                    SetConvectionVel( GridsPoints***** ptrArray_in, face, i, j, k);
+                    // Set density: (rho0/2) / r * ( 1- tanh( r - 6.5))
+                    double x = ptrArray_in[face][i][j][k]->Pos3().x();
+                    double y = ptrArray_in[face][i][j][k]->Pos3().y();
+                    double z = ptrArray_in[face][i][j][k]->Pos3().z();
+                    
+                    double longtitude;
+                    double latitude;
+                    double A = 0.5 * ( rho_max - rho_min);
+                    double A_average = 0.5 * ( rho_max + rho_min);
+                    double rho;
+                    if( x == 0 && y == 0)
+                    { rho = A_average;}
+                    else if( x == 0 && y > 0)
+                    { longtitude = PI / 2.0;}
+                    else if( x == 0 && y < 0)
+                    { longtitude = PI / 2.0 * 3.0;}
+                    else if( x!= 0)
+                    {
+                    longtitude = atan( y / x);
+                    if( x<0) { longtitude = longtitude + PI;}
+                    }
+
+                    latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
+                    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
+
+                    double r = ptrArray_in[face][i][j][k]->Pos3().norm() / radius;
+                    double parameter = r * 0.5 * ( 1.0 - tanh( r - 6.5));
+                    ptrArray_in[face][i][j][k]->Density_H( rho * ratioH / mi0_H * parameter);
+                    ptrArray_in[face][i][j][k]->Density_He( rho * ratioHe / mi0_He * parameter);
+                    ptrArray_in[face][i][j][k]->Density_O( rho * ratioO / mi0_O * parameter);
+
+                }
+            }
+        }
+        
+        // Set E3 from k=1 to k=fieldsgridsize-1
+        ptrVectorCellArray_in = ValueGradient( ptrVectorCellArray_in, ptrVolumeCellArray_in, ptrArray_in, face, 'P');
+        UpdateE3( ptrVectorCellArray_in, ptrArray_in, face);
+        // Set E3 for k=0 and k=fieldsgridsize
+        for( int i = 1; i < fieldsGridsSize+2; i++)
+        {
+            for( int j = 1; j < fieldsGridsSize+2; j++)
+            {
+                int k = 0;
+                Vector3 temp_gradPe = (ptrArray_in[face][i][j][k+1]->Density() * ptrArray_in[face][i][j][k+1]->Temperature() -
+                                        ptrArray_in[face][i][j][k]->Density() * ptrArray_in[face][i][j][k]->Temperature()) * boltzmann_k 
+                                        / (ptrArray_in[face][i][j][k+1]->Pos3().norm() - ptrArray_in[face][i][j][k]->Pos3().norm()) ;
+                
+                ptrArray_in[face][i][j][fieldsGridsSize]->updateE( temp_gradPe);
+
+                k = fieldsGridsSize - 1;
+                
+                temp_gradPe = (ptrArray_in[face][i][j][k+1]->Density() * ptrArray_in[face][i][j][k+1]->Temperature() -
+                                        ptrArray_in[face][i][j][k]->Density() * ptrArray_in[face][i][j][k]->Temperature()) * boltzmann_k 
+                                        / (ptrArray_in[face][i][j][k+1]->Pos3().norm() - ptrArray_in[face][i][j][k]->Pos3().norm()) ;
+                ptrArray_in[face][i][j][fieldsGridsSize]->updateE( temp_gradPe);
+            }
+        }
+
+    }
+}
+
+//************************************************************************
+//************************************************************************
+// Function
+// Set velocity due to two convection cell patern
+//************************************************************************
+//************************************************************************
 void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     
@@ -2559,8 +2649,8 @@ void ProcessFunc()
 
     Titheridge_Te( ptrArray); // initial Temprature of electron
     
-    SetTopBoundary( ptrArray);
-    SetBotBoundary( ptrArray);
+//    SetTopBoundary( ptrArray);
+//    SetBotBoundary( ptrArray);
     
 
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
@@ -2573,6 +2663,7 @@ void ProcessFunc()
     cout << " Create array of Volume at cells and at grids" << endl;
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
     
+    SetInitialCondition( ptrArray, ptrVectorCellArray, ptrVolumeCellArray);
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     list<Particles>* ptrParticlesList_H = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_H, N0_H);
