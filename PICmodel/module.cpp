@@ -2405,6 +2405,12 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
        vx_earth *= -1.0 ;
     }
 
+    // Rotate for a x-axis pointed to the sun
+    double vx_earth_rotate = vy_earth;
+    double vy_earth_rotate = vx_earth;
+    vx_earth = vx_earth_rotate;
+    vy_earth = vy_earth_rotate; 
+
 // cout << vx_earth << " " << vy_earth << " >> " << endl;
 /*    if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
     cout << face_in << " " << i_in << " " << j_in << " " << k_in << " vel_earth " << vx_earth << " " << vy_earth <<
@@ -2555,6 +2561,7 @@ void ProcessFunc()
     
     SetTopBoundary( ptrArray);
     SetBotBoundary( ptrArray);
+    
 
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     Vector3*** ptrVectorCellArray = VectorCellField();  
