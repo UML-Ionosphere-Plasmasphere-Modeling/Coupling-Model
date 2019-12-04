@@ -11,8 +11,6 @@
     // diople moment for earth, T*m^3
     const double dMoment = -8e15;
 
-    // Simulation parameters (unit) s
-    const double tstep = 0.01 ;
     // charge (C)
     const double qi0 = 1.602e-19;
     // mass of ion in unit of (kg) for Hydrogen
@@ -84,9 +82,11 @@
 //************************************************************************
 //************************************************************************
 
-    static int timeLineLimit = 2000;
-    static int printTimePeriod = 100;
-    static int updateInfoPeriod = 5;
+    // Simulation parameters (unit) s
+    const double tstep = 0.01 ;
+    static int timeLineLimit = 720000;
+    static int printTimePeriod = 60000;
+    static int updateInfoPeriod = 10;
 
 //************************************************************************
 //************************************************************************
