@@ -29,7 +29,7 @@
     // Boltzmann_k constant in unit J·K−1
     const double boltzmann_k = 1.38e-23;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 1;
+    const int iniParticleNumberPerCell = 100;
     // g (m / s2)
     const double gravity = 9.8;
     // number density at base level ( / m^3) for H
@@ -50,7 +50,7 @@
     // fieldGridsLevel max shouble better be 9 
     // particlesGridsLevel max should be 10 greater than fieldGridsLevel
     
-    const int fieldsGridsLevel = 4;
+    const int fieldsGridsLevel = 5;
     const int particlesGridsLevel = fieldsGridsLevel + 10;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
@@ -84,9 +84,9 @@
 //************************************************************************
 //************************************************************************
 
-    static int timeLineLimit = 200;
-    static int printTimePeriod = 1;
-    static int updateInfoPeriod = 1;
+    static int timeLineLimit = 2000;
+    static int printTimePeriod = 100;
+    static int updateInfoPeriod = 5;
 
 //************************************************************************
 //************************************************************************
@@ -111,7 +111,7 @@
 // For some control
 //************************************************************************
 //************************************************************************ 
-    const int update_type = 0; // 0- no current 1- with current
+    const int update_type = 1; // 0- no current 1- with current
     
 //************************************************************************
 //************************************************************************
@@ -119,8 +119,8 @@
 // c0_latitude > r0_latitude
 //************************************************************************
 //************************************************************************ 
-    const double r0_latitude = 75.0;
-    const double c0_latitude = 80.0;
+    const double r0_latitude = 63.0;
+    const double c0_latitude = 75.0;
     const double t0_convection = 1800.0;
 //************************************************************************
 //************************************************************************

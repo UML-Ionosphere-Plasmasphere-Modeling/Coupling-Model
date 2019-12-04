@@ -21,8 +21,8 @@ data=h5read(h5_files{roll},'/ArrayOfGrids_1');
 toc;
 
 % control panel
-gridsize = 17;
-showsize = 1;
+gridsize = 33;
+showsize = 3;
 %%%%%%%%%%%%%%
 
 for face=[3,6]

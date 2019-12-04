@@ -2285,12 +2285,10 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
         {
             for( int j = 1; j < fieldsGridsSize+2; j++)
             {
-                for( int k = 0; k < fieldsGridsSize+1; j++)
+                for( int k = 0; k < fieldsGridsSize+1; k++)
                 {
-                    if( ptrArray_in[face][i][j][k]->SetStopSign() == 1) continue;
-
                     // Set velocity
-                    SetConvectionVel( GridsPoints***** ptrArray_in, face, i, j, k);
+                    SetConvectionVel( ptrArray_in, face, i, j, k);
                     // Set density: (rho0/2) / r * ( 1- tanh( r - 6.5))
                     double x = ptrArray_in[face][i][j][k]->Pos3().x();
                     double y = ptrArray_in[face][i][j][k]->Pos3().y();
@@ -2317,7 +2315,7 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
                     rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
 
                     double r = ptrArray_in[face][i][j][k]->Pos3().norm() / radius;
-                    double parameter = r * 0.5 * ( 1.0 - tanh( r - 6.5));
+                    double parameter = 0.5 * ( 1.0 - tanh( r - 6.5)) / r;
                     ptrArray_in[face][i][j][k]->Density_H( rho * ratioH / mi0_H * parameter);
                     ptrArray_in[face][i][j][k]->Density_He( rho * ratioHe / mi0_He * parameter);
                     ptrArray_in[face][i][j][k]->Density_O( rho * ratioO / mi0_O * parameter);
@@ -2325,7 +2323,7 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
                 }
             }
         }
-        
+
         // Set E3 from k=1 to k=fieldsgridsize-1
         ptrVectorCellArray_in = ValueGradient( ptrVectorCellArray_in, ptrVolumeCellArray_in, ptrArray_in, face, 'P');
         UpdateE3( ptrVectorCellArray_in, ptrArray_in, face);
@@ -2335,17 +2333,17 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
             for( int j = 1; j < fieldsGridsSize+2; j++)
             {
                 int k = 0;
-                Vector3 temp_gradPe = (ptrArray_in[face][i][j][k+1]->Density() * ptrArray_in[face][i][j][k+1]->Temperature() -
+                Vector3 temp_gradPe = ptrArray_in[face][i][j][k]->Pos3().NormalizedVector().ScaleProduct( (ptrArray_in[face][i][j][k+1]->Density() * ptrArray_in[face][i][j][k+1]->Temperature() -
                                         ptrArray_in[face][i][j][k]->Density() * ptrArray_in[face][i][j][k]->Temperature()) * boltzmann_k 
-                                        / (ptrArray_in[face][i][j][k+1]->Pos3().norm() - ptrArray_in[face][i][j][k]->Pos3().norm()) ;
+                                        / (ptrArray_in[face][i][j][k+1]->Pos3().norm() - ptrArray_in[face][i][j][k]->Pos3().norm())) ;
                 
-                ptrArray_in[face][i][j][fieldsGridsSize]->updateE( temp_gradPe);
+                ptrArray_in[face][i][j][k]->updateE( temp_gradPe);
 
                 k = fieldsGridsSize - 1;
                 
-                temp_gradPe = (ptrArray_in[face][i][j][k+1]->Density() * ptrArray_in[face][i][j][k+1]->Temperature() -
+                temp_gradPe = ptrArray_in[face][i][j][k]->Pos3().NormalizedVector().ScaleProduct( (ptrArray_in[face][i][j][k+1]->Density() * ptrArray_in[face][i][j][k+1]->Temperature() -
                                         ptrArray_in[face][i][j][k]->Density() * ptrArray_in[face][i][j][k]->Temperature()) * boltzmann_k 
-                                        / (ptrArray_in[face][i][j][k+1]->Pos3().norm() - ptrArray_in[face][i][j][k]->Pos3().norm()) ;
+                                        / (ptrArray_in[face][i][j][k+1]->Pos3().norm() - ptrArray_in[face][i][j][k]->Pos3().norm())) ;
                 ptrArray_in[face][i][j][fieldsGridsSize]->updateE( temp_gradPe);
             }
         }
@@ -2412,7 +2410,7 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
         x_earth = 0.0;
         y_earth = 0.0;
     }
-
+//????????????????????????
     // Step 2
     // find the velocity of the point ( |x_earth|, y_earth) on the x-y plane
     double xx = x_earth;
@@ -2424,62 +2422,46 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
 // cout << xx << " " << yy << " " << r0 << endl;
 
     double x_prime, y_prime;    // used for region 2
-    if( x_earth < 0.0) 
+    if( y_earth < 0.0) 
     {
-        xx = -1.0 * xx;
+        yy = -1.0 * yy;
     }
-/*
-        if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
-        cout << " test0 " << face_in << " " << i_in << " " << j_in << " " << k_in << " xx " << xx << " yy " << yy <<
-        " pos " << x << " " << y << " " << z << endl;}
-*/
-    if( yy <= r0 - r0 *xx / c0 && yy >= -1.0 * r0 + xx * r0 / c0)       // region 1
+    if( xx <= r0 - r0 *yy / c0 && xx >= -1.0 * r0 + yy * r0 / c0)       // region 1
     {
     //    cout << " test 1 " << endl;
-        L = 2.0 * r0 * ( 1.0 - xx / c0);
-        vy_earth = -1.0 * PI * L / t0 * sqrt( 0.25 - yy*yy / L / L);
-        vx_earth = 0.0;
+        L = 2.0 * r0 * ( 1.0 - yy / c0);
+        vx_earth = -1.0 * PI * L / t0 * sqrt( 0.25 - xx*xx / L / L);
+        vy_earth = 0.0;
 
     }
     else if( xx *xx + yy* yy <= r0 * r0) // region 2
     {
     //    cout << " test 2 " << endl;
-        x_prime = -1.0 * ( xx - r0*r0/c0 + sqrt( (xx-r0*r0/c0)*(xx-r0*r0/c0) - (r0*r0/c0/c0 -1.0)*(r0*r0-xx*xx-yy*yy))) / (r0*r0/c0/c0 - 1.0);
-        y_prime = r0 * ( 1.0- x_prime / c0);
+        y_prime = ( yy - r0*r0/c0 + sqrt( (yy-r0*r0/c0)*(yy-r0*r0/c0) - (r0*r0/c0/c0 -1.0)*(r0*r0-xx*xx-yy*yy))) / (1.0 - r0*r0/c0/c0);
+        x_prime = r0 * ( 1.0- y_prime / c0);
         
-        L = 2.0 * y_prime;  // y direction
-        if( L != 0.0 && yy < y_prime - 1e-6)
+        L = 2.0 * x_prime;  // x direction
+        if( L != 0.0 && xx < x_prime - 1e-6)
         {
-            vy_earth = PI * L / t0 * sqrt( 0.25 - yy * yy / L / L);
-        } else
-        {
-            vy_earth = 0.0;
-        }
-/*        
-        if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
-        cout << " test1.5 " << face_in << " " << i_in << " " << j_in << " " << k_in << " vel_earth " << vx_earth << " " << vy_earth <<
-        " prime " << x_prime << " " << y_prime << 
-        " pos " << x << " " << y << " " << z << endl;}
-*/
-        L = y_prime; // x direction
-        if( L != 0.0 && (xx - x_prime) / L < 1.0 - 1e-6)
-        {
-            vx_earth = PI * L / t0 * sqrt( (xx - x_prime) / L * ( 1.0 - ( xx - x_prime) / L));
-            
-/*      if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
-        cout << " test2 " << face_in << " " << i_in << " " << j_in << " " << k_in << " vel_earth " << vx_earth << " " << vy_earth <<
-        " prime " << x_prime << " " << y_prime << 
-        " check " << (xx - x_prime) / L * ( 1.0 - ( xx - x_prime) / L) << " " << ( xx - x_prime) / L << 
-        " pos " << x << " " << y << " " << z << endl;}
-*/
+            vx_earth = PI * L / t0 * sqrt( 0.25 - xx * xx / L / L);
         } else
         {
             vx_earth = 0.0;
         }
-        
-        if( yy > 0.0)
+
+        L = x_prime; // y direction
+        if( L != 0.0 && (yy- y_prime) / L < 1.0 - 1e-6)
         {
-            vx_earth = -1.0 * vx_earth;
+            vy_earth = PI * L / t0 * sqrt( (yy - y_prime) / L * ( 1.0 - ( yy - y_prime) / L));
+
+        } else
+        {
+            vy_earth = 0.0;
+        }
+        
+        if( xx > 0.0)
+        {
+            vy_earth = -1.0 * vy_earth;
         }
 
 
@@ -2490,17 +2472,18 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
         vx_earth = 0.0;
         vy_earth = 0.0;
     }
-    if( x_earth < 0.0) 
+    if( y_earth < 0.0) 
     {
-       vx_earth *= -1.0 ;
+       vy_earth *= -1.0 ;
     }
 
+/*
     // Rotate for a x-axis pointed to the sun
     double vx_earth_rotate = vy_earth;
     double vy_earth_rotate = vx_earth;
     vx_earth = vx_earth_rotate;
     vy_earth = vy_earth_rotate; 
-
+*/
 // cout << vx_earth << " " << vy_earth << " >> " << endl;
 /*    if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
     cout << face_in << " " << i_in << " " << j_in << " " << k_in << " vel_earth " << vx_earth << " " << vy_earth <<
@@ -2663,7 +2646,9 @@ void ProcessFunc()
     cout << " Create array of Volume at cells and at grids" << endl;
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
     
+    // Initialize condition
     SetInitialCondition( ptrArray, ptrVectorCellArray, ptrVolumeCellArray);
+
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     list<Particles>* ptrParticlesList_H = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_H, N0_H);
@@ -2777,21 +2762,19 @@ void ProcessFunc()
             if( check == 0) // in the domain
             {    
         
-        std::cout << std::endl << std::bitset<64>(temp.PosUint()) << " info " <<
+/*        std::cout << std::endl << std::bitset<64>(temp.PosUint()) << " info " <<
         tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg <<" vel " << tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << std::endl;
 
         tempStr = temp.InttoStrp1();
         
         std::cout << std::bitset<64>(temp.PosUint()) << " info " << 
         tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " vel " << tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << std::endl;
-
+*/
 
                 ptrParticlesList_H->push_back( temp);
         //        iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
-        int pause;
-        std::cin >> pause;
     }
     #pragma omp section
     {  
@@ -2806,8 +2789,8 @@ void ProcessFunc()
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-           //     ptrParticlesList_He->push_back( temp);
-                iterator = ptrParticlesListTemp_He->erase( iterator);
+                ptrParticlesList_He->push_back( temp);
+            //    iterator = ptrParticlesListTemp_He->erase( iterator);
             }
         }
     }
@@ -2824,8 +2807,8 @@ void ProcessFunc()
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-         //       ptrParticlesList_O->push_back( temp);
-                iterator = ptrParticlesListTemp_O->erase( iterator);
+                ptrParticlesList_O->push_back( temp);
+            //    iterator = ptrParticlesListTemp_O->erase( iterator);
             }
         }
         
