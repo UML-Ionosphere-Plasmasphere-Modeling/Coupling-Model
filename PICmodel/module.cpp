@@ -1254,6 +1254,102 @@ void UpdateB3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_i
     }        
 }
 
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Each calculation are on the girds.
+// Calculate the grad|B| on the gridspoints
+//************************************************************************
+//************************************************************************
+void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int face_in)
+{
+
+
+    for( int i = 1; i < fieldsGridsSize+2; i++)
+    {
+        for( int j = 1; j < fieldsGridsSize+2; j++)
+        {
+            for( int k = 1; k < fieldsGridsSize; k++)
+            {
+                Vector3 tempGradBNorm = Vector3(0.0, 0.0, 0.0);
+                    
+                if(i==1&&j==1) 
+                {
+                // gradPe at gridspoints
+                tempGradBNorm = gradBNorm_in[1][0][k-1].PlusProduct(
+                                    gradBNorm_in[1][1][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(           
+                                    gradBNorm_in[0][1][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[1][0][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[1][1][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[0][1][k]).ScaleProduct(1.0/6.0);            
+                }
+                else if(i==1&&j==fieldsGridsSize+1) 
+                {
+                
+                tempGradBNorm = gradBNorm_in[1][fieldsGridsSize+1][k-1].PlusProduct(
+                                    gradBNorm_in[1][fieldsGridsSize][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(           
+                                    gradBNorm_in[0][fieldsGridsSize][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[1][fieldsGridsSize+1][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[1][fieldsGridsSize][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[0][fieldsGridsSize][k]).ScaleProduct(1.0/6.0);
+                }
+                else if(i==fieldsGridsSize+1&&j==fieldsGridsSize+1)
+                {
+                tempGradBNorm = gradBNorm_in[fieldsGridsSize][fieldsGridsSize+1][k-1].PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize][fieldsGridsSize][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(           
+                                    gradBNorm_in[fieldsGridsSize+1][fieldsGridsSize][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize][fieldsGridsSize+1][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize][fieldsGridsSize][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize+1][fieldsGridsSize][k]).ScaleProduct(1.0/6.0);
+                }
+                else if(i==fieldsGridsSize+1&&j==1) 
+                {
+                tempGradBNorm = gradBNorm_in[fieldsGridsSize][0][k-1].PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize][1][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(           
+                                    gradBNorm_in[fieldsGridsSize+1][1][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize][0][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize][1][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[fieldsGridsSize+1][1][k]).ScaleProduct(1.0/6.0);                
+                } else
+                {
+                tempGradBNorm = gradBNorm_in[i-1][j-1][k-1].PlusProduct(
+                                    gradBNorm_in[i][j-1][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(           
+                                    gradBNorm_in[i-1][j][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[i][j][k-1]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[i-1][j-1][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[i][j-1][k]);
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[i-1][j][k]);    
+                tempGradBNorm = tempGradBNorm.PlusProduct(
+                                    gradBNorm_in[i][j][k]).ScaleProduct(1.0/8.0);
+                }
+                // update gradB3
+                ptrArray_in[face_in][i][j][k]->UpdateGradBNorm(tempGradBNorm);
+            }
+        }
+    }        
+}
+
 
 //************************************************************************
 //************************************************************************
@@ -1283,7 +1379,7 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
             {
                 for( int j = 1; j < fieldsGridsSize+2; j++)
                 {
-                    for( int k = 1; k < fieldsGridsSize; k++)
+                    for( int k = 1 + tempGridsCellLevel; k < fieldsGridsSize - tempGridsCellLevel; k++)
                     {  
                         ptrArray_in[face][i][j][k]->ResetParameters();
                     }
@@ -1497,7 +1593,7 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
             {
                 for( int j = 1; j < fieldsGridsSize+2; j++)
                 {
-                    for( int k = 1; k < fieldsGridsSize; k++)
+                    for( int k = 1 + tempGridsCellLevel; k < fieldsGridsSize - tempGridsCellLevel; k++)
                     {           
                     //check stopsign
                     if( ptrArray_in[face][i][j][k]->StopSign() == 1) continue;
@@ -2842,7 +2938,7 @@ void ProcessFunc()
 
     if( timeline % updateInfoPeriod ==0)
     {
-    std::cout << " Update gridspoints info" << std::endl;
+    std::cout << " Update gridspoints info " << timeline << std::endl;
         // Run 2.5.2 
         for( int face = 0; face < 6; face++)
         {
@@ -2869,15 +2965,15 @@ void ProcessFunc()
             UpdateB3( ptrVectorCellArray, ptrArray, face);
             // Update gradient norm B
             ptrVectorCellArray = ValueGradient( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'B');
-
+            UpdateGradBNorm( ptrVectorCellArray, ptrArray, face);
             }
         }
     }
 
-    std::cout << " PrintOut " << std::endl;
     // Postrun 3.0 // Printout info in grids points
     if( timeline % printTimePeriod ==0)
     {
+        std::cout << " PrintOut " << std::endl;
         PrintOutHdf5( ptrArray, timeline, h5FileCheck);
     }
     }

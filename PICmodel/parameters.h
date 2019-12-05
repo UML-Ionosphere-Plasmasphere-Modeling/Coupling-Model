@@ -3,6 +3,12 @@
 #include<iostream>
 #include<cmath>
     using uint_64 = unsigned long long;
+//************************************************************************
+//************************************************************************
+// earth physics parameters control
+//************************************************************************
+//************************************************************************
+
     // Parameters constants of the earth
     // Length of face in 6
     const double length = 9220000.0;
@@ -26,18 +32,16 @@
     const double ikT = 1.38e-20;
     // Boltzmann_k constant in unit J·K−1
     const double boltzmann_k = 1.38e-23;
-    // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 100;
     // g (m / s2)
     const double gravity = 9.8;
-    // number density at base level ( / m^3) for H
-    const double N0_H =  100000000000.0;
-    // number density at base level for He
-    const double N0_He = 100000000000.0;
-    // number density at base level for O
-    const double N0_O =  100000000000.0;
     // angular velocity of Earth ( rad/s)
     const double omega_earth = 7.292e-5;
+
+//************************************************************************
+//************************************************************************
+// grids size control
+//************************************************************************
+//************************************************************************
 
     // These two levels are between 1 and 20, and particlesgridslevel is greater than the fieldgridslevel.
     // The radialgridslevel is calculated from the fieldgridslevel to make the fieldgrids-cell similar to 
@@ -83,10 +87,10 @@
 //************************************************************************
 
     // Simulation parameters (unit) s
-    const double tstep = 0.01 ;
+    const double tstep = 0.2 ;
     static int timeLineLimit = 720000;
-    static int printTimePeriod = 60000;
-    static int updateInfoPeriod = 10;
+    static int printTimePeriod = 100; //60000;
+    static int updateInfoPeriod = 10; //10;
 
 //************************************************************************
 //************************************************************************
@@ -99,11 +103,19 @@
 
 //************************************************************************
 //************************************************************************
-// For some parameters of some functions
+// Initial particles control
 //************************************************************************
 //************************************************************************           
     const double mu_MaxwellDis = 0.0;
-    const double sigma_MaxwellDis = 0.15;
+    const double sigma_MaxwellDis = 0.15;;
+    // number density at base level ( / m^3) for H
+    const double N0_H =  100000000000.0;
+    // number density at base level for He
+    const double N0_He = 100000000000.0;
+    // number density at base level for O
+    const double N0_O =  100000000000.0;
+    // initial particle numbers per cell ( count)
+    const int iniParticleNumberPerCell = 50;
 
     
 //************************************************************************
@@ -111,7 +123,7 @@
 // For some control
 //************************************************************************
 //************************************************************************ 
-    const int update_type = 1; // 0- no current 1- with current
+    const int update_type = 0; // 0- no current 1- with current
     
 //************************************************************************
 //************************************************************************
@@ -119,18 +131,18 @@
 // c0_latitude > r0_latitude
 //************************************************************************
 //************************************************************************ 
-    const double r0_latitude = 63.0;
+    const double r0_latitude = 66.0;
     const double c0_latitude = 75.0;
     const double t0_convection = 1800.0;
 //************************************************************************
 //************************************************************************
-// For bpt boundary initialization, in degree
+// For bot boundary initialization, in degree
 //************************************************************************
 //************************************************************************ 
     const double rho_max = 7.0e-18;
     const double rho_min = 1.0e-18;
-    const double ratioH = 1.0 / 21.0;
-    const double ratioHe = 4.0 /21.0;
-    const double ratioO = 16.0 / 21.0;
+    const double ratioH = 1.0 / 3.0;
+    const double ratioHe = 1.0 /3.0;
+    const double ratioO = 1.0 / 3.0;
 
 #endif

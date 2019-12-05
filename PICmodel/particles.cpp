@@ -219,13 +219,13 @@ Vector3 Particles::LocalB( struct structg *strg_in, GridsPoints***** ptrArray_in
     Vector3 temp7=ptrArray_in[strg_in->face][strg_in->ig+1][strg_in->jg+1][strg_in->kg+1]->B3();
     Vector3 temp8=ptrArray_in[strg_in->face][strg_in->ig][strg_in->jg+1][strg_in->kg+1]->B3();
     double w1 = 1-strg_in->iw * strg_in->jw * strg_in->kw / pow( cellSize3, 3);
-    double w2 = 1-(cellSize3- strg_in->iw)* strg_in->jw * strg_in->kw / pow( cellSize3, 3);
-    double w3 = 1-(cellSize3- strg_in->iw) * (cellSize3- strg_in->jw) * strg_in->kw / pow( cellSize3, 3);
-    double w4 = 1-strg_in->iw * (cellSize3- strg_in->jw )* strg_in->kw / pow( cellSize3, 3);
-    double w5 = 1-strg_in->iw * strg_in->jw * (cellSize3- strg_in->kw) / pow( cellSize3, 3);
-    double w6 = 1-(cellSize3 - strg_in->iw)* strg_in->jw * (cellSize3- strg_in->kw) / pow( cellSize3, 3);
-    double w7 = 1-(cellSize3- strg_in->iw) * (cellSize3- strg_in->jw) * (cellSize3- strg_in->kw) / pow( cellSize3, 3);
-    double w8 = 1-(strg_in->iw * (cellSize3- strg_in->jw )* (cellSize3- strg_in->kw)) / pow( cellSize3, 3);
+    double w2 = 1-(cellSize3- strg_in->iw)* strg_in->jw * strg_in->kw / pow( cellSize3, 3.0);
+    double w3 = 1-(cellSize3- strg_in->iw) * (cellSize3- strg_in->jw) * strg_in->kw / pow( cellSize3, 3.0);
+    double w4 = 1-strg_in->iw * (cellSize3- strg_in->jw )* strg_in->kw / pow( cellSize3, 3.0);
+    double w5 = 1-strg_in->iw * strg_in->jw * (cellSize3- strg_in->kw) / pow( cellSize3, 3.0);
+    double w6 = 1-(cellSize3 - strg_in->iw)* strg_in->jw * (cellSize3- strg_in->kw) / pow( cellSize3, 3.0);
+    double w7 = 1-(cellSize3- strg_in->iw) * (cellSize3- strg_in->jw) * (cellSize3- strg_in->kw) / pow( cellSize3, 3.0);
+    double w8 = 1-(strg_in->iw * (cellSize3- strg_in->jw )* (cellSize3- strg_in->kw)) / pow( cellSize3, 3.0);
 
     Vector3 temp;
     temp.Setx(temp1.x()*w1 + temp2.x()*w2 + temp3.x()*w3 + temp4.x()*w4 

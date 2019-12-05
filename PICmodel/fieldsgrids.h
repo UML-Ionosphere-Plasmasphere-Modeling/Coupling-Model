@@ -319,7 +319,11 @@ void updatedB( Vector3 E_in)
 }
 
 
-
+// update grad norm B
+inline Vector3 UpdateGradBNorm( Vector3 gradBNorm_other)
+{
+    gradB3 = gradBNorm_other;
+}
 
 
 // return Vector3 gradB3

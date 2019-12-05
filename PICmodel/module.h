@@ -1034,6 +1034,16 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
 //************************************************************************
 //************************************************************************
 // FUNCTION
+// Each calculation are on the girds.
+// Calculate the grad|B| on the gridspoints
+//************************************************************************
+//************************************************************************
+void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int face_in);
+
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
 // Initialization the particles for the magnetic moment / adiabatic invarient
 // 
 //************************************************************************
