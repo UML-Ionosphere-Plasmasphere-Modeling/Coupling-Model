@@ -732,6 +732,7 @@ Vector3*** VectorCellField()
 //************************************************************************
 Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char field_in)
 {
+#pragma omp parallel for collapse(3)
     for( int i = 0; i < fieldsGridsSize+2; i++)
     {
         for( int j = 0; j < fieldsGridsSize+2; j++)
@@ -796,6 +797,7 @@ Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray
 //************************************************************************
 Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char char_in)
 {
+#pragma omp parallel for collapse(3)
     for( int i = 0; i < fieldsGridsSize+2; i++)
     {
         for( int j = 0; j < fieldsGridsSize+2; j++)
@@ -868,7 +870,8 @@ Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArr
 //************************************************************************
 //************************************************************************
 void UpdateVe3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_in)
-{
+{   
+#pragma omp parallel for collapse(3)
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
         for( int j = 1; j < fieldsGridsSize+2; j++)
@@ -956,7 +959,7 @@ void UpdateVe3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_
 
 //************************************************************************
 //************************************************************************
-// FUNCTION
+// FUNCTION NOT used but is a good oppinion
 // As in the updating curlField and gradientPe array, some variables are
 // repeating calculating, it is suitable to put them in one function.
 // Therefore, we need three matrix of curlB, curlE, and gradientPe. 
@@ -1070,6 +1073,7 @@ void updateCellMatrix(Vector3**** curlB_in, Vector3**** curlE_in,
 void UpdateE3( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
 {
 
+#pragma omp parallel for collapse(3)
 
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
@@ -1168,6 +1172,7 @@ void UpdateE3( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
 void UpdateB3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_in)
 {
 
+#pragma omp parallel for collapse(3)
 
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
@@ -1264,6 +1269,7 @@ void UpdateB3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_i
 void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int face_in)
 {
 
+#pragma omp parallel for collapse(3)
 
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
@@ -1613,6 +1619,7 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
             }
         }   
 
+#pragma omp parallel for collapse(4)
         // reset stopsign
         for( int face = 0; face < totalFace; face++)
         {
@@ -2747,11 +2754,33 @@ void ProcessFunc()
 
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
-    list<Particles>* ptrParticlesList_H = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_H, N0_H);
-
-    list<Particles>* ptrParticlesList_He = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_He, N0_He);
     
-    list<Particles>* ptrParticlesList_O = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_O, N0_O);
+    list<Particles>* ptrParticlesList_H;
+    
+    list<Particles>* ptrParticlesList_He;
+    
+    list<Particles>* ptrParticlesList_O;
+#pragma omp parallel
+{
+    #pragma omp sections
+    {
+        #pragma omp section
+        {
+        ptrParticlesList_H = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_H, N0_H);
+        }
+        #pragma omp section
+        {
+        ptrParticlesList_He = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_He, N0_He);    
+        }
+        #pragma omp section
+        {
+        ptrParticlesList_O = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_O, N0_O);    
+        }
+    }
+    #pragma omp barrier
+}
+   
+    
     // Run 2.0
     
     cout << " Start" << endl;
@@ -2831,16 +2860,17 @@ void ProcessFunc()
 }
 
         // Run 2.2 // Create temp particle lists    
-        list<Particles>* ptrParticlesListTemp_H = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);
-        list<Particles>* ptrParticlesListTemp_He = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
-        list<Particles>* ptrParticlesListTemp_O = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
+        list<Particles>* ptrParticlesListTemp_H; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);
+        list<Particles>* ptrParticlesListTemp_He; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
+        list<Particles>* ptrParticlesListTemp_O; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
 
     #pragma omp parallel
     {
     #pragma omp sections
     {
     #pragma omp section
-    {        
+    {   
+        ptrParticlesListTemp_H = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);     
         // Run 2.3 // Particles in temp domain
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)
         {
@@ -2874,7 +2904,7 @@ void ProcessFunc()
     }
     #pragma omp section
     {  
-   
+        ptrParticlesListTemp_He = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_He->begin(); iterator != ptrParticlesListTemp_He->end(); ++iterator)
         {
             Particles temp = *iterator;
@@ -2892,7 +2922,7 @@ void ProcessFunc()
     }
     #pragma omp section
     {    
-    
+        ptrParticlesListTemp_O = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_O->begin(); iterator != ptrParticlesListTemp_O->end(); ++iterator)
         {
             Particles temp = *iterator;
