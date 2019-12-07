@@ -124,8 +124,8 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
                     break;
                 }
                 // mass of each simulation particle 
-                Ni_simu = N / iniParticleNumberPerCell * ptrVolumeCellArray_in[j][k][s];
-                for ( int t = 1; t <= iniParticleNumberPerCell; t++)
+                Ni_simu = N / tempParticleNumberPerCell * ptrVolumeCellArray_in[j][k][s];
+                for ( int t = 1; t <= tempParticleNumberPerCell; t++)
                 {
                 // calculate random position
                 Vector3 temp1 = ptrArray_in[i][j][k][s]->Pos3();
@@ -176,8 +176,8 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
                 
 
                 // mass of each simulation particle 
-                Ni_simu = N / iniParticleNumberPerCell *mi0 * ptrVolumeCellArray_in[j][k][s];
-                for ( int t = 1; t <= iniParticleNumberPerCell; t++)
+                Ni_simu = N / tempParticleNumberPerCell *mi0 * ptrVolumeCellArray_in[j][k][s];
+                for ( int t = 1; t <= tempParticleNumberPerCell; t++)
                 {
                 // calculate random position
                 Vector3 temp1 = ptrArray_in[i][j][k][s]->Pos3();
@@ -2799,7 +2799,8 @@ cout << LMin << " " << LMax << endl;
     {
         #pragma omp section
         {
-    // Run 2.1 // Particles in main domain
+
+        // Run 2.1 // Particles in main domain
         for( list<Particles>::iterator iteratorM = ptrParticlesList_H->begin(); iteratorM != ptrParticlesList_H->end(); ++iteratorM)
         {
             Particles temp = *iteratorM;
@@ -2814,9 +2815,7 @@ cout << LMin << " " << LMax << endl;
                 iteratorM = ptrParticlesList_H->erase( iteratorM);
                 
             }
-        }
-        cout << "Particles H " << ptrParticlesList_H->size() << endl;
-        }
+        }}
 
         #pragma omp section
         {
@@ -2870,6 +2869,7 @@ cout << LMin << " " << LMax << endl;
     {
     #pragma omp section
     {   
+
         ptrParticlesListTemp_H = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);     
         // Run 2.3 // Particles in temp domain
         for( list<Particles>::iterator iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)

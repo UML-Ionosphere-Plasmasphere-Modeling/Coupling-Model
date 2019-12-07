@@ -87,10 +87,10 @@
 //************************************************************************
 
     // Simulation parameters (unit) s
-    const double tstep = 0.2 ;
+    const double tstep = 0.005 ;
     static int timeLineLimit = 720000;
-    static int printTimePeriod = 5; //60000;
-    static int updateInfoPeriod = 5; //10;
+    static int printTimePeriod = 20000; //60000;
+    static int updateInfoPeriod = 10; //10;
 
 //************************************************************************
 //************************************************************************
@@ -115,7 +115,9 @@
     // number density at base level for O
     const double N0_O =  100000000000.0;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 5;
+    const int iniParticleNumberPerCell = 50;
+    // temp cell particle number per cell ( count)
+    const int tempParticleNumberPerCell = 200;
 
     
 //************************************************************************

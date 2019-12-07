@@ -17,12 +17,12 @@ filesinfo=h5info(h5_files{roll});
 % h1=h5disp(h5_files{roll});
 % gpsinfo=hdf5info('D:\DATA_calculation\TEC_mat\2015\gps150314g.001.hdf5');
 data_const = h5read(h5_files{roll},'/ArrayOfGrids_const');
-data=h5read(h5_files{roll},'/ArrayOfGrids_5');
+data=h5read(h5_files{roll},'/ArrayOfGrids_1');
 toc;
 
 % control panel
-gridsize = 65;
-showsize = 65;
+gridsize = 17;
+showsize = 17;
 %%%%%%%%%%%%%%
 
 for face=[3,6]
@@ -39,6 +39,8 @@ Vz_const=data_const.v3.z(showsize,:,:,face);
 Ex_const=data_const.e3.x(showsize,:,:,face);
 Ey_const=data_const.e3.y(showsize,:,:,face);
 Ez_const=data_const.e3.z(showsize,:,:,face);
+N_const = data_const.densityH(showsize,:,:,face);
+
 
 Ex=data.e3.x(:,:,:,face);
 Ey=data.e3.y(:,:,:,face);
@@ -89,5 +91,53 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+
 end
+
+%equatorial plane density
+for face=[1,2,4,5]
+posx_equa=data_const.pos3.x(:,(gridsize+1)/2,:,face)/1e3/(6371);
+posy_equa=data_const.pos3.y(:,(gridsize+1)/2,:,face)/1e3/(6371);
+posz_equa=data_const.pos3.z(:,(gridsize+1)/2,:,face)/1e3/(6371);
+N_equa = data_const.densityH(:,(gridsize+1)/2,:,face);
+
+figure(6)
+scatter3(reshape(posx_equa,[],1),reshape(posy_equa,[],1),reshape(posz_equa,[],1),10,reshape(N_equa,[],1),'filled');hold on
+grid on
+box on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+end    
+
+for face=[1:6]
+posx_equa=data_const.pos3.x(:,:,:,face)/1e3/(6371);
+posy_equa=data_const.pos3.y(:,:,:,face)/1e3/(6371);
+posz_equa=data_const.pos3.z(:,:,:,face)/1e3/(6371);
+N_equa = data_const.densityH(:,:,:,face);
+
+figure(6)
+scatter3(reshape(posx_equa,[],1),reshape(posy_equa,[],1),reshape(posz_equa,[],1),10,reshape(N_equa,[],1),'filled');hold on
+grid on
+box on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+end
+
+for face=[1,2,4,5]
+posx=data_const.pos3.x(showsize,:,:,face)/1e3/(6371);
+posy=data_const.pos3.y(showsize,:,:,face)/1e3/(6371);
+posz=data_const.pos3.z(showsize,:,:,face)/1e3/(6371);
+N = data_const.densityH(showsize,:,:,face);
+
+figure(7)
+scatter3(reshape(posx,[],1),reshape(posy,[],1),reshape(posz,[],1),10,reshape(N,[],1),'filled');hold on
+grid on
+box on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+end    
+
 end
