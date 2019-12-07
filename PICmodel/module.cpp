@@ -2738,7 +2738,7 @@ void ProcessFunc()
 //    SetTopBoundary( ptrArray);
 //    SetBotBoundary( ptrArray);
     
-
+cout << LMin << " " << LMax << endl;
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     Vector3*** ptrVectorCellArray = VectorCellField();  
 

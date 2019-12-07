@@ -52,7 +52,7 @@
     // fieldGridsLevel max shouble better be 9 
     // particlesGridsLevel max should be 10 greater than fieldGridsLevel
     
-    const int fieldsGridsLevel = 5;
+    const int fieldsGridsLevel = 6;
     const int particlesGridsLevel = fieldsGridsLevel + 10;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
@@ -89,8 +89,8 @@
     // Simulation parameters (unit) s
     const double tstep = 0.2 ;
     static int timeLineLimit = 720000;
-    static int printTimePeriod = 100; //60000;
-    static int updateInfoPeriod = 10; //10;
+    static int printTimePeriod = 5; //60000;
+    static int updateInfoPeriod = 5; //10;
 
 //************************************************************************
 //************************************************************************
@@ -115,7 +115,7 @@
     // number density at base level for O
     const double N0_O =  100000000000.0;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 50;
+    const int iniParticleNumberPerCell = 5;
 
     
 //************************************************************************
@@ -131,8 +131,8 @@
 // c0_latitude > r0_latitude
 //************************************************************************
 //************************************************************************ 
-    const double r0_latitude = 66.0;
-    const double c0_latitude = 75.0;
+    const double r0_latitude = 72.0;
+    const double c0_latitude = 82.0;
     const double t0_convection = 1800.0;
 //************************************************************************
 //************************************************************************

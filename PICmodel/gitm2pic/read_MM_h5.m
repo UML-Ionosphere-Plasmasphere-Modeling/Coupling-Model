@@ -17,15 +17,15 @@ filesinfo=h5info(h5_files{roll});
 % h1=h5disp(h5_files{roll});
 % gpsinfo=hdf5info('D:\DATA_calculation\TEC_mat\2015\gps150314g.001.hdf5');
 data_const = h5read(h5_files{roll},'/ArrayOfGrids_const');
-data=h5read(h5_files{roll},'/ArrayOfGrids_900');
+data=h5read(h5_files{roll},'/ArrayOfGrids_5');
 toc;
 
 % control panel
-gridsize = 33;
-showsize = 5;
+gridsize = 65;
+showsize = 65;
 %%%%%%%%%%%%%%
 
-for face=[1:6]
+for face=[3,6]
 posx=data_const.pos3.x(:,:,:,face)/1e3/(6371);
 posy=data_const.pos3.y(:,:,:,face)/1e3/(6371);
 posz=data_const.pos3.z(:,:,:,face)/1e3/(6371);
@@ -51,7 +51,7 @@ Vy=data.v3.y(:,:,:,face);
 Vz=data.v3.z(:,:,:,face);
 N=data.density(:,:,:,face);
 figure(1)
-plot3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),'*');hold on
+plot3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),'o');hold on
 grid on
 box on
 xlabel('X')
