@@ -3,7 +3,7 @@ clear all;clc
 close all
 clearvars -except inputyear mode    
 % h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
-h5_files=dir(['c:\Users\Yifan\Documents\Coupling-Model\PICmodel\*.h5']);
+h5_files=dir(['D:\DATA_calculation\GITM_MATLAB\GITM_OUTPUT_READ\*.h5']);
 h5_files=struct2cell(h5_files);
 h5_files=h5_files(1,:)';
 
@@ -17,15 +17,32 @@ filesinfo=h5info(h5_files{roll});
 % h1=h5disp(h5_files{roll});
 % gpsinfo=hdf5info('D:\DATA_calculation\TEC_mat\2015\gps150314g.001.hdf5');
 data_const = h5read(h5_files{roll},'/ArrayOfGrids_const');
-data=h5read(h5_files{roll},'/ArrayOfGrids_1');
+% data=h5read(h5_files{roll},'/ArrayOfGrids_1');
 toc;
 
 % control panel
 gridsize = 17;
-showsize = 17;
+showsize = 1;
 %%%%%%%%%%%%%%
+pos3x=data_const.pos3.x/1e3/(6371);
+pos3y=data_const.pos3.y/1e3/(6371);
+pos3z=data_const.pos3.z/1e3/(6371);
+EEx=data_const.e3.x;
+EEy=data_const.e3.y;
+EEz=data_const.e3.z;
+temperature=data_const.temperature;
+densityH=data_const.densityH;
+densityHe=data_const.densityHe;
+densityO=data_const.densityO;
+% % % % % % % % % % find the equator
+pp=find(pos3z==0);
+% % % % % % % % % % 
+px=pos3x(pp);
+py=pos3y(pp);
+pEx=EEx(pp);
+pEy=EEy(pp);
 
-for face=[3,6]
+for face=[1:6]
 posx=data_const.pos3.x(:,:,:,face)/1e3/(6371);
 posy=data_const.pos3.y(:,:,:,face)/1e3/(6371);
 posz=data_const.pos3.z(:,:,:,face)/1e3/(6371);
@@ -39,35 +56,34 @@ Vz_const=data_const.v3.z(showsize,:,:,face);
 Ex_const=data_const.e3.x(showsize,:,:,face);
 Ey_const=data_const.e3.y(showsize,:,:,face);
 Ez_const=data_const.e3.z(showsize,:,:,face);
-N_const = data_const.densityH(showsize,:,:,face);
-
-
-Ex=data.e3.x(:,:,:,face);
-Ey=data.e3.y(:,:,:,face);
-Ez=data.e3.z(:,:,:,face);
+Bx_const=data_const.b3.x(showsize,:,:,face);
+By_const=data_const.b3.y(showsize,:,:,face);
+Bz_const=data_const.b3.z(showsize,:,:,face);
+Ex=data_const.e3.x(:,:,:,face);
+Ey=data_const.e3.y(:,:,:,face);
+Ez=data_const.e3.z(:,:,:,face);
 Bx=data_const.b3.x(:,:,:,face);
 By=data_const.b3.y(:,:,:,face);
 Bz=data_const.b3.z(:,:,:,face);
-Vx=data.v3.x(:,:,:,face);
-Vy=data.v3.y(:,:,:,face);
-Vz=data.v3.z(:,:,:,face);
-N=data.density(:,:,:,face);
+Vx=data_const.v3.x(:,:,:,face);
+Vy=data_const.v3.y(:,:,:,face);
+Vz=data_const.v3.z(:,:,:,face);
+N=data_const.densityH(:,:,:,face);
+T=data_const.temperature(:,:,:,face);
 figure(1)
-plot3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),'o');hold on
+plot3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),'*');hold on
 grid on
 box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
-
 figure(2)
-quiver3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),reshape(Bx,gridsize*gridsize*gridsize,1),reshape(By,gridsize*gridsize*gridsize,1),reshape(Bz,gridsize*gridsize*gridsize,1),3,'b');hold on
+quiver3(reshape(posx_const,1,gridsize*gridsize,1),reshape(posy_const,1,gridsize*gridsize,1),reshape(posz_const,1,gridsize*gridsize,1),reshape(Bx_const,1,gridsize*gridsize,1),reshape(By_const,1,gridsize*gridsize,1),reshape(Bz_const,1,gridsize*gridsize,1),3,'b');hold on
 grid on
 box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
-
 figure(3)
 quiver3(reshape(posx_const,1,gridsize*gridsize,1),reshape(posy_const,1,gridsize*gridsize,1),reshape(posz_const,1,gridsize*gridsize,1),reshape(Ex_const,1,gridsize*gridsize,1),reshape(Ey_const,1,gridsize*gridsize,1),reshape(Ez_const,1,gridsize*gridsize,1),3,'b');hold on
 grid on
@@ -75,7 +91,6 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
-
 figure(4)
 quiver3(reshape(posx_const,1,gridsize*gridsize,1),reshape(posy_const,1,gridsize*gridsize,1),reshape(posz_const,1,gridsize*gridsize,1),reshape(Vx_const,1,gridsize*gridsize,1),reshape(Vy_const,1,gridsize*gridsize,1),reshape(Vz_const,1,gridsize*gridsize,1),3,'b');hold on
 grid on
@@ -83,61 +98,9 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
-
 figure(5)
-quiver3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),reshape(Vx,gridsize*gridsize*gridsize,1),reshape(Vy,gridsize*gridsize*gridsize,1),reshape(Vz,gridsize*gridsize*gridsize,1),3,'b');hold on
-grid on
-box on
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-
+scatter3(reshape(posx,gridsize*gridsize*gridsize,1),reshape(posy,gridsize*gridsize*gridsize,1),reshape(posz,gridsize*gridsize*gridsize,1),10,reshape(T,gridsize*gridsize*gridsize,1));hold on
 end
-
-%equatorial plane density
-for face=[1,2,4,5]
-posx_equa=data_const.pos3.x(:,(gridsize+1)/2,:,face)/1e3/(6371);
-posy_equa=data_const.pos3.y(:,(gridsize+1)/2,:,face)/1e3/(6371);
-posz_equa=data_const.pos3.z(:,(gridsize+1)/2,:,face)/1e3/(6371);
-N_equa = data_const.densityH(:,(gridsize+1)/2,:,face);
-
-figure(6)
-scatter3(reshape(posx_equa,[],1),reshape(posy_equa,[],1),reshape(posz_equa,[],1),10,reshape(N_equa,[],1),'filled');hold on
-grid on
-box on
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-end    
-
-for face=[1:6]
-posx_equa=data_const.pos3.x(:,:,:,face)/1e3/(6371);
-posy_equa=data_const.pos3.y(:,:,:,face)/1e3/(6371);
-posz_equa=data_const.pos3.z(:,:,:,face)/1e3/(6371);
-N_equa = data_const.densityH(:,:,:,face);
-
-figure(6)
-scatter3(reshape(posx_equa,[],1),reshape(posy_equa,[],1),reshape(posz_equa,[],1),10,reshape(N_equa,[],1),'filled');hold on
-grid on
-box on
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
 end
-
-for face=[1,2,4,5]
-posx=data_const.pos3.x(showsize,:,:,face)/1e3/(6371);
-posy=data_const.pos3.y(showsize,:,:,face)/1e3/(6371);
-posz=data_const.pos3.z(showsize,:,:,face)/1e3/(6371);
-N = data_const.densityH(showsize,:,:,face);
-
-figure(7)
-scatter3(reshape(posx,[],1),reshape(posy,[],1),reshape(posz,[],1),10,reshape(N,[],1),'filled');hold on
-grid on
-box on
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-end    
-
-end
+% % figure
+% % quiver(px,py,pEx,pEy);
