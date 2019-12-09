@@ -114,13 +114,13 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
                 switch (ionType_in)
                 {
                 case 1:
-                    N = ptrArray_in[i][j][k][s]->Density_H();
+                    N = ptrArray_in[i][j][k][s]->Density_H() * 3.0 * ratioH_bot;
                     break;
                 case 4:
-                    N = ptrArray_in[i][j][k][s]->Density_He();
+                    N = ptrArray_in[i][j][k][s]->Density_He()* 3.0 * ratioHe_bot;
                     break;                
                 default:
-                    N = ptrArray_in[i][j][k][s]->Density_O();
+                    N = ptrArray_in[i][j][k][s]->Density_O()* 3.0 * ratioO_bot;
                     break;
                 }
                 // mass of each simulation particle 
@@ -164,13 +164,13 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
                 switch (ionType_in)
                 {
                 case 1:
-                    N = ptrArray_in[i][j][k][s]->Density_H();
+                    N = ptrArray_in[i][j][k][s]->Density_H()* 3.0 * ratioH_top;
                     break;
                 case 4:
-                    N = ptrArray_in[i][j][k][s]->Density_He();
+                    N = ptrArray_in[i][j][k][s]->Density_He()* 3.0 * ratioHe_top;
                     break;                
                 default:
-                    N = ptrArray_in[i][j][k][s]->Density_O();
+                    N = ptrArray_in[i][j][k][s]->Density_O()* 3.0 * ratioO_top;
                     break;
                 }
                 
@@ -732,7 +732,7 @@ Vector3*** VectorCellField()
 //************************************************************************
 Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char field_in)
 {
-#pragma omp parallel for collapse(3)
+//#pragma omp parallel for collapse(3)
     for( int i = 0; i < fieldsGridsSize+2; i++)
     {
         for( int j = 0; j < fieldsGridsSize+2; j++)
@@ -797,7 +797,7 @@ Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray
 //************************************************************************
 Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char char_in)
 {
-#pragma omp parallel for collapse(3)
+//#pragma omp parallel for collapse(3)
     for( int i = 0; i < fieldsGridsSize+2; i++)
     {
         for( int j = 0; j < fieldsGridsSize+2; j++)
@@ -871,7 +871,7 @@ Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArr
 //************************************************************************
 void UpdateVe3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_in)
 {   
-#pragma omp parallel for collapse(3)
+//#pragma omp parallel for collapse(3)
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
         for( int j = 1; j < fieldsGridsSize+2; j++)
@@ -1073,7 +1073,7 @@ void updateCellMatrix(Vector3**** curlB_in, Vector3**** curlE_in,
 void UpdateE3( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
 {
 
-#pragma omp parallel for collapse(3)
+//#pragma omp parallel for collapse(3)
 
     for( int i = 1; i < fieldsGridsSize+2; i++)
     {
@@ -2415,7 +2415,7 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
                     }
 
                     latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
-                    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
+                    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude + PI / 2.0) + A_average;
 
                     double r = ptrArray_in[face][i][j][k]->Pos3().norm() / radius;
                     double parameter = 0.5 * ( 1.0 - tanh( r - 6.5)) / r;
@@ -2601,7 +2601,7 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
     double vphi_earth = vy_earth * cos( phi_earth) - vx_earth * sin( phi_earth); // notice polar points
     if( theta_earth <= 1e-5)
     {
-        vtheta_earth = vy_earth;
+        vtheta_earth = vx_earth;
     }
 
 // cout << " vtheta_earth " << vtheta_earth << " vphi_earth " << vphi_earth ; // vx_earth & vy_earth are zero
@@ -2643,8 +2643,8 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
 
     if( theta_earth <= 1e-5)
     {
-        vx_top = 0.0;
-        vy_top = vtheta_top;
+        vx_top = vtheta_top;
+        vy_top = 0.0;
         vz_top = 0.0;
     }
 /*
@@ -2815,7 +2815,10 @@ cout << LMin << " " << LMax << endl;
                 iteratorM = ptrParticlesList_H->erase( iteratorM);
                 
             }
-        }}
+        }
+        
+        cout << "Particles H " << ptrParticlesList_H->size() << endl;
+        }
 
         #pragma omp section
         {

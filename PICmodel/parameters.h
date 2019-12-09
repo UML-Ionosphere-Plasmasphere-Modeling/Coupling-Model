@@ -52,7 +52,7 @@
     // fieldGridsLevel max shouble better be 9 
     // particlesGridsLevel max should be 10 greater than fieldGridsLevel
     
-    const int fieldsGridsLevel = 6;
+    const int fieldsGridsLevel = 5;
     const int particlesGridsLevel = fieldsGridsLevel + 10;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
@@ -87,10 +87,10 @@
 //************************************************************************
 
     // Simulation parameters (unit) s
-    const double tstep = 0.005 ;
-    static int timeLineLimit = 720000;
-    static int printTimePeriod = 20000; //60000;
-    static int updateInfoPeriod = 10; //10;
+    const double tstep = 3 ;
+    static int timeLineLimit = 240000;
+    static int printTimePeriod = 200; //60000;
+    static int updateInfoPeriod = 20; //10;
 
 //************************************************************************
 //************************************************************************
@@ -107,7 +107,7 @@
 //************************************************************************
 //************************************************************************           
     const double mu_MaxwellDis = 0.0;
-    const double sigma_MaxwellDis = 0.15;;
+    const double sigma_MaxwellDis = 0.15;
     // number density at base level ( / m^3) for H
     const double N0_H =  100000000000.0;
     // number density at base level for He
@@ -115,9 +115,9 @@
     // number density at base level for O
     const double N0_O =  100000000000.0;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 50;
+    const int iniParticleNumberPerCell = 10;
     // temp cell particle number per cell ( count)
-    const int tempParticleNumberPerCell = 200;
+    const int tempParticleNumberPerCell = 100;
 
     
 //************************************************************************
@@ -133,9 +133,9 @@
 // c0_latitude > r0_latitude
 //************************************************************************
 //************************************************************************ 
-    const double r0_latitude = 72.0;
+    const double r0_latitude = 70.0;
     const double c0_latitude = 82.0;
-    const double t0_convection = 1800.0;
+    const double t0_convection = 3600.0;
 //************************************************************************
 //************************************************************************
 // For bot boundary initialization, in degree
@@ -146,5 +146,11 @@
     const double ratioH = 1.0 / 3.0;
     const double ratioHe = 1.0 /3.0;
     const double ratioO = 1.0 / 3.0;
+    const double ratioH_bot = 0.05;
+    const double ratioHe_bot = 0.1;
+    const double ratioO_bot = 0.85;
+    const double ratioH_top = 0.85;
+    const double ratioHe_top = 0.1;
+    const double ratioO_top = 0.05;
 
 #endif
