@@ -52,7 +52,7 @@
     // fieldGridsLevel max shouble better be 9 
     // particlesGridsLevel max should be 10 greater than fieldGridsLevel
     
-    const int fieldsGridsLevel = 5;
+    const int fieldsGridsLevel = 6;
     const int particlesGridsLevel = fieldsGridsLevel + 10;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
@@ -89,8 +89,8 @@
     // Simulation parameters (unit) s
     const double tstep = 3 ;
     static int timeLineLimit = 240000;
-    static int printTimePeriod = 200; //60000;
-    static int updateInfoPeriod = 20; //10;
+    static int printTimePeriod = 5; //60000;
+    static int updateInfoPeriod = 5; //10;
 
 //************************************************************************
 //************************************************************************
@@ -125,7 +125,7 @@
 // For some control
 //************************************************************************
 //************************************************************************ 
-    const int update_type = 0; // 0- no current 1- with current
+    const int update_type = 1; // 0- no current 1- with current
     
 //************************************************************************
 //************************************************************************
