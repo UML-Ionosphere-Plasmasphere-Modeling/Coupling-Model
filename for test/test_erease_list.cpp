@@ -13,13 +13,15 @@ int main()
     }
     std::cout << std::endl;
 
-    int a[4] = {4,5,6,7};
+    // int a[4] = {4,5,6,7};
     for(auto x = llist.begin(); x!= llist.end(); x++)
     {
-        
+    std::cout << " test " << std::endl;
+    if( *x == 4 || *x ==5 || *x ==6)    
+    {
+    x= llist.erase(x);
     
-    llist.erase(x);
-    std::cout << x << " " ;
+    }
 
     }
     for(auto x = llist.begin(); x!= llist.end(); x++)
