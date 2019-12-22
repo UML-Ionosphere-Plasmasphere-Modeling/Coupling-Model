@@ -2813,7 +2813,7 @@ cout << LMin << " " << LMax << endl;
             if( check == 1) // out of the domain
             {
                 iteratorM = ptrParticlesList_H->erase( iteratorM);
-                
+                iteratorM--;
             }
         }
         
@@ -2835,6 +2835,7 @@ cout << LMin << " " << LMax << endl;
             if( check == 1) // out of the domain
             {
                 iteratorM = ptrParticlesList_He->erase( iteratorM);
+                iteratorM--;
             }
         }
         cout << "Particles He " << ptrParticlesList_He->size() << endl;
@@ -2853,6 +2854,7 @@ cout << LMin << " " << LMax << endl;
             if( check == 1) // out of the domain
             {
                 iteratorM = ptrParticlesList_O->erase( iteratorM);
+                iteratorM--;
             }
         }
         cout << "Particles O " << ptrParticlesList_O->size() << endl;

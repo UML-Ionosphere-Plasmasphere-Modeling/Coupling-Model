@@ -114,6 +114,11 @@ inline uint_64 PosUint()
     return posUint;
 }
 
+inline Vector3 PosParticles()
+{
+    return posP;
+}
+
 inline Vector3 VelParticles()
 {
     return vp;
@@ -135,7 +140,9 @@ inline double MagneticIvarient()
 
 private:
     uint_64 posUint; // single unsigned int for position
+    Vector3 posP;
     Vector3 vp; // velocity of particles
+    
     double weightNi; // weight for number of real particles
     double mu; // magnetic moment/ adiabatic invarient
     static constexpr double mass1 = 16;
