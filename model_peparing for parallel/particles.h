@@ -82,15 +82,6 @@ inline structg InttoStrp2()
 
 //************************************************************************
 //************************************************************************
-// Calculate the local E and B of the particles, return vector3 E or B
-//
-//************************************************************************
-//************************************************************************
-Vector3 LocalE( struct structg *strg_in, GridsPoints***** ptrArray_in);
-Vector3 LocalB( struct structg *strg_in, GridsPoints***** ptrArray_in);
-
-//************************************************************************
-//************************************************************************
 // Calculate the new vp by Boris' Method, update vector3 vp
 // And return a int "0" means in the main domain
 // "1" means out of the main domain
@@ -135,7 +126,11 @@ inline double MagneticIvarient()
 }
 //////////////////////////////////Constructor//////////////////////////////
 
-    Particles( uint_64 posInt_in, Vector3 vx_in, double weightNi_in, double mu_in);
+    Particles( uint_64 posInt_in, 
+               Vector3 posP_in,
+               Vector3 vx_in,
+               double weightNi_in,
+               double mu_in);
     Particles();
 
 private:

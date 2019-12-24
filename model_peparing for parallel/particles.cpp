@@ -47,77 +47,16 @@ int Particles::UpdateUint_64()
     double px, py, pz;
     double temp[2];
     int check=0;
-    // 1. transfor Uint to face, ip, jp, kp
 
-
-
-//    std::cout << std::bitset<64>(posUint) << std::endl;
-    
-    face = posUint >> 61;
-    for( int i = 0; i < particlesGridsLevel; i++) 
-    {
-        ip = (ip << 1) + ((posUint >> 60   - i*3) & 1);
-        jp = (jp << 1) + ((posUint >> 60-1 - i*3) & 1);
-        kp = (kp << 1) + ((posUint >> 60-2 - i*3) & 1);
-    }
-/*
-    std::cout << std::bitset<64>(face) << " " << face << std::endl;
-    std::cout << std::bitset<64>(ip) << " " << ip << std::endl;
-    std::cout << std::bitset<64>(jp) << " " << jp << std::endl;
-    std::cout << std::bitset<64>(kp) << " " << kp << std::endl << std::endl;
-*/
-    // 2. transfor to double x y z
-    // 2.1 radial
-
-    // cellSize1 = /particlesGridsSize * fieldsGridsSize
-    // particles located at center of cell
-    double L = LMin * pow(10, logRatio *  ( (kp +0.5)/ cellSize1 )); 
-    
- //   std:: cout <<  " 1pos " << L << " " << ip << " " << jp << " " << kp << " vel " << vp.x() << " " << vp.y() << " " << vp.z() << std::endl; 
-
-//    std:: cout << " 1pos " << L << " " << px << " " << py << " " << pz << std::endl;  
-    // 2.2 IgJg to ST note 0<ST<1
-    temp[0] = (1.0 / particlesGridsSize) * ip;
-    temp[1] = (1.0 / particlesGridsSize) * jp;
-    // 2.3 ST to UV note -1<UV<1
-    for ( int i=0; i<=1; i++)
-    {
-        if (temp[i] >= 0.5) 
-        {
-            temp[i]= (1/3.) * (4*temp[i]*temp[i] - 1);
-        }
-        else
-        {
-            temp[i]= (1/3.) * (1 - 4*(1-temp[i])*(1-temp[i]));
-        }
-    }
-    // 2.4 UV to xyz 
-    double k = L * radius / sqrt(pow(1.0,2.0) + pow(temp[0],2.0) + pow(temp[1],2.0));
-    switch (face)
-    {
-        case 0: px=1.0;           py=temp[0];     pz=temp[1]; break;
-        case 1: px=-1.0*temp[0];  py=1.0;         pz=temp[1]; break;
-        case 2: px=-1.0*temp[1];  py=temp[0];     pz=1.0;     break;
-        case 3: px=-1.0;          py=-1.0*temp[0];pz=temp[1]; break;
-        case 4: px=temp[0];       py=-1.0;        pz=temp[1]; break;
-        default:px=temp[1];       py=temp[0];     pz=-1.0;    break;
-    }
-//    std:: cout << " 2pos " << L << " " << px << " " << py << " " << pz << std::endl; 
-    px *= k; py *= k; pz *= k;
+    px = posP.x(); py = posP.y(); pz = posP.z();
     // 3. update double x y z
-//    std:: cout << " 3pos " << L << " " << px << " " << py << " " << pz << std::endl; 
     px += vp.x() * tstep;
     py += vp.y() * tstep;
     pz += vp.z() * tstep;
 
-//    std:: cout << vp.x() << " " << vp.y() << " " << vp.z() << " " << tstep << std::endl;
-//    std:: cout << " >>> "<< px << " " << py << " " << pz << std::endl;
     // 4. transfor to face ip kp jp
     // 4.1 radial kp
-    L = sqrt( px*px + py*py + pz*pz )/radius;
-
-
- //   std:: cout << " 2pos " << L << " " << px << " " << py << " " << pz << std::endl; 
+    double L = sqrt( px*px + py*py + pz*pz )/radius;
 
     // check if in the main domain
     if( L > LMax_maindomain || L < LMin_maindomain) 
@@ -128,7 +67,6 @@ int Particles::UpdateUint_64()
     else
     {
         kp = static_cast<uint_64>( floor( log10(L / LMin)/logRatio *cellSize1)); 
-//        std::cout << " kp" << kp << " " << L << " ";
         // 4.2 XYZtoUV, note that -1<UV<1 
         face = Getface(px, py, pz);
         switch (face)

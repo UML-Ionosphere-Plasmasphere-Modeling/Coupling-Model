@@ -1,5 +1,6 @@
 #include<iostream>
 #include <list>
+#include <vector>
 #include <memory>
 #include <string>
 #include "parameters.h"
@@ -14,6 +15,7 @@
 using std::cout;
 using std::endl;
 using std::list;
+using std::vector;
 using std::shared_ptr;
 using std::make_shared;
 
@@ -24,11 +26,11 @@ using std::make_shared;
 // Generate lists of particles
 //************************************************************************
 //************************************************************************
-list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, double N0)
+vector<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, double N0)
 {
    //list<Particles> listP;
 //    auto listsPtr = make_shared<list<Particles>>();
-    list<Particles>* listsPtr = new list<Particles>;
+    vector<Particles>* listsPtr = new vector<Particles>;
 //   shared_ptr<Particles> p1 = make_shared<Particles> (); // test
 //    double scaleHeight = ikT / mi0 / gravity; // assume the T is const for initiallization
 
@@ -62,7 +64,7 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolu
                     uint_64 intPos = vPos.Uint_64_Trans();
                     */
                     uint_64 intPos = UniDisInCell( ptrArray_in, i, j, k, s);
-                    // calculate random velocity
+                    Vector3 tempVector3 = Uint64ToVector3 ( intPos);                    // calculate random velocity
          //           std::cout<< MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x()) << std::endl;
          //           std:: cout << ptrArray_in[i][j][k][s]->B3().norm()<< " B "<< std::endl;                        
                     
@@ -72,7 +74,7 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolu
                                             MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
                     double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
                     // put the particles at the end of list
-                    Particles tempP= Particles(intPos, vVel, Ni_simu, mu_simu);
+                    Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
                     listsPtr->push_back( tempP);       
                     }                
                 }
@@ -88,6 +90,64 @@ list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolu
 }
 
 
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Transform the ubit64 to vector of position
+//************************************************************************
+//************************************************************************
+Vector3 Uint64ToVector3( uint_64 intPos_in)
+{
+    double px, py, pz;
+    double temp[2];
+    uint_64 posUint = intPos_in;
+    uint_64 face = 0, ip = 0, jp = 0, kp = 0;
+
+    face = posUint >> 61;
+    for( int i = 0; i < particlesGridsLevel; i++) 
+    {
+        ip = (ip << 1) + ((posUint >> 60   - i*3) & 1);
+        jp = (jp << 1) + ((posUint >> 60-1 - i*3) & 1);
+        kp = (kp << 1) + ((posUint >> 60-2 - i*3) & 1);
+    }
+    // 2. transfor to double x y z
+    // 2.1 radial
+
+    // cellSize1 = /particlesGridsSize * fieldsGridsSize
+    // particles located at center of cell
+    double L = LMin * pow(10, logRatio *  ( (kp +0.5)/ cellSize1 )); 
+    
+    // 2.2 IgJg to ST note 0<ST<1
+    temp[0] = (1.0 / particlesGridsSize) * ip;
+    temp[1] = (1.0 / particlesGridsSize) * jp;
+    // 2.3 ST to UV note -1<UV<1
+    for ( int i=0; i<=1; i++)
+    {
+        if (temp[i] >= 0.5) 
+        {
+            temp[i]= (1/3.) * (4*temp[i]*temp[i] - 1);
+        }
+        else
+        {
+            temp[i]= (1/3.) * (1 - 4*(1-temp[i])*(1-temp[i]));
+        }
+    }
+    // 2.4 UV to xyz 
+    double k = L * radius / sqrt(pow(1.0,2.0) + pow(temp[0],2.0) + pow(temp[1],2.0));
+    switch (face)
+    {
+        case 0: px=1.0;           py=temp[0];     pz=temp[1]; break;
+        case 1: px=-1.0*temp[0];  py=1.0;         pz=temp[1]; break;
+        case 2: px=-1.0*temp[1];  py=temp[0];     pz=1.0;     break;
+        case 3: px=-1.0;          py=-1.0*temp[0];pz=temp[1]; break;
+        case 4: px=temp[0];       py=-1.0;        pz=temp[1]; break;
+        default:px=temp[1];       py=temp[0];     pz=-1.0;    break;
+    }
+    
+    px *= k; py *= k; pz *= k;
+    Vector3 tempV = Vector3( px, py, pz);
+    return tempV;
+}
 
 //************************************************************************
 //************************************************************************
@@ -143,7 +203,7 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
                                             MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
                 double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
                 // put the particles at the end of list
-                Particles tempP= Particles(intPos, vVel, Ni_simu, mu_simu);
+                Particles tempP= Particles(intPos, vPos, vVel, Ni_simu, mu_simu);
                 listsPtrTemp->push_back( tempP);           
                 }
             }
@@ -195,7 +255,7 @@ list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptr
                                             MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
                 double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
                 // put the particles at the end of list
-                Particles tempP= Particles(intPos, vVel, Ni_simu, mu_simu);
+                Particles tempP= Particles(intPos, vPos, vVel, Ni_simu, mu_simu);
                 listsPtrTemp->push_back( tempP);           
                 }
             }
@@ -2755,11 +2815,12 @@ cout << LMin << " " << LMax << endl;
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     
-    list<Particles>* ptrParticlesList_H;
-    
-    list<Particles>* ptrParticlesList_He;
-    
-    list<Particles>* ptrParticlesList_O;
+    vector<Particles>* ptrParticlesList_H;
+    vector<Particles>* ptrParticlesList_He;
+    vector<Particles>* ptrParticlesList_O;
+    vector<int>* ptrParticlesList_He_out;
+    vector<int>* ptrParticlesList_H_out; 
+    vector<int>* ptrParticlesList_O_out;
 #pragma omp parallel
 {
     #pragma omp sections
@@ -2801,7 +2862,7 @@ cout << LMin << " " << LMax << endl;
         {
 
         // Run 2.1 // Particles in main domain
-        for( list<Particles>::iterator iteratorM = ptrParticlesList_H->begin(); iteratorM != ptrParticlesList_H->end(); ++iteratorM)
+        for( auto iteratorM = ptrParticlesList_H->begin(); iteratorM != ptrParticlesList_H->end(); ++iteratorM)
         {
             Particles temp = *iteratorM;
             struct structg tempStr = temp.InttoStrp1();
@@ -2813,6 +2874,8 @@ cout << LMin << " " << LMax << endl;
             if( check == 1) // out of the domain
             {
                 iteratorM = ptrParticlesList_H->erase( iteratorM);
+                int tempint = iteratorM - ptrParticlesList_H->begin();
+                ptrParticlesList_H_out->push_back( tempint);
                 
             }
         }
@@ -2822,7 +2885,7 @@ cout << LMin << " " << LMax << endl;
 
         #pragma omp section
         {
-        for( list<Particles>::iterator iteratorM = ptrParticlesList_He->begin(); iteratorM != ptrParticlesList_He->end(); ++iteratorM)
+        for( auto iteratorM = ptrParticlesList_He->begin(); iteratorM != ptrParticlesList_He->end(); ++iteratorM)
         {
             Particles temp = *iteratorM;
             struct structg tempStr = temp.InttoStrp1();
@@ -2835,13 +2898,15 @@ cout << LMin << " " << LMax << endl;
             if( check == 1) // out of the domain
             {
                 iteratorM = ptrParticlesList_He->erase( iteratorM);
+                int tempint = iteratorM - ptrParticlesList_He->begin();
+                ptrParticlesList_He_out->push_back( tempint);
             }
         }
         cout << "Particles He " << ptrParticlesList_He->size() << endl;
         }
         #pragma omp section
         {
-        for( list<Particles>::iterator iteratorM = ptrParticlesList_O->begin(); iteratorM != ptrParticlesList_O->end(); ++iteratorM)
+        for( auto iteratorM = ptrParticlesList_O->begin(); iteratorM != ptrParticlesList_O->end(); ++iteratorM)
         {
             Particles temp = *iteratorM;
             struct structg tempStr = temp.InttoStrp1();
@@ -2853,6 +2918,8 @@ cout << LMin << " " << LMax << endl;
             if( check == 1) // out of the domain
             {
                 iteratorM = ptrParticlesList_O->erase( iteratorM);
+                int tempint = iteratorM - ptrParticlesList_O->begin();
+                ptrParticlesList_O_out->push_back( tempint);
             }
         }
         cout << "Particles O " << ptrParticlesList_O->size() << endl;
