@@ -4,13 +4,13 @@
 #include "parameters.h"
 #include <memory>
 #include "particles.h"
-#include <list>
+#include <vector>
 #include "fieldsgrids.h"
 #include <cmath>
 #include <limits>
 #include <bitset>
 using std::shared_ptr;
-using std::list;
+using std::vector;
 
 //************************************************************************
 //************************************************************************
@@ -906,7 +906,7 @@ std::cin >> pause;
 // Initialization the particles for velocity and position
 //************************************************************************
 //************************************************************************
-list<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in);
+vector<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in);
 
 //************************************************************************
 //************************************************************************
@@ -943,12 +943,14 @@ void ProcessFunc();
 //************************************************************************
 //************************************************************************
 void UpdateInfoGrids( GridsPoints***** ptrArray_in, 
-                    list<Particles>* ptrParticlesList_in, 
-                    list<Particles>* ptrParticlesListBottom_in,
-                    list<Particles>* ptrParticlesListTop_in, 
-                    double*** ptrVolumeGridArray_in, 
-                    int timeline_in, 
-                    int updateInfoPeriod_in);
+                      vector<Particles>* ptrParticlesList_H_in, 
+                      vector<Particles>* ptrParticlesList_He_in,
+                      vector<Particles>* ptrParticlesList_O_in,
+                      vector<Particles>* ptrParticlesListTemp_H_in,
+                      vector<Particles>* ptrParticlesListTemp_He_in,
+                      vector<Particles>* ptrParticlesListTemp_O_in,
+                      double*** ptrVolumeGridArray_in,
+                      int timeline_in, int updateInfoPeriod_in);
 
 //************************************************************************
 //************************************************************************
@@ -1011,7 +1013,7 @@ void GradBNorm( GridsPoints***** ptrArray_in);
 // Generate lists of particles for bot and top region temp
 //************************************************************************
 //************************************************************************
-list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, int ionType_in);
+vector<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, int ionType_in);
 
 
 //************************************************************************

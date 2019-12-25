@@ -14,7 +14,6 @@
 
 using std::cout;
 using std::endl;
-using std::list;
 using std::vector;
 using std::shared_ptr;
 using std::make_shared;
@@ -156,9 +155,9 @@ Vector3 Uint64ToVector3( uint_64 intPos_in)
 // Generate lists of particles for bot and top region temp
 //************************************************************************
 //************************************************************************
-list<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, int ionType_in)
+vector<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, int ionType_in)
 {
-    list<Particles>* listsPtrTemp = new list<Particles>;
+    vector<Particles>* listsPtrTemp = new vector<Particles>;
     double N, Ni_simu;
    
     
@@ -1427,12 +1426,12 @@ void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int
 //************************************************************************
 //************************************************************************
 void UpdateInfoGrids( GridsPoints***** ptrArray_in, 
-                      list<Particles>* ptrParticlesList_H_in, 
-                      list<Particles>* ptrParticlesList_He_in,
-                      list<Particles>* ptrParticlesList_O_in,
-                      list<Particles>* ptrParticlesListTemp_H_in,
-                      list<Particles>* ptrParticlesListTemp_He_in,
-                      list<Particles>* ptrParticlesListTemp_O_in,
+                      vector<Particles>* ptrParticlesList_H_in, 
+                      vector<Particles>* ptrParticlesList_He_in,
+                      vector<Particles>* ptrParticlesList_O_in,
+                      vector<Particles>* ptrParticlesListTemp_H_in,
+                      vector<Particles>* ptrParticlesListTemp_He_in,
+                      vector<Particles>* ptrParticlesListTemp_O_in,
                       double*** ptrVolumeGridArray_in,
                       int timeline_in, int updateInfoPeriod_in)
 {
@@ -1455,7 +1454,7 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
     }
 
 // For H particles in main domain    
-    for( list<Particles>::iterator iter= ptrParticlesList_H_in->begin(); iter!=ptrParticlesList_H_in->end(); ++iter)
+    for( auto iter= ptrParticlesList_H_in->begin(); iter!=ptrParticlesList_H_in->end(); ++iter)
     {
         // locate the particle
         Particles temp = *iter;
@@ -1508,7 +1507,7 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
 
 
 // For He particles in main domain    
-    for( list<Particles>::iterator iter= ptrParticlesList_He_in->begin(); iter!=ptrParticlesList_He_in->end(); ++iter)
+    for( auto iter= ptrParticlesList_He_in->begin(); iter!=ptrParticlesList_He_in->end(); ++iter)
     {
         // locate the particle
         Particles temp = *iter;
@@ -1535,7 +1534,7 @@ void UpdateInfoGrids( GridsPoints***** ptrArray_in,
 
 
 // For O particles in main domain    
-    for( list<Particles>::iterator iter= ptrParticlesList_O_in->begin(); iter!=ptrParticlesList_O_in->end(); ++iter)
+    for( auto iter= ptrParticlesList_O_in->begin(); iter!=ptrParticlesList_O_in->end(); ++iter)
     {
         // locate the particle
         Particles temp = *iter;
@@ -2929,9 +2928,9 @@ cout << LMin << " " << LMax << endl;
 }
 
         // Run 2.2 // Create temp particle lists    
-        list<Particles>* ptrParticlesListTemp_H; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);
-        list<Particles>* ptrParticlesListTemp_He; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
-        list<Particles>* ptrParticlesListTemp_O; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
+        vector<Particles>* ptrParticlesListTemp_H; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);
+        vector<Particles>* ptrParticlesListTemp_He; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
+        vector<Particles>* ptrParticlesListTemp_O; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
 
     #pragma omp parallel
     {
@@ -2942,7 +2941,7 @@ cout << LMin << " " << LMax << endl;
 
         ptrParticlesListTemp_H = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);     
         // Run 2.3 // Particles in temp domain
-        for( list<Particles>::iterator iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)
+        for( auto iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)
         {
             Particles temp = *iterator;
             struct structg tempStr = temp.InttoStrp1();
@@ -2966,16 +2965,23 @@ cout << LMin << " " << LMax << endl;
         std::cout << std::bitset<64>(temp.PosUint()) << " info " << 
         tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " vel " << tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << std::endl;
 */
-
-                ptrParticlesList_H->push_back( temp);
-        //        iterator = ptrParticlesListTemp_H->erase( iterator);
+                if( ptrParticlesList_H_out->size() > 0)
+                {
+                    auto temp_pos_out = ptrParticlesList_H_out->end() - 1;
+                    (*ptrParticlesList_H)[ *temp_pos_out] = temp;
+                }
+                else
+                {
+                    ptrParticlesList_H->push_back( temp);                   
+                }
+                       //        iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
     }
     #pragma omp section
     {  
         ptrParticlesListTemp_He = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
-        for( list<Particles>::iterator iterator = ptrParticlesListTemp_He->begin(); iterator != ptrParticlesListTemp_He->end(); ++iterator)
+        for( auto iterator = ptrParticlesListTemp_He->begin(); iterator != ptrParticlesListTemp_He->end(); ++iterator)
         {
             Particles temp = *iterator;
             struct structg tempStr = temp.InttoStrp1();
@@ -2985,15 +2991,23 @@ cout << LMin << " " << LMax << endl;
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                ptrParticlesList_He->push_back( temp);
-            //    iterator = ptrParticlesListTemp_He->erase( iterator);
+                if( ptrParticlesList_He_out->size() > 0)
+                {
+                    auto temp_pos_out = ptrParticlesList_He_out->end() - 1;
+                    (*ptrParticlesList_He)[ *temp_pos_out] = temp;
+                }
+                else
+                {
+                    ptrParticlesList_He->push_back( temp);
+                }
+                 //    iterator = ptrParticlesListTemp_He->erase( iterator);
             }
         }
     }
     #pragma omp section
     {    
         ptrParticlesListTemp_O = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
-        for( list<Particles>::iterator iterator = ptrParticlesListTemp_O->begin(); iterator != ptrParticlesListTemp_O->end(); ++iterator)
+        for( auto iterator = ptrParticlesListTemp_O->begin(); iterator != ptrParticlesListTemp_O->end(); ++iterator)
         {
             Particles temp = *iterator;
             struct structg tempStr = temp.InttoStrp1();
@@ -3003,8 +3017,15 @@ cout << LMin << " " << LMax << endl;
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                ptrParticlesList_O->push_back( temp);
-            //    iterator = ptrParticlesListTemp_O->erase( iterator);
+                if( ptrParticlesList_O_out->size() > 0)
+                {
+                    auto temp_pos_out = ptrParticlesList_O_out->end() - 1;
+                    (*ptrParticlesList_O)[ *temp_pos_out] = temp;
+                }
+                else
+                {
+                    ptrParticlesList_O->push_back( temp);
+                }
             }
         }
         
