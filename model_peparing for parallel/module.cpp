@@ -2817,9 +2817,9 @@ cout << LMin << " " << LMax << endl;
     vector<Particles>* ptrParticlesList_H;
     vector<Particles>* ptrParticlesList_He;
     vector<Particles>* ptrParticlesList_O;
-    vector<int>* ptrParticlesList_He_out;
-    vector<int>* ptrParticlesList_H_out; 
-    vector<int>* ptrParticlesList_O_out;
+    vector<int>* ptrParticlesList_He_out = new vector<int>;
+    vector<int>* ptrParticlesList_H_out = new vector<int>; 
+    vector<int>* ptrParticlesList_O_out = new vector<int>;
 #pragma omp parallel
 {
     #pragma omp sections
@@ -2969,6 +2969,7 @@ cout << LMin << " " << LMax << endl;
                 {
                     auto temp_pos_out = ptrParticlesList_H_out->end() - 1;
                     (*ptrParticlesList_H)[ *temp_pos_out] = temp;
+                    temp_pos_out = ptrParticlesList_H_out->erase(temp_pos_out);
                 }
                 else
                 {
@@ -2995,6 +2996,7 @@ cout << LMin << " " << LMax << endl;
                 {
                     auto temp_pos_out = ptrParticlesList_He_out->end() - 1;
                     (*ptrParticlesList_He)[ *temp_pos_out] = temp;
+                    temp_pos_out = ptrParticlesList_He_out->erase(temp_pos_out);
                 }
                 else
                 {
@@ -3021,6 +3023,7 @@ cout << LMin << " " << LMax << endl;
                 {
                     auto temp_pos_out = ptrParticlesList_O_out->end() - 1;
                     (*ptrParticlesList_O)[ *temp_pos_out] = temp;
+                    temp_pos_out = ptrParticlesList_O_out->erase(temp_pos_out);
                 }
                 else
                 {

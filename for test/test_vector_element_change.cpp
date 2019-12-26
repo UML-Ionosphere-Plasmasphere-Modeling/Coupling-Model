@@ -11,8 +11,7 @@ int main()
 
     for( auto iterator = ptrVector->begin(); iterator != ptrVector->end(); iterator++)
     {
-        std::cout << *iterator << std::endl; 
-        if( *iterator % 3 == 0)
+        if( *iterator % 4 == 0)
         {
             int temp = iterator - ptrVector->begin();
             ptrCheck->push_back( temp);  
@@ -28,14 +27,35 @@ int main()
 
     std::cout << std::endl ;
     
-
-    for( auto iterator = ptrCheck->rbegin(); iterator != ptrCheck->rend(); iterator++)
+/*
+    for( auto iterator = ptrCheck->end()-1; iterator >= ptrCheck->begin(); iterator--)
     {
         (*ptrVector)[ *iterator] = 0;
-        ptrCheck->erase((++iterator).base());
-    }
+        std::cout << " test " << *iterator ; 
 
+        iterator = ptrCheck->erase(iterator); // if erase the last element, I think the iterator won't go to NULL as end().
+        std::cout << " test " << *iterator << std::endl; 
+    }
+*/
+
+    for( auto iterator = ptrCheck->begin(); iterator != ptrCheck->end(); ++iterator)
+    {   
+        std::cout << " loop ";
+        std::cout << " test " << *iterator ; 
+
+        iterator = ptrCheck->erase(iterator);
+        std::cout << " test " << *iterator << std::endl; 
+        
+        for( auto iterator = ptrCheck->begin(); iterator != ptrCheck->end(); iterator++)
+        std::cout << *iterator << " ";
     
+        std::cout << std::endl ;
+
+        if( iterator == ptrCheck->end()) break; // if iterator is already NULL as end(), it cannot ++
+    }
+    
+    std::cout << " end test " << std::endl;
+
     for( auto iterator = ptrVector->begin(); iterator != ptrVector->end(); iterator++)
     std::cout << *iterator << " ";
     
