@@ -100,6 +100,11 @@ int BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double m
 //************************************************************************
 int UpdateUint_64();
 
+inline void SetOutParticles()
+{
+    posUint = 0;
+}
+
 inline uint_64 PosUint()
 {
     return posUint;

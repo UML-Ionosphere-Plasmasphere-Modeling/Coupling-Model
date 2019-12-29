@@ -8,6 +8,8 @@
 #include "particles.h"
 #include "vector3.h"
 #include "module.h"
+#include "module_0.h"
+#include "module_1.h"
 #include <cmath>
 #include "H5Cpp.h"
 #include <bitset>
@@ -62,6 +64,10 @@ cout << LMin << " " << LMax << endl;
     vector<int>* ptrParticlesList_He_out = new vector<int>;
     vector<int>* ptrParticlesList_H_out = new vector<int>; 
     vector<int>* ptrParticlesList_O_out = new vector<int>;
+
+    ptrParticlesList_H.reserve(50000000);
+
+    std::cout << std::endl << sizeof(*ptrParticlesList_H) << " " << ptrParticlesList_H_out->capacity() << endl;
 #pragma omp parallel
 {
     #pragma omp sections
@@ -106,22 +112,26 @@ cout << LMin << " " << LMax << endl;
         for( auto iteratorM = ptrParticlesList_H->begin(); iteratorM != ptrParticlesList_H->end(); ++iteratorM)
         {
             Particles temp = *iteratorM;
-            struct structg tempStr = temp.InttoStrp1();
-            
-            int check; // check whether in the main domain or not, "0" means in "1" means out
-            // update velocity // update position
-            check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
-            // check if still in the main domain
-            if( check == 1) // out of the domain
+            if( temp.PosUint() == 0) 
             {
-                iteratorM = ptrParticlesList_H->erase( iteratorM);
-                int tempint = iteratorM - ptrParticlesList_H->begin();
-                ptrParticlesList_H_out->push_back( tempint);
-                
+                continue;
+            } else
+            {    
+                struct structg tempStr = temp.InttoStrp1();
+                int check; // check whether in the main domain or not, "0" means in "1" means out
+                // update velocity // update position
+                check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
+                // check if still in the main domain
+                if( check == 1) // out of the domain
+                {
+                    iteratorM->SetOutParticles();
+                    int tempint = iteratorM - ptrParticlesList_H->begin();
+                    ptrParticlesList_H_out->push_back( tempint);
+                }
             }
         }
         
-        cout << "Particles H " << ptrParticlesList_H->size() << endl;
+        cout << "Particles H " << ptrParticlesList_H->size() << " out " << ptrParticlesList_H_out->size() << endl;
         }
 
         #pragma omp section
@@ -129,41 +139,50 @@ cout << LMin << " " << LMax << endl;
         for( auto iteratorM = ptrParticlesList_He->begin(); iteratorM != ptrParticlesList_He->end(); ++iteratorM)
         {
             Particles temp = *iteratorM;
-            struct structg tempStr = temp.InttoStrp1();
-            
-            int check; // check whether in the main domain or not, "0" means in "1" means out
-            //test function//  double xxx= temp.VelParticles().x();    //cout << xxx << " ";
-            // update velocity // update position
-            check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
-            // check if still in the main domain
-            if( check == 1) // out of the domain
+            if( temp.PosUint() == 0) 
             {
-                iteratorM = ptrParticlesList_He->erase( iteratorM);
-                int tempint = iteratorM - ptrParticlesList_He->begin();
-                ptrParticlesList_He_out->push_back( tempint);
+                continue;
+            } else
+            {    
+                struct structg tempStr = temp.InttoStrp1();
+                int check; // check whether in the main domain or not, "0" means in "1" means out
+                // update velocity // update position
+                check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
+                // check if still in the main domain
+                if( check == 1) // out of the domain
+                {
+                    iteratorM->SetOutParticles();
+                    int tempint = iteratorM - ptrParticlesList_He->begin();
+                    ptrParticlesList_He_out->push_back( tempint);
+                }
             }
         }
-        cout << "Particles He " << ptrParticlesList_He->size() << endl;
+        cout << "Particles He " << ptrParticlesList_He->size() << " out " << ptrParticlesList_He_out->size() << endl;
         }
         #pragma omp section
         {
         for( auto iteratorM = ptrParticlesList_O->begin(); iteratorM != ptrParticlesList_O->end(); ++iteratorM)
         {
             Particles temp = *iteratorM;
-            struct structg tempStr = temp.InttoStrp1();
-            
-            int check; // check whether in the main domain or not, "0" means in "1" means out
-            // update velocity // update position
-            check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
-            // check if still in the main domain
-            if( check == 1) // out of the domain
+            if( temp.PosUint() == 0) 
             {
-                iteratorM = ptrParticlesList_O->erase( iteratorM);
-                int tempint = iteratorM - ptrParticlesList_O->begin();
-                ptrParticlesList_O_out->push_back( tempint);
+                continue;
+            } else
+            {    
+                struct structg tempStr = temp.InttoStrp1();
+                int check; // check whether in the main domain or not, "0" means in "1" means out
+                // update velocity // update position
+                check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
+                // check if still in the main domain
+                if( check == 1) // out of the domain
+                {
+                    iteratorM->SetOutParticles();
+                    int tempint = iteratorM - ptrParticlesList_O->begin();
+                    ptrParticlesList_O_out->push_back( tempint);
+                }
             }
         }
-        cout << "Particles O " << ptrParticlesList_O->size() << endl;
+        cout << "Particles O " << ptrParticlesList_O->size() << " out " << ptrParticlesList_O_out->size() << endl;
         }     
     }   
     #pragma omp barrier

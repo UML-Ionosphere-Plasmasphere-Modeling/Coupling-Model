@@ -6,7 +6,7 @@
 #include "fieldsgrids.h"
 #include "particles.h"
 #include "vector3.h"
-#include "module.h"
+#include "module_0.h"
 #include <cmath>
 #include "H5Cpp.h"
 #include <bitset>
@@ -494,8 +494,6 @@ GridsPoints***** GridsCreation()
 // The data structure is array of Vector3, which is created in heap. Return
 // a pointer(may not need to be a smart pointer), and would not need to 
 // delete, or would be deleted as a smart pointer.
-//************************************************************************
-//************************************************************************
 Vector3*** VectorCellField()
 {
     static Vector3* mem_VectorCellField = new Vector3[ (fieldsGridsSize+2)*(fieldsGridsSize+2)*fieldsGridsSize];
@@ -541,8 +539,6 @@ Vector3*** VectorCellField()
 // Value the matrix field using finite volume method, put in the pointer 
 // of the MatrixField, value it, and return the pointer.
 // Notice that the cell at corners should be absent in calculation.
-//************************************************************************
-//************************************************************************
 Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char field_in)
 {
 //#pragma omp parallel for collapse(3)
@@ -607,8 +603,6 @@ Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray
 // gradientArray_in is in size of ( fsize+2 * fsize+2 * fsize) with vector3
 // ptrVolumeCellArray is in size of ( fsize+2 * fsize+2 * fsize) with double
 // Pe = n k T, in which n is the number density, k is the boltzmann constant, and T is the Te
-//************************************************************************
-//************************************************************************
 Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char char_in)
 {
 //#pragma omp parallel for collapse(3)
@@ -682,8 +676,6 @@ Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArr
 //************************************************************************
 // FUNCTION 
 // UpdateVe3
-//************************************************************************
-//************************************************************************
 void UpdateVe3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_in)
 {   
 //#pragma omp parallel for collapse(3)
@@ -779,8 +771,6 @@ void UpdateVe3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_
 // repeating calculating, it is suitable to put them in one function.
 // Therefore, we need three matrix of curlB, curlE, and gradientPe. 
 // Assume they are curlB, curlE and gradPe, respectively.
-//************************************************************************
-//************************************************************************
 void updateCellMatrix(Vector3**** curlB_in, Vector3**** curlE_in,
                       Vector3**** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
 {
@@ -883,8 +873,6 @@ void updateCellMatrix(Vector3**** curlB_in, Vector3**** curlE_in,
 // Each calculation are on the girds.
 // Update E at grids for ve = vi ( no current)
 // Update E at grids for ve ( with current)
-//************************************************************************
-//************************************************************************
 void UpdateE3( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
 {
 
@@ -982,8 +970,7 @@ void UpdateE3( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in)
 //************************************************************************
 // FUNCTION
 // UpdateB3 vased on faraday's law
-//************************************************************************
-//************************************************************************
+
 void UpdateB3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_in)
 {
 
@@ -1080,8 +1067,6 @@ void UpdateB3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_i
 // FUNCTION
 // Each calculation are on the girds.
 // Calculate the grad|B| on the gridspoints
-//************************************************************************
-//************************************************************************
 void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int face_in)
 {
 
@@ -1182,8 +1167,6 @@ void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int
 // Printout the gridpoints on the girds as hdf5 format
 // Step 1: Generate a new matrix fulling with gridspoints class
 // Step 2: Print out it as .h5
-//************************************************************************
-//************************************************************************
 void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 {
     using namespace H5;
@@ -1439,8 +1422,6 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 // at each grids points 
 // The volume means the sum volume of adjacent 6 or 8 cells
 // Only consider the main domain so that the size is (fieldsGridsSize+1)*(fieldsGridsSize+1)*(fieldsGridsSize+1)
-//************************************************************************
-//************************************************************************
 double*** VolumeGridsField( double*** ptrVolumeCellArray_in)
 {
     static double* mem_VolumeGridsArray = new double[(fieldsGridsSize+1)*(fieldsGridsSize+1)*(fieldsGridsSize+1)]; 
@@ -1499,8 +1480,6 @@ double*** VolumeGridsField( double*** ptrVolumeCellArray_in)
 // FUNCTION
 // Create a array to store volume of cells needed to calculate density 
 // at each cell [fieldsize+2][fieldsize+2][fieldsize]
-//************************************************************************
-//************************************************************************
 double*** VolumeCellsField( GridsPoints***** ptrArray_in)
 {
     static double* mem_VolumeCellsArray = new double[(fieldsGridsSize+2) * (fieldsGridsSize+2) * (fieldsGridsSize)];
@@ -1532,8 +1511,6 @@ double*** VolumeCellsField( GridsPoints***** ptrArray_in)
 //************************************************************************
 // FUNCTION
 // Calculation the temprature
-//************************************************************************
-//************************************************************************
 void Titheridge_Te( GridsPoints***** ptrArray_in) 
 //  by Yuzhang Ma AUG 16,2019
 {
@@ -1771,8 +1748,6 @@ double  MLON12=atan(sin(PLAT)*tan(GLONR-PLON));
 //************************************************************************
 // Function
 // initial the bot boundary for the  velocity of magnetic field line
-//************************************************************************
-//************************************************************************
 void SetBotBoundary( GridsPoints***** ptrArray_in)
 {
     double PI = 3.1415926535897;
@@ -1851,8 +1826,6 @@ void SetBotBoundary( GridsPoints***** ptrArray_in)
 //************************************************************************
 // Function
 // initial the top boundary for the  velocity of magnetic field line
-//************************************************************************
-//************************************************************************
 void SetTopBoundary( GridsPoints***** ptrArray_in)
 {
     double PI = 3.1415926535897;
@@ -1915,8 +1888,6 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
 //************************************************************************
 // Function
 // Set initial condition
-//************************************************************************
-//************************************************************************
 void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCellArray_in, double*** ptrVolumeCellArray_in)
 {
     double PI = 3.1415926535897;
@@ -1998,8 +1969,6 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
 //************************************************************************
 // Function
 // Set velocity due to two convection cell patern
-//************************************************************************
-//************************************************************************
 void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     
@@ -2214,8 +2183,6 @@ if( k_in == 16 && j_in == fieldsGridsSize / 2 && face_in == 5 )
 //************************************************************************
 // FUNCTION
 // Calculate the gradient of normal of B
-//************************************************************************
-//************************************************************************
 void GradBNorm( GridsPoints***** ptrArray_in)
 {
 

@@ -6,6 +6,7 @@
 #include "particles.h"
 #include <vector>
 #include "fieldsgrids.h"
+#include "module_0.h"
 #include <cmath>
 #include <limits>
 #include <bitset>
@@ -553,6 +554,15 @@ void updateCellMatrix(Vector3**** curlB_in, Vector3**** curlE_in,
 
 Vector3*** ValueGradientPe(Vector3*** gradientArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in);
 
+//************************************************************************
+//************************************************************************
+// FUNCTION 
+// Value gradient field of Pe.
+// gradientArray_in is in size of ( fsize+2 * fsize+2 * fsize) with vector3
+// ptrVolumeCellArray is in size of ( fsize+2 * fsize+2 * fsize) with double
+// Pe = n k T, in which n is the number density, k is the boltzmann constant, and T is the Te
+Vector3*** ValueGradient(Vector3*** gradientArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char char_in);
+
 
 //************************************************************************
 //************************************************************************
@@ -560,8 +570,7 @@ Vector3*** ValueGradientPe(Vector3*** gradientArray_in, double*** ptrVolumeCellA
 // Value the matrix field using finite volume method, put in the pointer 
 // of the MatrixField, value it, and return the pointer.
 // Notice that the cell at corners should be absent in calculation.
-
-Vector3**** ValueCurlField( Vector3**** curlArray_in, GridsPoints***** ptrArray_in, int face_in, char field_in);
+Vector3*** ValueCurlField( Vector3*** curlArray_in, double*** ptrVolumeCellArray_in, GridsPoints***** ptrArray_in, int face_in, char field_in);
 
 
 //************************************************************************
@@ -589,6 +598,27 @@ double*** VolumeCellsField( GridsPoints***** ptrArray_in);
 // Update E at grids for ve = vi ( no current)
 
 void updateGrids_nocurrent( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in);
+
+//************************************************************************
+//************************************************************************
+// FUNCTION 
+// UpdateVe3
+void UpdateVe3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_in);
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Each calculation are on the girds.
+// Update E at grids for ve = vi ( no current)
+// Update E at grids for ve ( with current)
+void UpdateE3( Vector3*** gradPe_in, GridsPoints***** ptrArray_in, int face_in);
+
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// UpdateB3 vased on faraday's law
+
+void UpdateB3( Vector3*** curlField_in, GridsPoints***** ptrArray_in, int face_in);
 
 //************************************************************************
 //************************************************************************
@@ -643,8 +673,6 @@ void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int
 // Each calculation are on the girds.
 // Step 1: Generate a new matrix fulling with gridspoints class
 // Step 2: Print out it as .h5
-//************************************************************************
-//************************************************************************
 void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in);
 
 //************************************************************************
@@ -654,3 +682,18 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in);
 
 GridsPoints***** GridsCreation();
 
+//************************************************************************
+//************************************************************************
+// FUNCTION // Set up a matrix to store the curl E or B for Faraday's Law
+// and for Ampere's Law, or the gradient of Pe. 
+// The size of the matrix should be 1 smaller than 
+// the size of gridspoints in main doman which is a cubic, which is [fsize+2].
+// Therefore, it is [fsize+2][fsize+2][fsize]
+// For each face, 8 corner cell should be excluded. ?
+// Notice that the curl E or B is at the center of each cell.
+// The data structure is array of Vector3, which is created in heap. Return
+// a pointer(may not need to be a smart pointer), and would not need to 
+// delete, or would be deleted as a smart pointer.
+Vector3*** VectorCellField();
+
+#endif

@@ -6,7 +6,7 @@
 #include "fieldsgrids.h"
 #include "particles.h"
 #include "vector3.h"
-#include "module.h"
+#include "module_1.h"
 #include <cmath>
 #include "H5Cpp.h"
 #include <bitset>
@@ -62,7 +62,9 @@ vector<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVo
                     uint_64 intPos = vPos.Uint_64_Trans();
                     */
                     uint_64 intPos = UniDisInCell( ptrArray_in, i, j, k, s);
-                    Vector3 tempVector3 = Uint64ToVector3 ( intPos);                    // calculate random velocity
+                    Vector3 tempVector3 = Uint64ToVector3 ( intPos);        
+
+                    // calculate random velocity
          //           std::cout<< MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x()) << std::endl;
          //           std:: cout << ptrArray_in[i][j][k][s]->B3().norm()<< " B "<< std::endl;                        
                     
@@ -187,22 +189,16 @@ vector<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** p
                 for ( int t = 1; t <= tempParticleNumberPerCell; t++)
                 {
                 // calculate random position
-                Vector3 temp1 = ptrArray_in[i][j][k][s]->Pos3();
-                Vector3 temp2 = ptrArray_in[i][j][k][s+1]->Pos3();
-                Vector3 temp = UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j][k][s+1]->Pos3());
+                uint_64 intPos = UniDisInCell( ptrArray_in, i, j, k, s);
+                Vector3 tempVector3 = Uint64ToVector3 ( intPos);   
 
-                Vector3 vPos = ptrArray_in[i][j][k][s]->Pos3().PlusProduct(UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j][k][s+1]->Pos3()));
-                vPos = vPos.PlusProduct( UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j][k+1][s]->Pos3()));
-                vPos = vPos.PlusProduct( UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j+1][k][s]->Pos3()));
-
-                uint_64 intPos = vPos.Uint_64_Trans();
                 // calculate random velocity
                 Vector3 vVel = Vector3( MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x(), mi0),
                                             MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().y(), mi0),
                                             MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
                 double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
                 // put the particles at the end of list
-                Particles tempP= Particles(intPos, vPos, vVel, Ni_simu, mu_simu);
+                Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
                 listsPtrTemp->push_back( tempP);           
                 }
             }
@@ -239,22 +235,16 @@ vector<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** p
                 for ( int t = 1; t <= tempParticleNumberPerCell; t++)
                 {
                 // calculate random position
-                Vector3 temp1 = ptrArray_in[i][j][k][s]->Pos3();
-                Vector3 temp2 = ptrArray_in[i][j][k][s+1]->Pos3();
-                Vector3 temp = UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j][k][s+1]->Pos3());
+                uint_64 intPos = UniDisInCell( ptrArray_in, i, j, k, s);
+                Vector3 tempVector3 = Uint64ToVector3 ( intPos);   
 
-                Vector3 vPos = ptrArray_in[i][j][k][s]->Pos3().PlusProduct(UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j][k][s+1]->Pos3()));
-                vPos = vPos.PlusProduct( UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j][k+1][s]->Pos3()));
-                vPos = vPos.PlusProduct( UniformDisVector3( ptrArray_in[i][j][k][s]->Pos3(),ptrArray_in[i][j+1][k][s]->Pos3()));
-
-                uint_64 intPos = vPos.Uint_64_Trans();
                 // calculate random velocity
                 Vector3 vVel = Vector3( MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x(), mi0),
                                             MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().y(), mi0),
                                             MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
                 double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
                 // put the particles at the end of list
-                Particles tempP= Particles(intPos, vPos, vVel, Ni_simu, mu_simu);
+                Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
                 listsPtrTemp->push_back( tempP);           
                 }
             }
