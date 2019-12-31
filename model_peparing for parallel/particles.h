@@ -32,7 +32,7 @@ inline structg InttoStrp1()
     {
         strg.ig = (strg.ig << 1) + ((posUint >> 60   - i*3) & 1);
         strg.jg = (strg.jg << 1) + ((posUint >> 60-1 - i*3) & 1);
-        strg.kg = (strg.kg << 1) + ((posUint >> 60-2 - i*3) & 1);
+        strg.kg = (strg.kg << 1) + ((posUint >> 60-2 -   i*3) & 1);
     }
 //std::cout << posUint << " "<< strg.face <<" "<< strg.ig<<" "<< strg.jg<<" "<< strg.kg << std::endl;
 

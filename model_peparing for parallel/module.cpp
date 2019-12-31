@@ -365,9 +365,20 @@ cout << LMin << " " << LMax << endl;
     }
     delete ptrVectorCellArray;
     delete ptrArray;
-//    delete ptrParticlesList_H;
-//    delete ptrParticlesList_He;
-//    delete ptrParticlesList_O;
+    ptrParticlesList_H.clear();
+    ptrParticlesList_He.clear();
+    ptrParticlesList_O.clear();
+    ptrParticlesList_H_out.clear();
+    ptrParticlesList_He_out.clear();
+    ptrParticlesList_O_out.clear();
+    ptrParticlesList_H.shrink_to_fit();
+    ptrParticlesList_He.shrink_to_fit();
+    ptrParticlesList_O.shrink_to_fit();
+    ptrParticlesList_H_out.shrink_to_fit();
+    ptrParticlesList_He_out.shrink_to_fit();
+    ptrParticlesList_O_out.shrink_to_fit();
+    
+    
 
 }
 
