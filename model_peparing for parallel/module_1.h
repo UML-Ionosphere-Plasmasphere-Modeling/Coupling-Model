@@ -17,16 +17,22 @@ using std::vector;
 //************************************************************************
 // FUNCTION
 // Initialization the particles for velocity and position
-
-vector<Particles>* ParticlesLists( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, double N0);
+void ParticlesLists(vector<Particles>& listsPtr_in,
+                    GridsPoints***** ptrArray_in, 
+                    double*** ptrVolumeCellArray_in, 
+                    double mi0, 
+                    double N0);
 
 //************************************************************************
 //************************************************************************
 // FUNCTION
 // Initialization the particles for velocity and position 
 // Generate lists of particles for bot and top region temp
-
-vector<Particles>* ParticlesListsTemp( GridsPoints***** ptrArray_in, double*** ptrVolumeCellArray_in, double mi0, int ionType_in);
+void ParticlesListsTemp(vector<Particles>& listsPtrTemp_in,
+                        GridsPoints***** ptrArray_in,
+                        double*** ptrVolumeCellArray_in,
+                        double mi0,
+                        int ionType_in);
 
 
 
@@ -361,12 +367,12 @@ inline Vector3 UniformDisVector3( Vector3 v1, Vector3 v2)
 // Update info in the grids due to the info of particles and related 
 // weighting
 void UpdateInfoGrids( GridsPoints***** ptrArray_in, 
-                      vector<Particles>* ptrParticlesList_H_in, 
-                      vector<Particles>* ptrParticlesList_He_in,
-                      vector<Particles>* ptrParticlesList_O_in,
-                      vector<Particles>* ptrParticlesListTemp_H_in,
-                      vector<Particles>* ptrParticlesListTemp_He_in,
-                      vector<Particles>* ptrParticlesListTemp_O_in,
+                      vector<Particles> ptrParticlesList_H_in, 
+                      vector<Particles> ptrParticlesList_He_in,
+                      vector<Particles> ptrParticlesList_O_in,
+                      vector<Particles> ptrParticlesListTemp_H_in,
+                      vector<Particles> ptrParticlesListTemp_He_in,
+                      vector<Particles> ptrParticlesListTemp_O_in,
                       double*** ptrVolumeGridArray_in,
                       int timeline_in, int updateInfoPeriod_in);
 

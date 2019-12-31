@@ -58,31 +58,42 @@ cout << LMin << " " << LMax << endl;
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     
-    vector<Particles>* ptrParticlesList_H;
-    vector<Particles>* ptrParticlesList_He;
-    vector<Particles>* ptrParticlesList_O;
-    vector<int>* ptrParticlesList_He_out = new vector<int>;
-    vector<int>* ptrParticlesList_H_out = new vector<int>; 
-    vector<int>* ptrParticlesList_O_out = new vector<int>;
-
+    vector<Particles> ptrParticlesList_H;
+    vector<Particles> ptrParticlesList_He;
+    vector<Particles> ptrParticlesList_O;
+    vector<int> ptrParticlesList_H_out;
+    vector<int> ptrParticlesList_He_out; 
+    vector<int> ptrParticlesList_O_out;
     ptrParticlesList_H.reserve(50000000);
+    ptrParticlesList_He.reserve(50000000);   
+    ptrParticlesList_O.reserve(50000000);
+    ptrParticlesList_H_out.reserve(10000000);
+    ptrParticlesList_He_out.reserve(10000000);
+    ptrParticlesList_O_out.reserve(10000000);
 
-    std::cout << std::endl << sizeof(*ptrParticlesList_H) << " " << ptrParticlesList_H_out->capacity() << endl;
+    vector<Particles> ptrParticlesListTemp_H; 
+    vector<Particles> ptrParticlesListTemp_He;
+    vector<Particles> ptrParticlesListTemp_O; 
+    ptrParticlesListTemp_H.reserve(5000000);
+    ptrParticlesListTemp_He.reserve(5000000);
+    ptrParticlesListTemp_O.reserve(5000000);
+
+    std::cout << std::endl << ptrParticlesList_H.capacity() << " " << ptrParticlesList_H_out.capacity() << endl;
 #pragma omp parallel
 {
     #pragma omp sections
     {
         #pragma omp section
         {
-        ptrParticlesList_H = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_H, N0_H);
+        ParticlesLists( ptrParticlesList_H, ptrArray, ptrVolumeCellArray, mi0_H, N0_H);
         }
         #pragma omp section
         {
-        ptrParticlesList_He = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_He, N0_He);    
+        ParticlesLists( ptrParticlesList_He, ptrArray, ptrVolumeCellArray, mi0_He, N0_He);    
         }
         #pragma omp section
         {
-        ptrParticlesList_O = ParticlesLists( ptrArray, ptrVolumeCellArray, mi0_O, N0_O);    
+        ParticlesLists( ptrParticlesList_O, ptrArray, ptrVolumeCellArray, mi0_O, N0_O);    
         }
     }
     #pragma omp barrier
@@ -109,89 +120,85 @@ cout << LMin << " " << LMax << endl;
         {
 
         // Run 2.1 // Particles in main domain
-        for( auto iteratorM = ptrParticlesList_H->begin(); iteratorM != ptrParticlesList_H->end(); ++iteratorM)
+        for( auto iteratorM = ptrParticlesList_H.begin(); iteratorM != ptrParticlesList_H.end(); ++iteratorM)
         {
-            Particles temp = *iteratorM;
-            if( temp.PosUint() == 0) 
+            if( iteratorM->PosUint() == 0) 
             {
                 continue;
             } else
             {    
-                struct structg tempStr = temp.InttoStrp1();
+                struct structg tempStr = iteratorM->InttoStrp1();
                 int check; // check whether in the main domain or not, "0" means in "1" means out
                 // update velocity // update position
-                check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
+                check = iteratorM->BorisMethod( &tempStr, ptrArray, mi0_H);
                 // check if still in the main domain
                 if( check == 1) // out of the domain
                 {
                     iteratorM->SetOutParticles();
-                    int tempint = iteratorM - ptrParticlesList_H->begin();
-                    ptrParticlesList_H_out->push_back( tempint);
+                    int tempint = iteratorM - ptrParticlesList_H.begin();
+                    ptrParticlesList_H_out.push_back( tempint);
                 }
             }
         }
         
-        cout << "Particles H " << ptrParticlesList_H->size() << " out " << ptrParticlesList_H_out->size() << endl;
+        cout << "Particles H " << ptrParticlesList_H.size() << " out " << ptrParticlesList_H_out.size() << endl;
         }
 
         #pragma omp section
         {
-        for( auto iteratorM = ptrParticlesList_He->begin(); iteratorM != ptrParticlesList_He->end(); ++iteratorM)
+        for( auto iteratorM = ptrParticlesList_He.begin(); iteratorM != ptrParticlesList_He.end(); ++iteratorM)
         {
-            Particles temp = *iteratorM;
-            if( temp.PosUint() == 0) 
+            if( iteratorM->PosUint() == 0) 
             {
                 continue;
             } else
             {    
-                struct structg tempStr = temp.InttoStrp1();
+                struct structg tempStr = iteratorM->InttoStrp1();
                 int check; // check whether in the main domain or not, "0" means in "1" means out
                 // update velocity // update position
-                check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
+                check = iteratorM->BorisMethod( &tempStr, ptrArray, mi0_He);
                 // check if still in the main domain
                 if( check == 1) // out of the domain
                 {
                     iteratorM->SetOutParticles();
-                    int tempint = iteratorM - ptrParticlesList_He->begin();
-                    ptrParticlesList_He_out->push_back( tempint);
+                    int tempint = iteratorM - ptrParticlesList_He.begin();
+                    ptrParticlesList_He_out.push_back( tempint);
                 }
             }
+
         }
-        cout << "Particles He " << ptrParticlesList_He->size() << " out " << ptrParticlesList_He_out->size() << endl;
+        cout << "Particles He " << ptrParticlesList_He.size() << " out " << ptrParticlesList_He_out.size() << endl;
         }
         #pragma omp section
         {
-        for( auto iteratorM = ptrParticlesList_O->begin(); iteratorM != ptrParticlesList_O->end(); ++iteratorM)
+        for( auto iteratorM = ptrParticlesList_O.begin(); iteratorM != ptrParticlesList_O.end(); ++iteratorM)
         {
-            Particles temp = *iteratorM;
-            if( temp.PosUint() == 0) 
+            if( iteratorM->PosUint() == 0) 
             {
                 continue;
             } else
             {    
-                struct structg tempStr = temp.InttoStrp1();
+                struct structg tempStr = iteratorM->InttoStrp1();
                 int check; // check whether in the main domain or not, "0" means in "1" means out
                 // update velocity // update position
-                check = temp.BorisMethod( &tempStr, ptrArray, mi0_O);
+                check = iteratorM->BorisMethod( &tempStr, ptrArray, mi0_O);
                 // check if still in the main domain
                 if( check == 1) // out of the domain
                 {
                     iteratorM->SetOutParticles();
-                    int tempint = iteratorM - ptrParticlesList_O->begin();
-                    ptrParticlesList_O_out->push_back( tempint);
+                    int tempint = iteratorM - ptrParticlesList_O.begin();
+                    ptrParticlesList_O_out.push_back( tempint);
                 }
-            }
+            } 
         }
-        cout << "Particles O " << ptrParticlesList_O->size() << " out " << ptrParticlesList_O_out->size() << endl;
+        cout << "Particles O " << ptrParticlesList_O.size() << " out " << ptrParticlesList_O_out.size() << endl;
         }     
     }   
     #pragma omp barrier
 }
 
         // Run 2.2 // Create temp particle lists    
-        vector<Particles>* ptrParticlesListTemp_H; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);
-        vector<Particles>* ptrParticlesListTemp_He; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
-        vector<Particles>* ptrParticlesListTemp_O; // = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
+
 
     #pragma omp parallel
     {
@@ -200,20 +207,15 @@ cout << LMin << " " << LMax << endl;
     #pragma omp section
     {   
 
-        ptrParticlesListTemp_H = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_H , 1);     
+        ParticlesListsTemp(ptrParticlesListTemp_H, ptrArray, ptrVolumeCellArray, mi0_H , 1);     
         // Run 2.3 // Particles in temp domain
-        for( auto iterator = ptrParticlesListTemp_H->begin(); iterator != ptrParticlesListTemp_H->end(); ++iterator)
+        for( auto iterator = ptrParticlesListTemp_H.begin(); iterator != ptrParticlesListTemp_H.end(); ++iterator)
         {
-            Particles temp = *iterator;
-            struct structg tempStr = temp.InttoStrp1();
-
-       
-
+            struct structg tempStr = iterator->InttoStrp1();
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-            check = temp.BorisMethod( &tempStr, ptrArray, mi0_H);
+            check = iterator->BorisMethod( &tempStr, ptrArray, mi0_H);
    
-
             // check if still in the main domain
             if( check == 0) // in the domain
             {    
@@ -226,15 +228,15 @@ cout << LMin << " " << LMax << endl;
         std::cout << std::bitset<64>(temp.PosUint()) << " info " << 
         tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " vel " << tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << std::endl;
 */
-                if( ptrParticlesList_H_out->size() > 0)
+                if( ptrParticlesList_H_out.size() > 0)
                 {
-                    auto temp_pos_out = ptrParticlesList_H_out->end() - 1;
-                    (*ptrParticlesList_H)[ *temp_pos_out] = temp;
-                    temp_pos_out = ptrParticlesList_H_out->erase(temp_pos_out);
+                    auto temp_pos_out = ptrParticlesList_H_out.end() - 1;
+                    (ptrParticlesList_H)[ *temp_pos_out] = *iterator;
+                    temp_pos_out = ptrParticlesList_H_out.erase(temp_pos_out);
                 }
                 else
                 {
-                    ptrParticlesList_H->push_back( temp);                   
+                    ptrParticlesList_H.push_back( *iterator);                   
                 }
                        //        iterator = ptrParticlesListTemp_H->erase( iterator);
             }
@@ -242,26 +244,25 @@ cout << LMin << " " << LMax << endl;
     }
     #pragma omp section
     {  
-        ptrParticlesListTemp_He = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_He, 4);
-        for( auto iterator = ptrParticlesListTemp_He->begin(); iterator != ptrParticlesListTemp_He->end(); ++iterator)
+        ParticlesListsTemp(ptrParticlesListTemp_He, ptrArray, ptrVolumeCellArray, mi0_He, 4);
+        for( auto iterator = ptrParticlesListTemp_He.begin(); iterator != ptrParticlesListTemp_He.end(); ++iterator)
         {
-            Particles temp = *iterator;
-            struct structg tempStr = temp.InttoStrp1();
+            struct structg tempStr = iterator->InttoStrp1();
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-            check = temp.BorisMethod( &tempStr, ptrArray, mi0_He);
+            check = iterator->BorisMethod( &tempStr, ptrArray, mi0_He);
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                if( ptrParticlesList_He_out->size() > 0)
+                if( ptrParticlesList_He_out.size() > 0)
                 {
-                    auto temp_pos_out = ptrParticlesList_He_out->end() - 1;
-                    (*ptrParticlesList_He)[ *temp_pos_out] = temp;
-                    temp_pos_out = ptrParticlesList_He_out->erase(temp_pos_out);
+                    auto temp_pos_out = ptrParticlesList_He_out.end() - 1;
+                    ptrParticlesList_He[ *temp_pos_out] = *iterator;
+                    temp_pos_out = ptrParticlesList_He_out.erase(temp_pos_out);
                 }
                 else
                 {
-                    ptrParticlesList_He->push_back( temp);
+                    ptrParticlesList_He.push_back( *iterator);
                 }
                  //    iterator = ptrParticlesListTemp_He->erase( iterator);
             }
@@ -269,8 +270,8 @@ cout << LMin << " " << LMax << endl;
     }
     #pragma omp section
     {    
-        ptrParticlesListTemp_O = ParticlesListsTemp( ptrArray, ptrVolumeCellArray, mi0_O, 16);
-        for( auto iterator = ptrParticlesListTemp_O->begin(); iterator != ptrParticlesListTemp_O->end(); ++iterator)
+        ParticlesListsTemp(ptrParticlesListTemp_O, ptrArray, ptrVolumeCellArray, mi0_O, 16);
+        for( auto iterator = ptrParticlesListTemp_O.begin(); iterator != ptrParticlesListTemp_O.end(); ++iterator)
         {
             Particles temp = *iterator;
             struct structg tempStr = temp.InttoStrp1();
@@ -280,15 +281,15 @@ cout << LMin << " " << LMax << endl;
             // check if still in the main domain
             if( check == 0) // in the domain
             {   
-                if( ptrParticlesList_O_out->size() > 0)
+                if( ptrParticlesList_O_out.size() > 0)
                 {
-                    auto temp_pos_out = ptrParticlesList_O_out->end() - 1;
-                    (*ptrParticlesList_O)[ *temp_pos_out] = temp;
-                    temp_pos_out = ptrParticlesList_O_out->erase(temp_pos_out);
+                    auto temp_pos_out = ptrParticlesList_O_out.end() - 1;
+                    ptrParticlesList_O[ *temp_pos_out] = temp;
+                    temp_pos_out = ptrParticlesList_O_out.erase(temp_pos_out);
                 }
                 else
                 {
-                    ptrParticlesList_O->push_back( temp);
+                    ptrParticlesList_O.push_back( temp);
                 }
             }
         }
@@ -315,9 +316,9 @@ cout << LMin << " " << LMax << endl;
     
 
     // Run 2.4 // delete temp particlesLists
-    delete ptrParticlesListTemp_H;
-    delete ptrParticlesListTemp_He;
-    delete ptrParticlesListTemp_O;
+    ptrParticlesListTemp_H.clear();
+    ptrParticlesListTemp_He.clear();
+    ptrParticlesListTemp_O.clear();
 
 
 
@@ -364,9 +365,9 @@ cout << LMin << " " << LMax << endl;
     }
     delete ptrVectorCellArray;
     delete ptrArray;
-    delete ptrParticlesList_H;
-    delete ptrParticlesList_He;
-    delete ptrParticlesList_O;
+//    delete ptrParticlesList_H;
+//    delete ptrParticlesList_He;
+//    delete ptrParticlesList_O;
 
 }
 
