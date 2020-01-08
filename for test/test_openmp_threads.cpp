@@ -14,7 +14,7 @@ void sub(float*x, int npoints)
     {
         iam = omp_get_thread_num();
         nt =  omp_get_num_threads();
-        std::cout << iam << " " << nt << std::endl;
+        std::cout << iam << std::endl;
         ipoints = npoints / nt;    /*size of partition*/
         istart = iam*ipoints;  /*starting array index*/
         if (iam == nt-1)     /*last thread may do more*/
