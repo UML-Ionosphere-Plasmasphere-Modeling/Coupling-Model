@@ -260,6 +260,86 @@ void ParticlesListsTemp(vector<Particles>& listsPtrTemp_in,
 }
 
 
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Go through particles vectors in main domain
+// 1. Update grids info
+// 2. Kick out particles which are out of main domain
+// 3. Generate vector which shows the locations of the particles in 2
+//************************************************************************
+//************************************************************************
+void IterateParticlesMain( GridsPoints***** ptrArray_in, 
+                           vector<Particles>& ptrParticlesList_in, 
+                           vector<Particles>& ptrParticlesListTemp_in,
+                           vector<int>& ptrParticlesList_out_in,
+                           double*** ptrVolumeGridArray_in,
+                           int timeline_in, 
+                           int updateInfoPeriod_in,
+                           double mi0_in)
+{
+    int npoints = ptrParticlesList_in.size();
+    int thread_num, num_threads, sizeThread, startThread;
+    #pragma omp parallel default(shared) private( thread_num, num_threads, sizeThread, startThread)
+    {
+        thread_num = omp_get_thread_num();
+        num_threads= omp_get_num_threads();
+        sizeThread = npoints / sizeThread;
+        startThread= thread_num * sizeThread;
+        if( thread_num == num_threads-1)
+        sizeThread = npoints - startThread;
+
+        auto iter = ptrParticlesList_in.begin();
+        for( int i = 0; i < sizeThread; i++)
+        {
+            // update grids info
+            struct structg tempStr = (iter+startThread+i)->InttoStrp1();
+            double tempNumber = (iter+startThread+i)->WeightNi();
+            Vector3 tempVel = (iter+startThread+i)->VelParticles();
+
+            #pragma omp critical
+            if( tempStr.kg > tempGridsCellLevel ){
+            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
+            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
+            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
+            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
+            }
+            #pragma omp critical
+            if( tempStr.kg < fieldsGridsSize - 1 - tempGridsCellLevel ){
+            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 1);
+            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 1);
+            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 1);
+            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 1);
+            }
+            
+            // boris method, update particle info
+            // update vector_out_particles
+            if( iter->PosUint() == 0) 
+            {
+                continue;
+            } else
+            {    
+                int check; // check whether in the main domain or not, "0" means in "1" means out
+                // update velocity // update position
+                check = iter->BorisMethod( &tempStr, ptrArray_in, mi0_in);
+                // check if still in the main domain
+                if( check == 1) // out of the domain
+                {
+                    iter->SetOutParticles();
+                    int tempint = iter + startThread + i - ptrParticlesList.begin();
+                    #pragma omp critical
+                    ptrParticlesList_out_in.push_back( tempint);
+                }
+            }
+
+        }
+
+    }
+
+}
+
+
+
 
 
 //************************************************************************

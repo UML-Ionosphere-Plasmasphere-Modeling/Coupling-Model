@@ -112,12 +112,6 @@ cout << LMin << " " << LMax << endl;
 
     std::cout << "timeline" << timeline << std::endl;
 
-#pragma omp parallel
-{
-    #pragma omp sections
-    {
-        #pragma omp section
-        {
 
         // Run 2.1 // Particles in main domain
         for( auto iteratorM = ptrParticlesList_H.begin(); iteratorM != ptrParticlesList_H.end(); ++iteratorM)
@@ -142,10 +136,8 @@ cout << LMin << " " << LMax << endl;
         }
         
         cout << "Particles H " << ptrParticlesList_H.size() << " out " << ptrParticlesList_H_out.size() << endl;
-        }
 
-        #pragma omp section
-        {
+
         for( auto iteratorM = ptrParticlesList_He.begin(); iteratorM != ptrParticlesList_He.end(); ++iteratorM)
         {
             if( iteratorM->PosUint() == 0) 
@@ -168,9 +160,7 @@ cout << LMin << " " << LMax << endl;
 
         }
         cout << "Particles He " << ptrParticlesList_He.size() << " out " << ptrParticlesList_He_out.size() << endl;
-        }
-        #pragma omp section
-        {
+
         for( auto iteratorM = ptrParticlesList_O.begin(); iteratorM != ptrParticlesList_O.end(); ++iteratorM)
         {
             if( iteratorM->PosUint() == 0) 
@@ -192,20 +182,8 @@ cout << LMin << " " << LMax << endl;
             } 
         }
         cout << "Particles O " << ptrParticlesList_O.size() << " out " << ptrParticlesList_O_out.size() << endl;
-        }     
-    }   
-    #pragma omp barrier
-}
 
         // Run 2.2 // Create temp particle lists    
-
-
-    #pragma omp parallel
-    {
-    #pragma omp sections
-    {
-    #pragma omp section
-    {   
 
         ParticlesListsTemp(ptrParticlesListTemp_H, ptrArray, ptrVolumeCellArray, mi0_H , 1);     
         // Run 2.3 // Particles in temp domain
@@ -241,9 +219,7 @@ cout << LMin << " " << LMax << endl;
                        //        iterator = ptrParticlesListTemp_H->erase( iterator);
             }
         }
-    }
-    #pragma omp section
-    {  
+
         ParticlesListsTemp(ptrParticlesListTemp_He, ptrArray, ptrVolumeCellArray, mi0_He, 4);
         for( auto iterator = ptrParticlesListTemp_He.begin(); iterator != ptrParticlesListTemp_He.end(); ++iterator)
         {
@@ -267,9 +243,7 @@ cout << LMin << " " << LMax << endl;
                  //    iterator = ptrParticlesListTemp_He->erase( iterator);
             }
         }
-    }
-    #pragma omp section
-    {    
+    
         ParticlesListsTemp(ptrParticlesListTemp_O, ptrArray, ptrVolumeCellArray, mi0_O, 16);
         for( auto iterator = ptrParticlesListTemp_O.begin(); iterator != ptrParticlesListTemp_O.end(); ++iterator)
         {
@@ -293,12 +267,7 @@ cout << LMin << " " << LMax << endl;
                 }
             }
         }
-        
-    }
-    }
-    #pragma omp barrier
 
-    }
 
     // Run 2.5 // Update info in grids 
     // Run 2.5.1 // Accumulate density and velocity per timestep and average them to get the
