@@ -9,7 +9,7 @@ void subdomain( vector<int>& ptrVector, vector<int>& ptrCheck, int istart, int i
     vector<int>::iterator iter = ptrVector.begin();
     for (i = 0; i < ipoints; i++)
     {
-        if( *(iter+istart+i)%5==0 )
+        if( *(iter+istart+i)%3==0 )
         {
             int item = iter+istart+i - ptrVector.begin();
             #pragma omp critical
@@ -26,18 +26,15 @@ void subdomain2( vector<int>& ptrVector, vector<int>& ptrVector2, vector<int>& p
     for (i = 0; i < ipoints; i++)
     {
         int temp = *(iter+istart+i);
-        if( ptrCheck.size()!=0)
-        {
+        
         #pragma omp critical
+        if( ptrCheck.size()!=0)
         {
         ptrVector[*(ptrCheck.end()-1)]=temp;
         iterCheck = ptrCheck.erase(ptrCheck.end()-1);
         iterCheck--;
-        }
         } else
-        {
-        #pragma omp critical
-        ptrVector.push_back(temp);
+        {ptrVector.push_back(temp);
         }
         
     }
@@ -59,6 +56,7 @@ void sub( vector<int>& ptrVector, vector<int>& ptrVector2, vector<int>& ptrCheck
         #pragma omp critical
         std::cout << iam << " " << istart << " " << ipoints << std::endl;
 
+        #pragma omp barrier
         std::cout << " step 2 " << std::endl;
 
         ipoints = cpoints /nt;
@@ -76,7 +74,7 @@ void sub( vector<int>& ptrVector, vector<int>& ptrVector2, vector<int>& ptrCheck
 int main()
 {
     vector<int> ptrVector={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-    vector<int> ptrVector2(10,0);
+    vector<int> ptrVector2(20,0);
     vector<int> ptrCheck;
 
     sub(ptrVector, ptrVector2, ptrCheck);   
