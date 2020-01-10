@@ -112,7 +112,8 @@ cout << LMin << " " << LMax << endl;
 
     std::cout << "timeline" << timeline << std::endl;
 
-
+    
+    
         // Run 2.1 // Particles in main domain
         for( auto iteratorM = ptrParticlesList_H.begin(); iteratorM != ptrParticlesList_H.end(); ++iteratorM)
         {
