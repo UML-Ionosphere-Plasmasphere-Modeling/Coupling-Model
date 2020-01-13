@@ -654,6 +654,12 @@ void SetConvectionVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int 
 //************************************************************************
 //************************************************************************
 // Function
+// Set velocity due to earth rotation
+void SetRotationalVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in);
+
+//************************************************************************
+//************************************************************************
+// Function
 // Set initial condition
 
 void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCellArray_in, double*** ptrVolumeCellArray_in);
@@ -708,6 +714,19 @@ void CalculatingAveragedPhoVatGrids(GridsPoints***** ptrArray_in,
 //************************************************************************
 // FUNCTION
 // Set zero for pho and v at each points
-void  ResetPhoVatGrids( GridsPoints***** ptrArray_in);
+void ResetPhoVatGrids( GridsPoints***** ptrArray_in);
+
+//************************************************************************
+//************************************************************************
+// Function
+// initial the bot boundary for the  velocity of magnetic field line
+void SetRotationalVelBotBoundary( GridsPoints***** ptrArray_in, int timeline_in);
+
+//************************************************************************
+//************************************************************************
+// Function
+// initial the top boundary for the  velocity of magnetic field line
+void SetConvectionVelTopBoundary( GridsPoints***** ptrArray_in, int timeline_in);
+
 
 #endif

@@ -64,7 +64,7 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0);
                 ptrArray[0][i][j][k]->InttoPos3( 0, i, j, k);                                        
                 ptrArray[0][i][j][k]->XYZtoB(ptrArray[0][i][j][k]->Pos3());
-                ptrArray[0][i][j][k]->XYZtoVel();
+                ptrArray[0][i][j][k]->XYZtoVel( update_type);
                 ptrArray[0][i][j][k]->XYZtoE();
                 ptrArray[0][i][j][k]->XYZtoDensity();
                 ptrArray[0][i][j][k]->SetStopSign(0);
@@ -106,7 +106,7 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0);
                 ptrArray[1][i][j][k]->InttoPos3( 1, i, j, k);                                        
                 ptrArray[1][i][j][k]->XYZtoB(ptrArray[1][i][j][k]->Pos3());
-                ptrArray[1][i][j][k]->XYZtoVel();
+                ptrArray[1][i][j][k]->XYZtoVel( update_type);
                 ptrArray[1][i][j][k]->XYZtoE();     
                 ptrArray[1][i][j][k]->XYZtoDensity();
                 ptrArray[1][i][j][k]->SetStopSign(0);
@@ -151,7 +151,7 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0);
                 ptrArray[2][i][j][k]->InttoPos3( 2, i, j, k);                                        
                 ptrArray[2][i][j][k]->XYZtoB(ptrArray[2][i][j][k]->Pos3());
-                ptrArray[2][i][j][k]->XYZtoVel();
+                ptrArray[2][i][j][k]->XYZtoVel( update_type);
                 ptrArray[2][i][j][k]->XYZtoE();
                 ptrArray[2][i][j][k]->XYZtoDensity();
                 ptrArray[2][i][j][k]->SetStopSign(0);
@@ -198,7 +198,7 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0);
                 ptrArray[4][i][j][k]->InttoPos3( 4, i, j, k);                                        
                 ptrArray[4][i][j][k]->XYZtoB(ptrArray[4][i][j][k]->Pos3());
-                ptrArray[4][i][j][k]->XYZtoVel();
+                ptrArray[4][i][j][k]->XYZtoVel( update_type);
                 ptrArray[4][i][j][k]->XYZtoE();
                 ptrArray[4][i][j][k]->XYZtoDensity();
                 ptrArray[4][i][j][k]->SetStopSign(0);
@@ -251,7 +251,7 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0);
                 ptrArray[5][i][j][k]->InttoPos3( 5, i, j, k);                                        
                 ptrArray[5][i][j][k]->XYZtoB(ptrArray[5][i][j][k]->Pos3());
-                ptrArray[5][i][j][k]->XYZtoVel();
+                ptrArray[5][i][j][k]->XYZtoVel( update_type);
                 ptrArray[5][i][j][k]->XYZtoE();
                 ptrArray[5][i][j][k]->XYZtoDensity();
                 ptrArray[5][i][j][k]->SetStopSign(0);
@@ -313,7 +313,7 @@ GridsPoints***** GridsCreation()
                                                         0.0, 0);
                 ptrArray[3][i][j][k]->InttoPos3( 3, i, j, k);                                        
                 ptrArray[3][i][j][k]->XYZtoB(ptrArray[3][i][j][k]->Pos3());
-                ptrArray[3][i][j][k]->XYZtoVel();
+                ptrArray[3][i][j][k]->XYZtoVel( update_type);
                 ptrArray[3][i][j][k]->XYZtoE();
                 ptrArray[3][i][j][k]->XYZtoDensity();
                 ptrArray[3][i][j][k]->SetStopSign(0);
@@ -1748,7 +1748,7 @@ double  MLON12=atan(sin(PLAT)*tan(GLONR-PLON));
 //************************************************************************
 // Function
 // initial the bot boundary for the  velocity of magnetic field line
-void SetBotBoundary( GridsPoints***** ptrArray_in)
+void SetRotationalVelBotBoundary( GridsPoints***** ptrArray_in, int timeline_in)
 {
     double PI = 3.1415926535897;
     // Set the dawn and equatorial point as zero point
@@ -1761,46 +1761,53 @@ void SetBotBoundary( GridsPoints***** ptrArray_in)
             for( int j = 1; j < fieldsGridsSize+2; j++)
             {
                 int k = 0;
-    if( ptrArray_in[face][i][j][k]->StopSign() == 1) continue;
+                if( ptrArray_in[face][i][j][k]->StopSign() == 1) continue;
 
-    double x = ptrArray_in[face][i][j][k]->Pos3().x();
-    double y = ptrArray_in[face][i][j][k]->Pos3().y();
-    double z = ptrArray_in[face][i][j][k]->Pos3().z();
+                double x = ptrArray_in[face][i][j][k]->Pos3().x();
+                double y = ptrArray_in[face][i][j][k]->Pos3().y();
+                double z = ptrArray_in[face][i][j][k]->Pos3().z();
 
-    //Set density
-    double longtitude;
-    double latitude;
+                //Set density
+                double longtitude;
+                double latitude;
 
-    double A = 0.5 * ( rho_max - rho_min);
-    double A_average = 0.5 * ( rho_max + rho_min);
-    double rho;
+                double A = 0.5 * ( rho_max - rho_min);
+                double A_average = 0.5 * ( rho_max + rho_min);
+                double rho;
 
-    if( x == 0 && y == 0)
-    { rho = A_average;}
-    else if( x == 0 && y > 0)
-    { longtitude = PI / 2.0;}
-    else if( x == 0 && y < 0)
-    { longtitude = PI / 2.0 * 3.0;}
-    else if( x!= 0)
-    {
+                if( x == 0 && y == 0)
+                { rho = A_average;}
+                else if( x == 0 && y > 0)
+                { longtitude = PI / 2.0;}
+                else if( x == 0 && y < 0)
+                { longtitude = PI / 2.0 * 3.0;}
+                else if( x!= 0)
+                {
+                
+                longtitude = atan( y / x);
 
-    longtitude = atan( y / x);
-    
-    if( x<0) { longtitude = longtitude + PI;}
-    
-    }
-    
-    latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
+                if( x<0) { longtitude = longtitude + PI;}
 
-    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
+                }
 
-    ptrArray_in[face][i][j][k]->Density_H( rho * ratioH / mi0_H);
-    ptrArray_in[face][i][j][k]->Density_He( rho * ratioHe / mi0_He);
-    ptrArray_in[face][i][j][k]->Density_O( rho * ratioO / mi0_O);
+                latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
 
-    SetConvectionVel(ptrArray_in, face, i, j, k);
+                rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
 
-    ptrArray_in[face][i][j][k]->SetStopSign(1);
+                ptrArray_in[face][i][j][k]->Density_H( rho * ratioH / mi0_H);
+                ptrArray_in[face][i][j][k]->Density_He( rho * ratioHe / mi0_He);
+                ptrArray_in[face][i][j][k]->Density_O( rho * ratioO / mi0_O);
+
+                // set velocity
+                SetRotationalVel(ptrArray_in, face, i, j, k);
+                Vector3 original_vel = ptrArray_in[face][i][j][k]->Vel3();
+                ptrArray_in[face][i][j][k]->SetVel_Boundary(original_vel.ScaleProduct(sin(PI/2.0*(timeline_in*tstep-botBoundaryInitialTimeStart)/botBoundaryInitialTime)));
+
+                // set E
+                Vector3 temp_gradPe = Vector3( 0.0, 0.0, 0.0);
+                ptrArray_in[face][i][j][k]->updateE( temp_gradPe);
+
+                ptrArray_in[face][i][j][k]->SetStopSign(1);
             }
         }
     }
@@ -1826,7 +1833,7 @@ void SetBotBoundary( GridsPoints***** ptrArray_in)
 //************************************************************************
 // Function
 // initial the top boundary for the  velocity of magnetic field line
-void SetTopBoundary( GridsPoints***** ptrArray_in)
+void SetConvectionVelTopBoundary( GridsPoints***** ptrArray_in, int timeline_in)
 {
     double PI = 3.1415926535897;
     // input two const
@@ -1845,22 +1852,26 @@ void SetTopBoundary( GridsPoints***** ptrArray_in)
             {
                 int k = fieldsGridsSize;
                 
-    if( ptrArray_in[face][i][j][k]->StopSign() == 1) continue;
-    SetConvectionVel(ptrArray_in, face, i, j, k);
+                if( ptrArray_in[face][i][j][k]->StopSign() == 1) continue;
+                SetConvectionVel(ptrArray_in, face, i, j, k);
+                Vector3 original_vel = ptrArray_in[face][i][j][k]->Vel3();
+                ptrArray_in[face][i][j][k]->SetVel_Boundary(original_vel.ScaleProduct(sin(PI/2.0*(timeline_in*tstep-topBoundaryInitialTimeStart)/topBoundaryInitialTime)));
 
-    Vector3 temp_gradPe = Vector3( 0.0, 0.0, 0.0);
-    ptrArray_in[face][i][j][k]->updateE( temp_gradPe);
+                double r = ptrArray_in[face][i][j][k]->Pos3().norm() / radius;
+                if( r > 0){
+                ptrArray_in[face][i][j][k]->Density_H( N0_H / r * ( 1.0 - tanh( r - 6.5)));
 
-    double r = ptrArray_in[face][i][j][k]->Pos3().norm() / radius;
-    if( r > 0){
-    ptrArray_in[face][i][j][k]->Density_H( N0_H / r * ( 1.0 - tanh( r - 6.5)));
-         
-    ptrArray_in[face][i][j][k]->Density_He( N0_He / r * ( 1.0 - tanh( r - 6.5)));
+                ptrArray_in[face][i][j][k]->Density_He( N0_He / r * ( 1.0 - tanh( r - 6.5)));
 
-    ptrArray_in[face][i][j][k]->Density_O( N0_O / r * ( 1.0 - tanh( r - 6.5)));   
-    }
-    // set stopSign
-    ptrArray_in[face][i][j][k]->SetStopSign(1);
+                ptrArray_in[face][i][j][k]->Density_O( N0_O / r * ( 1.0 - tanh( r - 6.5)));   
+                
+                }
+                // set E
+                Vector3 temp_gradPe = Vector3( 0.0, 0.0, 0.0);
+                ptrArray_in[face][i][j][k]->updateE( temp_gradPe);
+
+                // set stopSign
+                ptrArray_in[face][i][j][k]->SetStopSign(1);
         
             }
         }
@@ -1964,6 +1975,17 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
     }
 }
 
+//************************************************************************
+//************************************************************************
+// Function
+// Set velocity due to earth rotation
+void SetRotationalVel( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+{
+    Vector3 tempPos = ptrArray_in[face_in][i_in][j_in][k_in]->Pos3();
+    Vector3 tempOmega = Vector3( 0.0, 0.0, omega_earth);
+    tempPos.Setz( 0.0);
+    ptrArray_in[face_in][i_in][j_in][k_in]->SetVel_Boundary( tempOmega.CrossProduct(tempPos));
+}
 
 //************************************************************************
 //************************************************************************
@@ -2170,7 +2192,7 @@ if( k_in == 16 && j_in == fieldsGridsSize / 2 && face_in == 5 )
 // cout << vx_top << " " << vy_top << " " << vz_top << endl;
     Vector3 temp = Vector3( vx_top, vy_top, vz_top);
     Vector3 original_vel = ptrArray_in[face_in][i_in][j_in][k_in]->Vel3();
-    ptrArray_in[face_in][i_in][j_in][k_in]->SetVel_topBoundary( original_vel.PlusProduct( temp));
+    ptrArray_in[face_in][i_in][j_in][k_in]->SetVel_Boundary( original_vel.PlusProduct( temp));
 /*
     if( k_in == 16 && i_in == fieldsGridsSize/2 +1 &&  j_in == 5 && face_in == 5) {
     cout << face_in << " " << i_in << " " << j_in << " " << k_in << " vel " << vx_top << " " << vy_top << " " << vz_top << " " <<

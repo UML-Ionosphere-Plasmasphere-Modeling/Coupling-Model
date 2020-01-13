@@ -41,7 +41,7 @@ void ProcessFunc()
 //    SetTopBoundary( ptrArray);
 //    SetBotBoundary( ptrArray);
     
-cout << LMin << " " << LMax << endl;
+    cout << LMin << " " << LMax << endl;
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     Vector3*** ptrVectorCellArray = VectorCellField();  
 
@@ -53,8 +53,10 @@ cout << LMin << " " << LMax << endl;
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
     
     // Initialize condition
-    SetInitialCondition( ptrArray, ptrVectorCellArray, ptrVolumeCellArray);
-
+    if( update_type == 0)
+    {
+        SetInitialCondition( ptrArray, ptrVectorCellArray, ptrVolumeCellArray);
+    }
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     
@@ -64,12 +66,12 @@ cout << LMin << " " << LMax << endl;
     vector<int> ptrParticlesList_out_H;
     vector<int> ptrParticlesList_out_He; 
     vector<int> ptrParticlesList_out_O;
-    ptrParticlesList_H.reserve(50000000);
-    ptrParticlesList_He.reserve(50000000);   
-    ptrParticlesList_O.reserve(50000000);
-    ptrParticlesList_out_H.reserve(10000000);
-    ptrParticlesList_out_He.reserve(10000000);
-    ptrParticlesList_out_O.reserve(10000000);
+    ptrParticlesList_H.reserve(500000000);
+    ptrParticlesList_He.reserve(500000000);   
+    ptrParticlesList_O.reserve(500000000);
+    ptrParticlesList_out_H.reserve(50000000);
+    ptrParticlesList_out_He.reserve(50000000);
+    ptrParticlesList_out_O.reserve(50000000);
 
     vector<Particles> ptrParticlesListTemp_H; 
     vector<Particles> ptrParticlesListTemp_He;
@@ -83,11 +85,29 @@ cout << LMin << " " << LMax << endl;
         #pragma omp sections
         {
             #pragma omp section
-            {ParticlesLists( ptrParticlesList_H, ptrArray, ptrVolumeCellArray, mi0_H, N0_H);}
+            {
+                ParticlesLists( ptrParticlesList_H, 
+                                ptrArray, 
+                                ptrVolumeCellArray, 
+                                mi0_H, 
+                                N0_H);
+            }
             #pragma omp section
-            {ParticlesLists( ptrParticlesList_He, ptrArray, ptrVolumeCellArray, mi0_He, N0_He);}
+            {
+                ParticlesLists( ptrParticlesList_He, 
+                                ptrArray, 
+                                ptrVolumeCellArray, 
+                                mi0_He, 
+                                N0_He);
+            }
             #pragma omp section
-            {ParticlesLists( ptrParticlesList_O, ptrArray, ptrVolumeCellArray, mi0_O, N0_O);}
+            {
+                ParticlesLists( ptrParticlesList_O, 
+                                ptrArray, 
+                                ptrVolumeCellArray, 
+                                mi0_O, 
+                                N0_O);
+            }
         }
         #pragma omp barrier
     }
@@ -100,7 +120,25 @@ cout << LMin << " " << LMax << endl;
 
     for( int timeline = 1; timeline <= timeLineLimit; timeline++)   // timeline start with 1
     {
-
+        // set boundary condition: 60s initial time interval
+        // can be developed for info exchanging boundary
+        if( update_type == 1)
+        { 
+            if( timeline >= botBoundaryInitialTimeStart/tstep && 
+                timeline <= (botBoundaryInitialTimeStart+botBoundaryInitialTime)/tstep &&
+                initial_bot_type ==0)
+            {
+                SetRotationalVelBotBoundary( ptrArray, timeline);
+            }
+            if( timeline >= topBoundaryInitialTimeStart/tstep && 
+                timeline <= (topBoundaryInitialTimeStart+topBoundaryInitialTime)/tstep && 
+                initial_top_type ==1)
+            {
+                SetConvectionVelTopBoundary( ptrArray, timeline);
+            }
+        }
+        
+        // const info print out
         if( timeline == 1)
         {
             std::cout << " PrintOut Const" << std::endl;
@@ -109,7 +147,10 @@ cout << LMin << " " << LMax << endl;
         // average pho, v, update grids info B, E & reset pho, v
         if( timeline % updateInfoPeriod ==0)
         {
-            std::cout << " Update gridspoints info " << timeline << std::endl;
+            cout << timeline << " H " << ptrParticlesList_H.size() << " " << ptrParticlesList_out_H.size();
+            cout << " He " << ptrParticlesList_He.size() << " " << ptrParticlesList_out_He.size();
+            cout << " O " << ptrParticlesList_O.size() << " " << ptrParticlesList_out_O.size() << endl;
+        
             // average pho and v
             CalculatingAveragedPhoVatGrids( ptrArray, 
                                             ptrVolumeGridArray,
@@ -182,7 +223,7 @@ cout << LMin << " " << LMax << endl;
             // printout 
             if( timeline % printTimePeriod == 0)
             {
-                std::cout << " PrintOut " << std::endl;
+                std::cout << " PrintOut  " << timeline << std::endl;
                 PrintOutHdf5( ptrArray, timeline, h5FileCheck);
             }
             // reset pho and v
@@ -203,17 +244,34 @@ cout << LMin << " " << LMax << endl;
                                 ptrParticlesList_out_O,
                                 mi0_O);
                                 
-        
         #pragma omp parallel
         {
             #pragma omp sections
             {
                 #pragma omp section
-                {ParticlesListsTemp(ptrParticlesListTemp_H, ptrArray, ptrVolumeCellArray, mi0_H , 1);}
+                {
+                    ParticlesListsTemp( ptrParticlesListTemp_H, 
+                                        ptrArray, 
+                                        ptrVolumeCellArray, 
+                                        mi0_H, 
+                                        1);
+                }
                 #pragma omp section
-                {ParticlesListsTemp(ptrParticlesListTemp_He, ptrArray, ptrVolumeCellArray, mi0_He, 4);}
+                {
+                    ParticlesListsTemp( ptrParticlesListTemp_He, 
+                                        ptrArray, 
+                                        ptrVolumeCellArray, 
+                                        mi0_He, 
+                                        4);
+                }
                 #pragma omp section
-                {ParticlesListsTemp(ptrParticlesListTemp_O, ptrArray, ptrVolumeCellArray, mi0_O, 16);}
+                {
+                    ParticlesListsTemp( ptrParticlesListTemp_O, 
+                                        ptrArray, 
+                                        ptrVolumeCellArray, 
+                                        mi0_O, 
+                                        16);
+                }
             }
             #pragma omp barrier
         }
@@ -239,7 +297,7 @@ cout << LMin << " " << LMax << endl;
         ptrParticlesListTemp_He.clear();
         ptrParticlesListTemp_O.clear();
 
-    }
+        }
 
     delete ptrVectorCellArray;
     delete ptrArray;

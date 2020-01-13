@@ -29,19 +29,26 @@ inline void XYZtoB( Vector3 const& v)
 // with pos3
 //************************************************************************
 //************************************************************************
-inline void XYZtoVel( )
+inline void XYZtoVel( int update_type)
 {
-    Vector3 tempPos = pos3;
-    Vector3 tempOmega = Vector3( 0.0, 0.0, omega_earth);
-    tempPos.Setz( 0.0);
-    v3 = tempOmega.CrossProduct(tempPos);
+    if( update_type == 0)
+    {
+        Vector3 tempPos = pos3;
+        Vector3 tempOmega = Vector3( 0.0, 0.0, omega_earth);
+        tempPos.Setz( 0.0);
+        v3 = tempOmega.CrossProduct(tempPos);
+    } else
+    {
+        v3 = Vector3( 0.0, 0.0, 0.0);
+    }
+    
 }
 //************************************************************************
 //************************************************************************
 // initialize vx, vy, vz of top boundary
 //************************************************************************
 //************************************************************************
-inline void SetVel_topBoundary( const Vector3& vel_in)
+inline void SetVel_Boundary( const Vector3& vel_in)
 {
     v3 = vel_in;
     ve3= vel_in;

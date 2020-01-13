@@ -125,6 +125,11 @@ inline double WeightNi()
     return weightNi;
 }
 
+inline void ResetWeightNi() // reset weight for testing openmp
+{
+    weightNi = 0.0;
+}
+
 inline double MagneticIvarient()
 {
     return mu;

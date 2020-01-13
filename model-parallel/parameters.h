@@ -125,7 +125,25 @@
 // For some control
 //************************************************************************
 //************************************************************************ 
-    const int update_type = 0; // 0- no current 1- with current
+    // 0- no current 1- with current
+    const int update_type = 0;  
+
+    // work only with update_type = 1
+    // 0- zero velocity 
+    //    increased inner boundary velocity to normal
+    //    normal density for all
+    // 1- normal velocity for all ( not applied)
+    //    increased outer boundary velocity
+    //    normal density for all
+    const int initial_bot_type = 0;
+    // 0- no convectional top boundary
+    // 1- with convectional top boundary
+    const int initial_top_type = 1;
+
+    const double botBoundaryInitialTimeStart = 0.0;
+    const double topBoundaryInitialTimeStart = 180.0;
+    const double botBoundaryInitialTime = 60.0;
+    const double topBoundaryInitialTime = 60.0;
     
 //************************************************************************
 //************************************************************************
