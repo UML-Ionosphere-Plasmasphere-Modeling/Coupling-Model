@@ -281,7 +281,7 @@ void IterateParticlesMain( GridsPoints***** ptrArray_in,
     {
         thread_num = omp_get_thread_num();
         num_threads= omp_get_num_threads();
-        sizeThread = npoints / sizeThread;  // size for each thread
+        sizeThread = npoints / num_threads;  // size for each thread
         startThread= thread_num * sizeThread;   // start point for each thread
         if( thread_num == num_threads-1)    // if last thread, it may have more
         sizeThread = npoints - startThread;
@@ -358,7 +358,7 @@ void IterateParticlesTemp( GridsPoints***** ptrArray_in,
     {
         thread_num = omp_get_thread_num();
         num_threads= omp_get_num_threads();
-        sizeThread = npoints / sizeThread;  // size for each thread
+        sizeThread = npoints / num_threads;  // size for each thread
         startThread= thread_num * sizeThread;   // start point for each thread
         if( thread_num == num_threads-1)    // if last thread, it may have more
         sizeThread = npoints - startThread;

@@ -101,6 +101,11 @@ cout << LMin << " " << LMax << endl;
     for( int timeline = 1; timeline <= timeLineLimit; timeline++)   // timeline start with 1
     {
 
+        if( timeline == 1)
+        {
+            std::cout << " PrintOut Const" << std::endl;
+            PrintOutHdf5( ptrArray, timeline, h5FileCheck);
+        }
         // average pho, v, update grids info B, E & reset pho, v
         if( timeline % updateInfoPeriod ==0)
         {
@@ -116,26 +121,62 @@ cout << LMin << " " << LMax << endl;
                 {
                 // Update E without current
                 // Calculate curl dB update ve3, ve3 = v3
-                ptrVectorCellArray = ValueCurlField( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'D');
-                UpdateVe3( ptrVectorCellArray, ptrArray, face);
+                ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 
+                                                    ptrVolumeCellArray, 
+                                                    ptrArray, 
+                                                    face, 
+                                                    'D');
+                UpdateVe3(  ptrVectorCellArray, 
+                            ptrArray,   
+                            face);
                 // Calculate the gradient of Pe
-                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'P');
-                UpdateE3( ptrVectorCellArray, ptrArray, face); // update E
+                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
+                                                    ptrVolumeCellArray, 
+                                                    ptrArray, 
+                                                    face, 
+                                                    'P');
+                UpdateE3(   ptrVectorCellArray, 
+                            ptrArray, 
+                            face); // update E
                 } else
                 {
                 // Update grids info
                 // Calculate curl dB update ve3
-                ptrVectorCellArray = ValueCurlField( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'D');
-                UpdateVe3( ptrVectorCellArray, ptrArray, face);
+                ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 
+                                                    ptrVolumeCellArray, 
+                                                    ptrArray, 
+                                                    face, 
+                                                    'D');
+                UpdateVe3(  ptrVectorCellArray, 
+                            ptrArray, 
+                            face);
                 // Calculate the gradient of Pe update E
-                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'P');
-                UpdateE3( ptrVectorCellArray, ptrArray, face);
+                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
+                                                    ptrVolumeCellArray, 
+                                                    ptrArray, 
+                                                    face, 
+                                                    'P');
+                UpdateE3(   ptrVectorCellArray, 
+                            ptrArray, 
+                            face);
                 // Calculate the curl E update B
-                ptrVectorCellArray = ValueCurlField( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'E');
-                UpdateB3( ptrVectorCellArray, ptrArray, face);
+                ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 
+                                                    ptrVolumeCellArray, 
+                                                    ptrArray, 
+                                                    face, 
+                                                    'E');
+                UpdateB3(   ptrVectorCellArray, 
+                            ptrArray, 
+                            face);
                 // Update gradient norm B
-                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, ptrVolumeCellArray, ptrArray, face, 'B');
-                UpdateGradBNorm( ptrVectorCellArray, ptrArray, face);
+                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
+                                                    ptrVolumeCellArray, 
+                                                    ptrArray, 
+                                                    face, 
+                                                    'B');
+                UpdateGradBNorm(ptrVectorCellArray, 
+                                ptrArray, 
+                                face);
                 }
             }
             // printout 
@@ -147,6 +188,7 @@ cout << LMin << " " << LMax << endl;
             // reset pho and v
             ResetPhoVatGrids( ptrArray);
         }
+
         // iterate particles
         IterateParticlesMain(   ptrArray, 
                                 ptrParticlesList_H, 
@@ -160,6 +202,7 @@ cout << LMin << " " << LMax << endl;
                                 ptrParticlesList_O, 
                                 ptrParticlesList_out_O,
                                 mi0_O);
+                                
         
         #pragma omp parallel
         {
