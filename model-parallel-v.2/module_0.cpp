@@ -2340,7 +2340,7 @@ Vector3***** EVectorCellArray()
                 for( int k = 0; k < fieldsGridsSize; k++)
                 {
                     ptrEArray[face][i][j][k] = mem_EVectorCellArray + face * fieldsGridsSize * fieldsGridsSize * fieldsGridsSize
-                                                + i * fieldsGridsSize * fieldsGridsSize + j * fieldsGridsSize + k; 
+                                                + (i-2) * fieldsGridsSize * fieldsGridsSize + (j-2) * fieldsGridsSize + k; 
                 }
             }
         }
@@ -2383,7 +2383,7 @@ Vector3***** EVectorCellArray()
         }
     }
     // face 2
-    for( int i = 1; i <= fieldsGridsSize+1; i++)
+    for( int i = 2; i <= fieldsGridsSize+2; i++)
     {
         for( int k = 0; k <= fieldsGridsSize; k++)
         {
@@ -2401,7 +2401,7 @@ Vector3***** EVectorCellArray()
         }
     }
     //face 3
-    for( int i = 1; i <= fieldsGridsSize+1; i++)
+    for( int i = 2; i <= fieldsGridsSize+2; i++)
     {
         for( int k = 0; k <= fieldsGridsSize; k++)
         {
@@ -2417,8 +2417,44 @@ Vector3***** EVectorCellArray()
         ptrArray[3][0][i][k] = ptrArray[1][fieldsGridsSize][i][k];  // left
         ptrArray[3][1][i][k] = ptrArray[1][fieldsGridsSize+1][i][k];  // left
         }
-    
+    }
+    // face 4
+    for( int i = 2; i <= fieldsGridsSize+2; i++)
+    {
+        for( int k = 0; k <= fieldsGridsSize; k++)
+        {
+        ptrArray[4][i][0][k] = ptrArray[5][3][i][k]; // bot
+        ptrArray[4][i][1][k] = ptrArray[5][2][i][k]; // bot
+        
+        ptrArray[4][fieldsGridsSize+3][i][k] = ptrArray[0][3][i][k]; // right
+        ptrArray[4][fieldsGridsSize+2][i][k] = ptrArray[0][2][i][k]; // right
+        
+        ptrArray[4][i][fieldsGridsSize+3][k] = ptrArray[2][3][fieldsGridsSize+3-i][k]; // top
+        ptrArray[4][i][fieldsGridsSize+2][k] = ptrArray[2][2][fieldsGridsSize+3-i][k]; // top
+        
+        ptrArray[4][0][i][k] = ptrArray[3][fieldsGridsSize][i][k];  // left
+        ptrArray[4][1][i][k] = ptrArray[3][fieldsGridsSize+1][i][k];  // left
+        }
+    }
+    // face 5
+    for( int i = 2; i <= fieldsGridsSize+2; i++)
+    {
+        for( int k = 0; k <= fieldsGridsSize; k++)
+        {
+        ptrArray[5][i][0][k] = ptrArray[3][fieldsGridsSize+3-i][3][k]; // bot
+        ptrArray[5][i][1][k] = ptrArray[3][fieldsGridsSize+3-i][2][k]; // bot
+
+        ptrArray[5][fieldsGridsSize+3][i][k] = ptrArray[1][fieldsGridsSize+3-i][3][k]; // right
+        ptrArray[5][fieldsGridsSize+2][i][k] = ptrArray[1][fieldsGridsSize+3-i][2][k]; // right
+
+        ptrArray[5][i][fieldsGridsSize+3][k] = ptrArray[0][i][3][k]; // top
+        ptrArray[5][i][fieldsGridsSize+2][k] = ptrArray[0][i][2][k]; // top
+
+        ptrArray[5][0][i][k] = ptrArray[4][i][3][k];  // left
+        ptrArray[5][1][i][k] = ptrArray[4][i][2][k];  // left
+            
+        }
     }
 
-
+    return ptrEArray;
 }
