@@ -2322,7 +2322,7 @@ void CalculatingAveragedPhoVatGrids(GridsPoints***** ptrArray_in,
 //************************************************************************
 //************************************************************************
 // Create Cell centered field array for E for the type of Vector3
-Vector3***** EVectorCellArray()
+Vector3***** EVectorCellArray( )
 {
     // Apply space to store
     static Vector3* mem_EVectorCellArray = new Vector3[totalFace * fieldsGridsSize * fieldsGridsSize * fieldsGridsSize];
@@ -2457,4 +2457,37 @@ Vector3***** EVectorCellArray()
     }
 
     return ptrEArray;
+}
+
+//************************************************************************
+//************************************************************************
+// FUNCTION 
+// Set up a vector array to store the B on face
+// The size of this array is [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
+Vector3***** BVectorFaceArray()
+{
+    static Vector3* mem_BVectorFaceArray = new Vector3[ 3 * totalFace * (fieldsGridsSize+1) * (fieldsGridsSize+1) *(fieldsGridsSize+1)];
+    Vector3***** ptrBFaceArray = new Vector3 ****[3];
+    for( int direction = 0; direcion < 3; direction++)
+    {
+        ptrBFaceArray[direction] = new Vector3***[totalFace];
+        for( int face = 0; face < totalFace; face++)
+        {
+            ptrBFaceArray[direction][face] = new Vector3**[fieldsGridsSize+1];
+            for( int i = 0; i < fieldsGridsSize+1; i++)
+            {
+                ptrBFaceArray[direction][face][i] = new Vector3*[fieldsGridsSize+1];
+                for( int j = 0; j<fieldsGridsSize+1; j++)
+                {
+                    ptrBFaceArray[direction][face][i][j] = new Vector3[fieldsGridsSize+1];
+                    ptrBFaceArray[direction][face][i][j] = mem_BVectorFaceArray + direction * totalFace * (fieldsGridsSize+1) * (fieldsGridsSize+1)* (fieldsGridsSize+1)
+                                                        + face * (fieldsGridsSize+1)* (fieldsGridsSize+1)* (fieldsGridsSize+1)
+                                                        + i * (fieldsGridsSize+1)* (fieldsGridsSize+1)
+                                                        + j * (fieldsGridsSize+1);
+                }
+            }
+        }
+    }
+
+    return BVectorFaceArray;
 }
