@@ -2464,7 +2464,7 @@ Vector3***** EVectorCellArray( )
 // FUNCTION 
 // Set up a vector array to store the B on face
 // The size of this array is [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
-Vector3***** BVectorFaceArray()
+Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in)
 {
     static Vector3* mem_BVectorFaceArray = new Vector3[ 3 * totalFace * (fieldsGridsSize+1) * (fieldsGridsSize+1) *(fieldsGridsSize+1)];
     Vector3***** ptrBFaceArray = new Vector3 ****[3];
@@ -2484,6 +2484,35 @@ Vector3***** BVectorFaceArray()
                                                         + face * (fieldsGridsSize+1)* (fieldsGridsSize+1)* (fieldsGridsSize+1)
                                                         + i * (fieldsGridsSize+1)* (fieldsGridsSize+1)
                                                         + j * (fieldsGridsSize+1);
+                    for( int k = 0; k<fieldsGridsSize+1; k++)
+                    {
+                        int I = i+1;
+                        int J = j+1;
+                        int K = k;
+                        Vector3 tempB, tempPos;
+                        if( direction == 0) // face perpendicular to i direction 
+                        {
+                            tempPos = ptrArray_in[face][I][J][K]->Pos3().PlusProduct( ptrArray_in[face][I][J+1][K]->Pos3());
+                            tempPos = tempPos.PlusProduct( ptrArray_in[face][I][J][K+1]->Pos3()).PlusProduct( ptrArray_in[face][I][J+1][K+1]->Pos3());
+                            tempPos = tempPos.ScaleProduct(0.25);
+                        } else if ( direction ==1)  // face perpendicular to j direction
+                        {
+                            tempPos = ptrArray_in[face][I][J][K]->Pos3().PlusProduct( ptrArray_in[face][I+1][J][K]->Pos3());
+                            tempPos = tempPos.PlusProduct( ptrArray_in[face][I][J][K+1]->Pos3()).PlusProduct( ptrArray_in[face][I+1][J][K+1]->Pos3());
+                            tempPos = tempPos.ScaleProduct(0.25);
+                        } else if ( direction ==2)  // face perpendicular to k direction
+                        {
+                            tempPos = ptrArray_in[face][I][J][K]->Pos3().PlusProduct( ptrArray_in[face][I+1][J][K]->Pos3());
+                            tempPos = tempPos.PlusProduct( ptrArray_in[face][I][J+1][K]->Pos3()).PlusProduct( ptrArray_in[face][I+1][J+1][K]->Pos3());
+                            tempPos = tempPos.ScaleProduct(0.25);
+                        }
+
+                        double r = sqrt(pow(tempPos.x(),2.0) + pow(tempPos.y(),2.0) + pow(tempPos.z(),2.0));
+                        tempB.Setx( 3 * dMoment * v.x() * v.z() / pow(r,5.0));
+                        tempB.Sety( 3 * dMoment * v.y() * v.z() / pow(r,5.0));
+                        tempB.Setz( dMoment * (3 * pow(v.z(),2.0) - pow(r,2.0)) / pow(r,5.0));
+                        ptrBFaceArray[direction][face][i][j][k] = tempB;
+                    }
                 }
             }
         }
