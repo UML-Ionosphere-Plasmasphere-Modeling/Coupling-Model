@@ -734,4 +734,10 @@ void SetRotationalVelBotBoundary( GridsPoints***** ptrArray_in, int timeline_in)
 void SetConvectionVelTopBoundary( GridsPoints***** ptrArray_in, int timeline_in);
 
 
+//************************************************************************
+//************************************************************************
+// FUNCTION 
+// Calculate the B on each face from BVectorFaceArray
+void BVectorFaceArrayUpdate(GridsPoints***** ptrArray_in; Vector3***** ptrBFaceArray_in);
+
 #endif

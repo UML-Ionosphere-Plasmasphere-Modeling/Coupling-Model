@@ -2517,6 +2517,66 @@ Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in)
             }
         }
     }
+    
+    return ptrBFaceArray;
+}
 
-    return BVectorFaceArray;
+
+//************************************************************************
+//************************************************************************
+// FUNCTION 
+// Calculate the B on each face from BVectorFaceArray
+void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFaceArray_in)
+{   
+    // i direction
+    // face i j k 
+    // adjacent grid points:ptaArray[face][i+1][j+1][k]
+    //                      ptaArray[face][i+1][j+2][k]
+    //                      ptaArray[face][i+1][j+1][k+1]
+    //                      ptaArray[face][i+1][j+2][k+1]
+    // adjacent grid points outside:ptaArray[face][i][j+1][k]
+    //                              ptaArray[face][i][j+2][k]
+    //                              ptaArray[face][i][j+1][k+1]
+    //                              ptaArray[face][i][j+2][k+1]
+    // adjacent grid points inside: ptaArray[face][i+2][j+1][k]
+    //                              ptaArray[face][i+2][j+2][k]
+    //                              ptaArray[face][i+2][j+1][k+1]
+    //                              ptaArray[face][i+2][j+2][k+1]
+    // 20 length with E must be indentified
+    // 
+    //  Using gridspoints E to average length E to simplify the calculation
+    // matrix for calculating the face B need:
+    // 3 face vector, 3 circle intergration with length E
+    //
+    Vector3 Bface;
+    Vector3 AVector, BVector, CVector;
+    double weight;
+    double AIntegra, BIntegra, CIntegra;
+    
+    for( int direction = 0; direction < 3; direction++)
+    {
+        for( int face = 0; face < totalFace; face ++)
+        {
+            for( int i = 0; i < fieldsGridsSize +1; i++)
+            {
+                for( int j = 0; j < fieldsGridsSize+1; j++)
+                {
+                    for( int k = 0; k < fieldsGridsSize; k++)
+                    {
+                        if( direction == 0)
+                        {
+                            AVector = 
+                        } else if( direction == 1)
+                        {
+
+                        } else
+                        {
+                            
+                        }
+                        
+                    }
+                }
+            }
+        }
+    }
 }
