@@ -514,6 +514,112 @@ inline Vector3 AreaVectorBack(GridsPoints***** ptrArray_in, int face_in, int i_i
 
 //************************************************************************
 //************************************************************************
+// FUNCTION 
+// Return a integration of circuit E towards outside
+inline double EIntegrationL( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+{
+    int I = i_in +1;
+    int J = j_in +1;
+    int K = k_in;
+    Vector3 temp1 = ptrArray_in[face_in][I][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
+    Vector3 temp2 = ptrArray_in[face_in][I][J+1][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K+1]->Pos3());
+    Vector3 temp3 = ptrArray_in[face_in][I][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J+1][K+1]->Pos3());
+    Vector3 temp4 = ptrArray_in[face_in][I][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J+1][K]->Pos3());
+    
+    double EL =   ptrArray_in[face_in][I][J][K]->E3().DotProduct( temp1.PlusProduct( temp4)) 
+                + ptrArray_in[face_in][I][J][K+1]->E3().DotProduct( temp1.PlusProduct( temp2)) 
+                + ptrArray_in[face_in][I][J+1][K+1]->E3().DotProduct( temp2.PlusProduct( temp3)) 
+                + ptrArray_in[face_in][I][J+1][K]->E3().DotProduct( temp3.PlusProduct( temp4)); 
+    return EL;
+}
+
+inline double EIntegrationR( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+{
+    int I = i_in +2;
+    int J = j_in +2;
+    int K = k_in +1;
+    Vector3 temp1 = ptrArray_in[face_in][I][J][K-1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
+    Vector3 temp2 = ptrArray_in[face_in][I][J+1][K-1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K-1]->Pos3());
+    Vector3 temp3 = ptrArray_in[face_in][I][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J+1][K-1]->Pos3());
+    Vector3 temp4 = ptrArray_in[face_in][I][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J+1][K]->Pos3());
+    
+    double ER =   ptrArray_in[face_in][I][J][K]->E3().DotProduct( temp1.PlusProduct( temp4)) 
+                + ptrArray_in[face_in][I][J][K-1]->E3().DotProduct( temp1.PlusProduct( temp2)) 
+                + ptrArray_in[face_in][I][J+1][K-1]->E3().DotProduct( temp2.PlusProduct( temp3)) 
+                + ptrArray_in[face_in][I][J+1][K]->E3().DotProduct( temp3.PlusProduct( temp4)); 
+    return ER;
+}
+
+inline double EIntegrationF( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+{
+    int I = i_in +1;
+    int J = j_in +1;
+    int K = k_in +1;
+    Vector3 temp1 = ptrArray_in[face_in][I+1][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
+    Vector3 temp2 = ptrArray_in[face_in][I+1][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J][K]->Pos3());
+    Vector3 temp3 = ptrArray_in[face_in][I][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J+1][K]->Pos3());
+    Vector3 temp4 = ptrArray_in[face_in][I][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J+1][K]->Pos3());
+    
+    double EF =   ptrArray_in[face_in][I][J][K]->E3().DotProduct( temp1.PlusProduct( temp4)) 
+                + ptrArray_in[face_in][I+1][J][K]->E3().DotProduct( temp1.PlusProduct( temp2)) 
+                + ptrArray_in[face_in][I+1][J+1][K]->E3().DotProduct( temp2.PlusProduct( temp3)) 
+                + ptrArray_in[face_in][I+1][J+1][K]->E3().DotProduct( temp3.PlusProduct( temp4)); 
+    return EF;
+}
+
+inline double EIntegrationBack( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+{
+    int I = i_in +2;
+    int J = j_in +1;
+    int K = k_in;
+    Vector3 temp1 = ptrArray_in[face_in][I-1][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
+    Vector3 temp2 = ptrArray_in[face_in][I-1][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I-1][J][K]->Pos3());
+    Vector3 temp3 = ptrArray_in[face_in][I][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I-1][J+1][K]->Pos3());
+    Vector3 temp4 = ptrArray_in[face_in][I][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J+1][K]->Pos3());
+    
+    double EB =   ptrArray_in[face_in][I][J][K]->E3().DotProduct( temp1.PlusProduct( temp4)) 
+                + ptrArray_in[face_in][I-1][J][K]->E3().DotProduct( temp1.PlusProduct( temp2)) 
+                + ptrArray_in[face_in][I-1][J+1][K]->E3().DotProduct( temp2.PlusProduct( temp3)) 
+                + ptrArray_in[face_in][I][J+1][K]->E3().DotProduct( temp3.PlusProduct( temp4)); 
+    return EB;
+}
+
+inline double EIntegrationTop( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+{
+    int I = i_in +1;
+    int J = j_in +2;
+    int K = k_in;
+    Vector3 temp1 = ptrArray_in[face_in][I][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
+    Vector3 temp2 = ptrArray_in[face_in][I+1][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K+1]->Pos3());
+    Vector3 temp3 = ptrArray_in[face_in][I+1][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J][K+1]->Pos3());
+    Vector3 temp4 = ptrArray_in[face_in][I][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J][K]->Pos3());
+    
+    double ET =   ptrArray_in[face_in][I][J][K]->E3().DotProduct( temp1.PlusProduct( temp4)) 
+                + ptrArray_in[face_in][I][J][K+1]->E3().DotProduct( temp1.PlusProduct( temp2)) 
+                + ptrArray_in[face_in][I+1][J+1][K+1]->E3().DotProduct( temp2.PlusProduct( temp3)) 
+                + ptrArray_in[face_in][I+1][J][K]->E3().DotProduct( temp3.PlusProduct( temp4)); 
+    return ET;
+}
+
+inline double EIntegrationBot( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+{
+    int I = i_in +1;
+    int J = j_in +1;
+    int K = k_in;
+    Vector3 temp1 = ptrArray_in[face_in][I+1][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
+    Vector3 temp2 = ptrArray_in[face_in][I+1][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J][K]->Pos3());
+    Vector3 temp3 = ptrArray_in[face_in][I][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J][K+1]->Pos3());
+    Vector3 temp4 = ptrArray_in[face_in][I][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K+1]->Pos3());
+    
+    double EBot =   ptrArray_in[face_in][I][J][K]->E3().DotProduct( temp1.PlusProduct( temp4)) 
+                + ptrArray_in[face_in][I+1][J][K]->E3().DotProduct( temp1.PlusProduct( temp2)) 
+                + ptrArray_in[face_in][I+1][J][K+1]->E3().DotProduct( temp2.PlusProduct( temp3)) 
+                + ptrArray_in[face_in][I][J][K+1]->E3().DotProduct( temp3.PlusProduct( temp4)); 
+    return EBot;
+}
+
+//************************************************************************
+//************************************************************************
 // FUNCTION // Return a volume for a cell. Input (face, i, j, k) and return 
 // a double. The value is (average of back and front area) * (norm of vector
 // between back and front face vector)
