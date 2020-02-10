@@ -148,6 +148,40 @@ inline uint_64 Uint_64_Trans()
     return posUint;
 }
 
+// Calculate the face B vector from a linear equation
+// The equation is like this
+// (vector v1)    (x)      (c1)
+// (vector v2) *  (y)  =   (c2)
+// (vector v3)    (z)      (c3)
+// Solve for ( x, y ,z) and the v is the face area vector, and c1 is the integration
+// of E along the completed loop for outside direction
+inline Vector3 FaceBSolver( const Vector3& v1, const Vector3& v2, const Vector3& v3,
+                            const double& c1, const double& c2, const double& c3)
+                            {
+                              
+                                // computes the inverse of a matrix m
+                                double det = v1.x() * (v2.y() * v3.z() - v3.y() * v2.z()) -
+                                             v1.y() * (v2.x() * v3.z() - v2.z() * v3.x()) +
+                                             v1.z() * (v2.x() * v3.y() - v2.y() * v3.x());
+                                if(det == 0)
+                                std::cout << " Face B solver DET can't be zero" << std::endl;
+                                double invdet = 1.0 / det;
+
+                                double minv[3][3]; // inverse of matrix m
+                                minv[0][0] = (v2.y() * v3.z() - v3.y() * v2.z()) * invdet;
+                                minv[0][1] = (v1.z() * v3.y() - v1.y() * v3.z()) * invdet;
+                                minv[0][2] = (v1.y() * v2.z() - v1.z() * v2.y()) * invdet;
+                                minv[1][0] = (v2.z() * v3.x() - v2.x() * v3.z()) * invdet;
+                                minv[1][1] = (v1.x() * v3.z() - v1.z() * v3.x()) * invdet;
+                                minv[1][2] = (v2.x() * v1.z() - v1.x() * v2.z()) * invdet;
+                                minv[2][0] = (v2.x() * v3.y() - v3.x() * v2.y()) * invdet;
+                                minv[2][1] = (v3.x() * v1.y() - v1.x() * v3.y()) * invdet;
+                                minv[2][2] = (v1.x() * v2.y() - v2.x() * v1.y()) * invdet;
+
+                                v_x = minv[0][0]*c1 + minv[0][1]*c2 + minv[0][2]*c3;
+                                v_y = minv[1][0]*c1 + minv[1][1]*c2 + minv[1][2]*c3;
+                                v_z = minv[2][0]*c1 + minv[2][1]*c2 + minv[2][2]*c3;
+                            }
 // constructor
     Vector3()
     {
