@@ -2525,7 +2525,8 @@ Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in)
 //************************************************************************
 //************************************************************************
 // FUNCTION 
-// Calculate the B on each face from BVectorFaceArray
+// Update the B on each face from BVectorFaceArray
+// Calculate dB/dt over adjacent faces (madsen1995)
 void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFaceArray_in)
 {   
     // i direction
@@ -2565,7 +2566,7 @@ void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFace
                 {
                     for( int k = tempGridsCellLevel; k < fieldsGridsSize-tempGridsCellLevel+1; k++)
                     {
-                        if( direction == 0)
+                        if( direction == 0) // perpendicular to i direction
                         {
                             if( j == fieldsGridsSize+1 || k == fieldsGridsSize-tempGridsCellLevel)
                             continue;
