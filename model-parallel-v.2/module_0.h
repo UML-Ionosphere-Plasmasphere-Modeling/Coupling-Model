@@ -518,8 +518,8 @@ inline Vector3 AreaVectorBack(GridsPoints***** ptrArray_in, int face_in, int i_i
 // Return a integration of circuit E towards outside
 inline double EIntegrationL( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
-    int I = i_in +1;
-    int J = j_in +1;
+    int I = i_in;
+    int J = j_in;
     int K = k_in;
     Vector3 temp1 = ptrArray_in[face_in][I][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
     Vector3 temp2 = ptrArray_in[face_in][I][J+1][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K+1]->Pos3());
@@ -535,8 +535,8 @@ inline double EIntegrationL( GridsPoints***** ptrArray_in, int face_in, int i_in
 
 inline double EIntegrationR( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
-    int I = i_in +2;
-    int J = j_in +2;
+    int I = i_in +1;
+    int J = j_in +1;
     int K = k_in +1;
     Vector3 temp1 = ptrArray_in[face_in][I][J][K-1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
     Vector3 temp2 = ptrArray_in[face_in][I][J+1][K-1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K-1]->Pos3());
@@ -552,8 +552,8 @@ inline double EIntegrationR( GridsPoints***** ptrArray_in, int face_in, int i_in
 
 inline double EIntegrationF( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
-    int I = i_in +1;
-    int J = j_in +1;
+    int I = i_in;
+    int J = j_in;
     int K = k_in +1;
     Vector3 temp1 = ptrArray_in[face_in][I+1][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
     Vector3 temp2 = ptrArray_in[face_in][I+1][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J][K]->Pos3());
@@ -569,8 +569,8 @@ inline double EIntegrationF( GridsPoints***** ptrArray_in, int face_in, int i_in
 
 inline double EIntegrationBack( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
-    int I = i_in +2;
-    int J = j_in +1;
+    int I = i_in +1;
+    int J = j_in;
     int K = k_in;
     Vector3 temp1 = ptrArray_in[face_in][I-1][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
     Vector3 temp2 = ptrArray_in[face_in][I-1][J+1][K]->Pos3().MinusProduct( ptrArray_in[face_in][I-1][J][K]->Pos3());
@@ -584,10 +584,10 @@ inline double EIntegrationBack( GridsPoints***** ptrArray_in, int face_in, int i
     return EB;
 }
 
-inline double EIntegrationTop( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
+inline double EIntegrationT( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
-    int I = i_in +1;
-    int J = j_in +2;
+    int I = i_in;
+    int J = j_in +1;
     int K = k_in;
     Vector3 temp1 = ptrArray_in[face_in][I][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
     Vector3 temp2 = ptrArray_in[face_in][I+1][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K+1]->Pos3());
@@ -603,8 +603,8 @@ inline double EIntegrationTop( GridsPoints***** ptrArray_in, int face_in, int i_
 
 inline double EIntegrationBot( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
-    int I = i_in +1;
-    int J = j_in +1;
+    int I = i_in;
+    int J = j_in;
     int K = k_in;
     Vector3 temp1 = ptrArray_in[face_in][I+1][J][K]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
     Vector3 temp2 = ptrArray_in[face_in][I+1][J][K+1]->Pos3().MinusProduct( ptrArray_in[face_in][I+1][J][K]->Pos3());
@@ -839,6 +839,13 @@ void SetRotationalVelBotBoundary( GridsPoints***** ptrArray_in, int timeline_in)
 // initial the top boundary for the  velocity of magnetic field line
 void SetConvectionVelTopBoundary( GridsPoints***** ptrArray_in, int timeline_in);
 
+
+//************************************************************************
+//************************************************************************
+// FUNCTION 
+// Set up a vector array to store the B on face
+// The size of this array is [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
+Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in);
 
 //************************************************************************
 //************************************************************************

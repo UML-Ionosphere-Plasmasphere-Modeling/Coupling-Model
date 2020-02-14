@@ -2548,30 +2548,310 @@ void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFace
     // matrix for calculating the face B need:
     // 3 face vector, 3 circle intergration with length E
     //
-    Vector3 Bface;
-    Vector3 AVector, BVector, CVector;
-    double weight;
-    double AIntegra, BIntegra, CIntegra;
     
+    // index are for the [fieldgridsize+2][fieldgridsize+2][fieldgridsize+2]
+    Vector3 dBOnFace, sumtempB;
+    Vector3 AFace, BFace, CFace;
+    double weightB, sumWeightB;
+    double AInteger, BInteger, CInteger;
+
     for( int direction = 0; direction < 3; direction++)
     {
         for( int face = 0; face < totalFace; face ++)
         {
-            for( int i = 0; i < fieldsGridsSize +1; i++)
+            for( int i = 1; i < fieldsGridsSize +2; i++)
             {
-                for( int j = 0; j < fieldsGridsSize+1; j++)
+                for( int j = 1; j < fieldsGridsSize+2; j++)
                 {
-                    for( int k = 0; k < fieldsGridsSize; k++)
+                    for( int k = tempGridsCellLevel; k < fieldsGridsSize-tempGridsCellLevel+1; k++)
                     {
                         if( direction == 0)
                         {
-                            AVector = 
-                        } else if( direction == 1)
-                        {
+                            if( j == fieldsGridsSize+1 || k == fieldsGridsSize-tempGridsCellLevel)
+                            continue;
+                           //face vector 
+                            AFace = AreaVectorT( ptrArray_in, face, i-1, j, k);
+                            BFace = AreaVectorF( ptrArray_in, face, i-1, j, k);
+                            CFace = AreaVectorR( ptrArray_in, face, i-1, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationT( ptrArray_in, face, i-1, j, k);
+                            BInteger = EIntegrationF( ptrArray_in, face, i-1, j, k);
+                            CInteger = EIntegrationR( ptrArray_in, face, i-1, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB = dBOnFace.ScaleProduct(weightB);
+                            sumWeightB = weightB;
+                            
+                            AFace = AreaVectorF( ptrArray_in, face, i-1, j, k);
+                            BFace = AreaVectorBot( ptrArray_in, face, i-1, j, k);
+                            CFace = AreaVectorR( ptrArray_in, face, i-1, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationF( ptrArray_in, face, i-1, j, k);
+                            BInteger = EIntegrationBot( ptrArray_in, face, i-1, j, k);
+                            CInteger = EIntegrationR( ptrArray_in, face, i-1, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorBot( ptrArray_in, face, i-1, j, k);
+                            BFace = AreaVectorBack( ptrArray_in, face, i-1, j, k);
+                            CFace = AreaVectorR( ptrArray_in, face, i-1, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBot( ptrArray_in, face, i-1, j, k);
+                            BInteger = EIntegrationBack( ptrArray_in, face, i-1, j, k);
+                            CInteger = EIntegrationR( ptrArray_in, face, i-1, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
 
+                            AFace = AreaVectorBack( ptrArray_in, face, i-1, j, k);
+                            BFace = AreaVectorT( ptrArray_in, face, i-1, j, k);
+                            CFace = AreaVectorR( ptrArray_in, face, i-1, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBack( ptrArray_in, face, i-1, j, k);
+                            BInteger = EIntegrationT( ptrArray_in, face, i-1, j, k);
+                            CInteger = EIntegrationR( ptrArray_in, face, i-1, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+
+                            AFace = AreaVectorT( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationT( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+
+                            AFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorF( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationF( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorF( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorT( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationF( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationT( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+
+                            dBOnFace = sumtempB.ScaleProduct( 1.0 / sumWeightB);
+                            ptrBFaceArray_in[direction][face][i][j][k] = 
+                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep);
+
+                        } else if( direction == 1) // perpendicular to j direction
+                        {
+                            if( i == fieldsGridsSize+1 || k == fieldsGridsSize-tempGridsCellLevel)
+                            continue;
+                            AFace = AreaVectorR( ptrArray_in, face, i, j-1, k);
+                            BFace = AreaVectorBack( ptrArray_in, face, i, j-1, k);
+                            CFace = AreaVectorT( ptrArray_in, face, i, j-1, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationR( ptrArray_in, face, i, j-1, k);
+                            BInteger = EIntegrationBack( ptrArray_in, face, i, j-1, k);
+                            CInteger = EIntegrationT( ptrArray_in, face, i, j-1, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB = dBOnFace.ScaleProduct(weightB);
+                            sumWeightB = weightB;
+                            
+                            AFace = AreaVectorBack( ptrArray_in, face, i, j-1, k);
+                            BFace = AreaVectorL( ptrArray_in, face, i, j-1, k);
+                            CFace = AreaVectorT( ptrArray_in, face, i, j-1, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBack( ptrArray_in, face, i, j-1, k);
+                            BInteger = EIntegrationL( ptrArray_in, face, i, j-1, k);
+                            CInteger = EIntegrationT( ptrArray_in, face, i, j-1, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorL( ptrArray_in, face, i, j-1, k);
+                            BFace = AreaVectorF( ptrArray_in, face, i, j-1, k);
+                            CFace = AreaVectorT( ptrArray_in, face, i, j-1, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationL( ptrArray_in, face, i, j-1, k);
+                            BInteger = EIntegrationF( ptrArray_in, face, i, j-1, k);
+                            CInteger = EIntegrationT( ptrArray_in, face, i, j-1, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorF( ptrArray_in, face, i, j-1, k);
+                            BFace = AreaVectorR( ptrArray_in, face, i, j-1, k);
+                            CFace = AreaVectorT( ptrArray_in, face, i, j-1, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationF( ptrArray_in, face, i, j-1, k);
+                            BInteger = EIntegrationR( ptrArray_in, face, i, j-1, k);
+                            CInteger = EIntegrationT( ptrArray_in, face, i, j-1, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorR( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorF( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationR( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationF( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+
+                            AFace = AreaVectorF( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationF( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+
+                            AFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorR( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationR( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+
+                            dBOnFace = sumtempB.ScaleProduct( 1.0 / sumWeightB);
+                            ptrBFaceArray_in[direction][face][i][j][k] = 
+                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep);
                         } else
                         {
+                            if( i == fieldsGridsSize+1 || j == fieldsGridsSize+1)
+                            continue;
+                            AFace = AreaVectorT( ptrArray_in, face, i, j, k-1);
+                            BFace = AreaVectorL( ptrArray_in, face, i, j, k-1);
+                            CFace = AreaVectorF( ptrArray_in, face, i, j, k-1);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationT( ptrArray_in, face, i, j, k-1);
+                            BInteger = EIntegrationL( ptrArray_in, face, i, j, k-1);
+                            CInteger = EIntegrationF( ptrArray_in, face, i, j, k-1);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB = dBOnFace.ScaleProduct(weightB);
+                            sumWeightB = weightB;
                             
+                            AFace = AreaVectorL( ptrArray_in, face, i, j, k-1);
+                            BFace = AreaVectorBot( ptrArray_in, face, i, j, k-1);
+                            CFace = AreaVectorF( ptrArray_in, face, i, j, k-1);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationL( ptrArray_in, face, i, j, k-1);
+                            BInteger = EIntegrationBot( ptrArray_in, face, i, j, k-1);
+                            CInteger = EIntegrationF( ptrArray_in, face, i, j, k-1);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorBot( ptrArray_in, face, i, j, k-1);
+                            BFace = AreaVectorR( ptrArray_in, face, i, j, k-1);
+                            CFace = AreaVectorF( ptrArray_in, face, i, j, k-1);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBot( ptrArray_in, face, i, j, k-1);
+                            BInteger = EIntegrationR( ptrArray_in, face, i, j, k-1);
+                            CInteger = EIntegrationF( ptrArray_in, face, i, j, k-1);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorR( ptrArray_in, face, i, j, k-1);
+                            BFace = AreaVectorT( ptrArray_in, face, i, j, k-1);
+                            CFace = AreaVectorF( ptrArray_in, face, i, j, k-1);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationR( ptrArray_in, face, i, j, k-1);
+                            BInteger = EIntegrationT( ptrArray_in, face, i, j, k-1);
+                            CInteger = EIntegrationF( ptrArray_in, face, i, j, k-1);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorT( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorR( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationT( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationR( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorR( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationR( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorBot( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationBot( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            AFace = AreaVectorL( ptrArray_in, face, i, j, k);
+                            BFace = AreaVectorT( ptrArray_in, face, i, j, k);
+                            CFace = AreaVectorBack( ptrArray_in, face, i, j, k);
+                            weightB = AFace.CrossProduct(BFace).DotProduct(CFace);
+                            AInteger = EIntegrationL( ptrArray_in, face, i, j, k);
+                            BInteger = EIntegrationT( ptrArray_in, face, i, j, k);
+                            CInteger = EIntegrationBack( ptrArray_in, face, i, j, k);
+                            dBOnFace.FaceBSolver( AFace, BFace, CFace, AInteger, BInteger, CInteger); 
+                            sumtempB.PlusProduct( dBOnFace.ScaleProduct(weightB));
+                            sumWeightB += weightB;
+                            
+                            dBOnFace = sumtempB.ScaleProduct( 1.0 / sumWeightB);
+                            ptrBFaceArray_in[direction][face][i][j][k] = 
+                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep);
                         }
                         
                     }
