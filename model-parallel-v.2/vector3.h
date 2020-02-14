@@ -45,7 +45,13 @@ class Vector3
     {
         return( Vector3( v_x* scale, v_y* scale, v_z* scale));
     }
-
+// Calculate mix product a dot b cross c
+    inline double MixProduct( const Vector3& v3b, const Vector3& v3c)
+    {
+        return  (v_y * v3b.v_z - v_z * v3b.v_y) * v3c.v_x +
+                (v_z * v3b.v_x - v_x * v3b.v_z) * v3c.v_y +
+                (v_x * v3b.v_y - v_y * v3b.v_x) * v3c.v_z;
+    }
 // Calculate V1 + V2, return a Vector3
     inline Vector3 PlusProduct( const Vector3& v3b)
     {
