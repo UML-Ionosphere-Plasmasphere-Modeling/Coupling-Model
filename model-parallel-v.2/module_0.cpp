@@ -2322,7 +2322,7 @@ void CalculatingAveragedPhoVatGrids(GridsPoints***** ptrArray_in,
 //************************************************************************
 //************************************************************************
 // Create Cell centered field array for E for the type of Vector3
-Vector3***** EVectorCellArray( )
+Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
 {
     // Apply space to store
     static Vector3* mem_EVectorCellArray = new Vector3[totalFace * fieldsGridsSize * fieldsGridsSize * fieldsGridsSize];

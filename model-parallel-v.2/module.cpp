@@ -53,7 +53,9 @@ void ProcessFunc()
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
 
     // Presun 1.4 // Create Cell centered field array for E 
-    Vector3***** ptrEVectorCellArray = EVectorCellArray();
+    Vector3***** ptrEVectorCellArray = EVectorCellArray( ptrArray);
+    // Presun 1.5 // Create Face centered field array for B
+    Vector3***** ptrBVectorFaceArray = BVectorFaceArray( ptrArray);
     
     // Initialize condition
     if( update_type == 0)
