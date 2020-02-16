@@ -44,6 +44,8 @@ void ProcessFunc()
     cout << LMin << " " << LMax << endl;
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     Vector3*** ptrVectorCellArray = VectorCellField();  
+    Vector3*** ptrVelVectorCellArray = VectorCellField();
+    Vector3*** ptrGradVectorCellArray= VectorCellField();
 
     // Prerun 1.3 // Create grids field array of volum for one face of six
     cout << " Create array of Volume at cells and at grids" << endl;
@@ -186,6 +188,32 @@ void ProcessFunc()
                             face); // update E
                 } else
                 {
+                // 1. Calculate the curl B, need ptrBFaceArray 
+                ptrVectorCellArray = CurlBCellArray(ptrArray, 
+                                                    ptrVectorCellArray,
+                                                    ptrBVectorFaceArray,
+                                                    ptrVolumeCellArray,
+                                                    face);
+                // 2. Calculate the gradient of Pe
+                ptrGradVectorCellArray = ValueGradient( ptrVectorCellArray, 
+                                                    ptrVolumeCellArray, 
+                                                    ptrArray, 
+                                                    face, 
+                                                    'P');
+                // 3. Calculate the B at the center of cells
+                // 4. Update E at the center of cells and at the grids
+                UpdateECellArray(  ptrArray, 
+                                   ptrEVectorCellArray,
+                                   ptrVectorCellArray,
+                                   ptrGradVectorCellArray,
+                                   face);
+                // 5. Update B at center of cells and at the grids
+                BVectorFaceArrayUpdate( ptrArray, ptrBVectorFaceArray);
+                
+
+
+
+
                 // Update grids info
                 // Calculate curl dB update ve3
                 ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 

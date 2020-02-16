@@ -2322,6 +2322,7 @@ void CalculatingAveragedPhoVatGrids(GridsPoints***** ptrArray_in,
 //************************************************************************
 //************************************************************************
 // Create Cell centered field array for E for the type of Vector3
+// The size of this array is [totalface * fsize+2 * fsize+2 * fsize+2]
 Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
 {
     // Apply space to store
@@ -2860,4 +2861,178 @@ void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFace
             }
         }
     }
+
+    
+}
+
+Vector3*** CurlBCellArray( GridsPoints***** ptrArray_in, 
+                           Vector3*** ptrVectorCellArray, 
+                           Vector3***** ptrBVectorFaceArray, 
+                           double*** ptrVolumeCellArray,
+                           int face_in)
+{
+    for( int i = 1; i < fieldsGridsSize+1; i++)
+    {
+        for( int j = 1; j < fieldsGridsSize+1; j++)
+        {
+            for( int k = 0; k < fieldsGridsSize; k++)
+            {
+                Vector3 temp = AreaVectorL( ptrArray_in, face_in, i, j, k).CrossProduct(
+                               ptrBVectorFaceArray[0][face_in][i][j][k]);
+                        temp = temp.PlusProduct(
+                               AreaVectorR( ptrArray_in, face_in, i, j, k).CrossProduct(
+                               ptrBVectorFaceArray[0][face_in][i+1][j][k]);
+                        temp = temp.PlusProduct(
+                               AreaVectorT( ptrArray_in, face_in, i, j, k).CrossProduct(
+                               ptrBVectorFaceArray[1][face_in][i][j+1][k]);
+                        temp = temp.PlusProduct(
+                               AreaVectorBot( ptrArray_in, face_in, i, j, k).CrossProduct(
+                               ptrBVectorFaceArray[1][face_in][i][j][k]);
+                        temp = temp.PlusProduct(
+                               AreaVectorF( ptrArray_in, face_in, i, j, k).CrossProduct(
+                               ptrBVectorFaceArray[2][face_in][i][j][k+1]);
+                        temp = temp.PlusProduct(
+                               AreaVectorBack( ptrArray_in, face_in, i, j, k).CrossProduct(
+                               ptrBVectorFaceArray[2][face_in][i][j][k]);
+                double volumetemp = ptrVolumeCellArray_in[i][j][k];
+                
+                temp = temp.ScaleProduct( 1.0 / volumetemp);
+                curlArray_in[i][j][k].SetVector3( temp); 
+            }
+        }
+    }
+    return ptrVectorCellArray;
+}
+
+void UpdateECellArray(  GridsPoints***** ptrArray, 
+                        Vector3***** ptrEVectorCellArray,
+                        Vector3*** CurlBCellArray,
+                        Vector3*** ptrGradVectorCellArray,
+                        int face_in)
+{   
+    Vector3 Vele, Veli;
+    double density;
+    Vector3 temp;
+    for( int i = 1; i < fieldsGridsSize+1; i++)
+    {
+        for( int j = 1; j < fieldsGridsSize+1; j++)
+        {
+            for( int k = 0; k < fieldsGridsSize; k++)
+            {
+                
+                Veli = ptrArray[face_in][i-1][j-1][k-1]->Vel3().PlusProduct(
+                                    ptrArray[face_in][i][j-1][k-1]->Vel3() );
+                Veli = Veli.PlusProduct(           
+                                    ptrArray[face_in][i-1][j][k-1]->Vel3());
+                Veli = Veli.PlusProduct(
+                                    ptrArray[face_in][i][j][k-1]->Vel3());
+                Veli = Veli.PlusProduct(
+                                    ptrArray[face_in][i-1][j-1][k]->Vel3());
+                Veli = Veli.PlusProduct(
+                                    ptrArray[face_in][i][j-1][k]->Vel3());
+                Veli = Veli.PlusProduct(
+                                    ptrArray[face_in][i-1][j][k]->Vel3());    
+                Veli = Veli.PlusProduct(
+                                    ptrArray[face_in][i][j][k]->Vel3()).ScaleProduct(1.0/8.0);
+            
+                density =(ptrArray[face_in][i-1][j-1][k-1]->Density() +
+                          ptrArray[face_in][i][j-1][k-1]->Density() +
+                          ptrArray[face_in][i-1][j][k-1]->Density() +
+                          ptrArray[face_in][i][j][k-1]->Density() +
+                          ptrArray[face_in][i-1][j-1][k]->Density() +
+                          ptrArray[face_in][i][j-1][k]->Density() +
+                          ptrArray[face_in][i-1][j][k]->Density() +
+                          ptrArray[face_in][i][j][k]->Density()) / 8.0;
+
+                Vele =  Veli.MinusProduct(CurlBCellArray[i][j][k].ScaleProduct(1.0 / (mu0 * density)));
+
+                temp = ptrGradVectorCellArray[i][j][k].ScaleProduct(1.0 / qi0 / density);
+                ptrEVectorCellArray[face_in][i][j][k]->SetVector3(
+                CurlBCellArray[i][j][k].CrossProduct(Vele).PlusProduct(temp).ScaleProduct(-1.0));
+            }
+        }
+    }
+    
+    for( int i = 1; i < fieldsGridsSize+2; i++)
+    {
+        for( int j = 1; j < fieldsGridsSize+2; j++)
+        {
+            for( int k = 1; k < fieldsGridsSize; k++)
+            {
+                Vector3 EVector = Vector3(0.0, 0.0, 0.0);
+                    
+                if(i==1&&j==1) 
+                {
+                EVector = ptrEVectorCellArray[face_in][1][0][k-1].PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][1][k-1]);
+                EVector = EVector.PlusProduct(           
+                                    ptrEVectorCellArray[face_in][0][1][k-1]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][0][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][1][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][0][1][k]).ScaleProduct(1.0/6.0);            
+                }
+                else if(i==1&&j==fieldsGridsSize+1) 
+                {
+                
+                EVector = ptrEVectorCellArray[face_in][1][fieldsGridsSize+1][k-1].PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize][k-1]);
+                EVector = EVector.PlusProduct(           
+                                    ptrEVectorCellArray[face_in][0][fieldsGridsSize][k-1]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize+1][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][0][fieldsGridsSize][k]).ScaleProduct(1.0/6.0);
+                }
+                else if(i==fieldsGridsSize+1&&j==fieldsGridsSize+1)
+                {
+                EVector = ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize+1][k-1].PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize][k-1]);
+                EVector = EVector.PlusProduct(           
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][fieldsGridsSize][k-1]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize+1][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][fieldsGridsSize][k]).ScaleProduct(1.0/6.0);
+                }
+                else if(i==fieldsGridsSize+1&&j==1) 
+                {
+                EVector = ptrEVectorCellArray[face_in][fieldsGridsSize][0][k-1].PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][1][k-1]);
+                EVector = EVector.PlusProduct(           
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][1][k-1]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][0][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][1][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][1][k]).ScaleProduct(1.0/6.0);                
+                } else
+                {
+                EVector = ptrEVectorCellArray[face_in][i-1][j-1][k-1].PlusProduct(
+                                    ptrEVectorCellArray[face_in][i][j-1][k-1]);
+                EVector = EVector.PlusProduct(           
+                                    ptrEVectorCellArray[face_in][i-1][j][k-1]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][i][j][k-1]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][i-1][j-1][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][i][j-1][k]);
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][i-1][j][k]);    
+                EVector = EVector.PlusProduct(
+                                    ptrEVectorCellArray[face_in][i][j][k]).ScaleProduct(1.0/8.0);
+                }
+                // update E
+                ptrArray[face_in][i][j][k]->E3().SetVector3(EVector);
+            }
+        }
+    }        
 }
