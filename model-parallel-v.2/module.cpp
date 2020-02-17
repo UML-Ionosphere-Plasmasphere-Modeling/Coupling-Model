@@ -209,6 +209,7 @@ void ProcessFunc()
                                    face);
                 // 5. Update B at center of cells and at the grids
                 BVectorFaceArrayUpdate( ptrArray, ptrBVectorFaceArray);
+                BVectorGridsArrayUpdate( ptrArray, ptrBVectorFaceArray);
                 
 
 

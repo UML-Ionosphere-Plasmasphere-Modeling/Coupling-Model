@@ -872,4 +872,9 @@ void UpdateECellArray(  GridsPoints***** ptrArray,
                         Vector3*** CurlBCellArray,
                         Vector3*** ptrGradVectorCellArray,
                         int face_in);
+                        
+// ******************************************************
+// Update the B on each grids
+void BVectorGridsArrayUpdate(   GridsPoints***** ptrArray, 
+                                Vector3***** ptrBVectorFaceArray);
 #endif
