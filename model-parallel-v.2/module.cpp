@@ -43,20 +43,25 @@ void ProcessFunc()
     
     cout << LMin << " " << LMax << endl;
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
+    // The size is [fsize+2][fsize+2][fsize+2]
     Vector3*** ptrVectorCellArray = VectorCellField();  
     Vector3*** ptrVelVectorCellArray = VectorCellField();
     Vector3*** ptrGradVectorCellArray= VectorCellField();
 
     // Prerun 1.3 // Create grids field array of volum for one face of six
+    // The size is [fsize+2][fsize+2][fsize+2]
     cout << " Create array of Volume at cells and at grids" << endl;
     double*** ptrVolumeCellArray = VolumeCellsField( ptrArray);
     
     cout << " Create array of Volume at cells and at grids" << endl;
+    // The size if [fsize+1][fsize+1][fsize+1]
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
 
-    // Presun 1.4 // Create Cell centered field array for E 
+    // Presun 1.4 // Create Cell centered field array for E
+    // [totalface * fsize+2 * fsize+2 * fsize+2] 
     Vector3***** ptrEVectorCellArray = EVectorCellArray( ptrArray);
     // Presun 1.5 // Create Face centered field array for B
+    // [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
     Vector3***** ptrBVectorFaceArray = BVectorFaceArray( ptrArray);
     
     // Initialize condition
@@ -189,12 +194,14 @@ void ProcessFunc()
                 } else
                 {
                 // 1. Calculate the curl B, need ptrBFaceArray 
+                // With the B on the faces and area vectors
                 ptrVectorCellArray = CurlBCellArray(ptrArray, 
                                                     ptrVectorCellArray,
                                                     ptrBVectorFaceArray,
                                                     ptrVolumeCellArray,
                                                     face);
                 // 2. Calculate the gradient of Pe
+                // ( fsize+2 * fsize+2 * fsize)
                 ptrGradVectorCellArray = ValueGradient( ptrVectorCellArray, 
                                                     ptrVolumeCellArray, 
                                                     ptrArray, 
@@ -212,37 +219,6 @@ void ProcessFunc()
                 BVectorGridsArrayUpdate( ptrArray, ptrBVectorFaceArray);
                 
 
-
-
-
-                // Update grids info
-                // Calculate curl dB update ve3
-                ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 
-                                                    ptrVolumeCellArray, 
-                                                    ptrArray, 
-                                                    face, 
-                                                    'D');
-                UpdateVe3(  ptrVectorCellArray, 
-                            ptrArray, 
-                            face);
-                // Calculate the gradient of Pe update E
-                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
-                                                    ptrVolumeCellArray, 
-                                                    ptrArray, 
-                                                    face, 
-                                                    'P');
-                UpdateE3(   ptrVectorCellArray, 
-                            ptrArray, 
-                            face);
-                // Calculate the curl E update B
-                ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 
-                                                    ptrVolumeCellArray, 
-                                                    ptrArray, 
-                                                    face, 
-                                                    'E');
-                UpdateB3(   ptrVectorCellArray, 
-                            ptrArray, 
-                            face);
                 // Update gradient norm B
                 ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
                                                     ptrVolumeCellArray, 

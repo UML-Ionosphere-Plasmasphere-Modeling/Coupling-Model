@@ -2865,6 +2865,9 @@ void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFace
     
 }
 
+// ***************************************************************************************
+// Calculate curl B at the center of cells
+
 Vector3*** CurlBCellArray( GridsPoints***** ptrArray_in, 
                            Vector3*** ptrVectorCellArray, 
                            Vector3***** ptrBVectorFaceArray, 
@@ -2875,7 +2878,7 @@ Vector3*** CurlBCellArray( GridsPoints***** ptrArray_in,
     {
         for( int j = 1; j < fieldsGridsSize+1; j++)
         {
-            for( int k = 0; k < fieldsGridsSize; k++)
+            for( int k = tempGridsCellLevel; k < fieldsGridsSize - tempGridsCellLevel; k++)
             {
                 Vector3 temp = AreaVectorL( ptrArray_in, face_in, i, j, k).CrossProduct(
                                ptrBVectorFaceArray[0][face_in][i][j][k]);
@@ -2897,13 +2900,16 @@ Vector3*** CurlBCellArray( GridsPoints***** ptrArray_in,
                 double volumetemp = ptrVolumeCellArray_in[i][j][k];
                 
                 temp = temp.ScaleProduct( 1.0 / volumetemp);
-                curlArray_in[i][j][k].SetVector3( temp); 
+                ptrVectorCellArray[i][j][k].SetVector3( temp); 
             }
         }
     }
     return ptrVectorCellArray;
 }
 
+// *********************************************************************
+// Update E at the centers of cells
+// with the (curl B), (ve), (grad Pe) at the centers of cells
 void UpdateECellArray(  GridsPoints***** ptrArray, 
                         Vector3***** ptrEVectorCellArray,
                         Vector3*** CurlBCellArray,
@@ -2917,7 +2923,7 @@ void UpdateECellArray(  GridsPoints***** ptrArray,
     {
         for( int j = 1; j < fieldsGridsSize+1; j++)
         {
-            for( int k = 0; k < fieldsGridsSize; k++)
+            for( int k = tempGridsCellLevel; k < fieldsGridsSize - tempGridsCellLevel; k++)
             {
                 
                 Veli = ptrArray[face_in][i-1][j-1][k-1]->Vel3().PlusProduct(
@@ -3049,7 +3055,7 @@ void BVectorGridsArrayUpdate(   GridsPoints***** ptrArray,
         {
             for( int j = 1; j < fieldsGridsSize+2; j++)
             {
-                for( int k = 1; k < fieldsGridsSize; k++)
+                for( int k = tempGridsCellLevel; k < fieldsGridsSize - tempGridsCellLevel; k++)
                 {
                     if( i == 1 && j == 1 ||
                         i == 1 && j == fieldsGridsSize+1 ||
