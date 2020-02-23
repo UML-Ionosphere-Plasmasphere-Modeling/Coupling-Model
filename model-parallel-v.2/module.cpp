@@ -48,15 +48,20 @@ void ProcessFunc()
     Vector3*** ptrVelVectorCellArray = VectorCellField();
     Vector3*** ptrGradVectorCellArray= VectorCellField();
 
+    std::cout << " test 1";
     // Prerun 1.3 // Create grids field array of volum for one face of six
     // The size is [fsize+2][fsize+2][fsize+2]
-    cout << " Create array of Volume at cells and at grids" << endl;
+    cout << " Create array of Volume at cells and at grids" << std::endl;
     double*** ptrVolumeCellArray = VolumeCellsField( ptrArray);
     
-    cout << " Create array of Volume at cells and at grids" << endl;
+    std::cout << " test 2";
+    std::cout << " Create array of Volume at cells and at grids" << std::endl;
+    
+    std::cout << " test 22";
     // The size if [fsize+1][fsize+1][fsize+1]
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
 
+    std::cout << " test 3";
     // Presun 1.4 // Create Cell centered field array for E
     // [totalface * fsize+2 * fsize+2 * fsize+2] 
     Vector3***** ptrEVectorCellArray = EVectorCellArray( ptrArray);
@@ -64,6 +69,7 @@ void ProcessFunc()
     // [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
     Vector3***** ptrBVectorFaceArray = BVectorFaceArray( ptrArray);
     
+    std::cout << " test 4";
     // Initialize condition
     if( update_type == 0)
     {

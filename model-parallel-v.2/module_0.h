@@ -851,7 +851,7 @@ Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in);
 //************************************************************************
 // FUNCTION 
 // Calculate the B on each face from BVectorFaceArray
-void BVectorFaceArrayUpdate(GridsPoints***** ptrArray_in; Vector3***** ptrBFaceArray_in);
+void BVectorFaceArrayUpdate(GridsPoints***** ptrArray_in, Vector3***** ptrBFaceArray_in);
 
 
 //************************************************************************
@@ -861,7 +861,8 @@ void BVectorFaceArrayUpdate(GridsPoints***** ptrArray_in; Vector3***** ptrBFaceA
 Vector3*** CurlBCellArray( GridsPoints***** ptrArray, 
                            Vector3*** ptrVectorCellArray, 
                            Vector3***** ptrBVectorCellArray, 
-                           double*** ptrVolumeCellArray);
+                           double*** ptrVolumeCellArray,
+                           int face_in);
                         
 //************************************************************************
 //************************************************************************

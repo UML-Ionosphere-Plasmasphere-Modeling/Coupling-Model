@@ -1428,6 +1428,8 @@ double*** VolumeGridsField( double*** ptrVolumeCellArray_in)
     static double* mem_VolumeGridsArray = new double[(fieldsGridsSize+1)*(fieldsGridsSize+1)*(fieldsGridsSize+1)]; 
     double*** VolumeGridsArray = new double **[fieldsGridsSize+1];
 
+
+    std::cout << " test 2.1";
     for( int i =0; i < fieldsGridsSize+1; i++)
     {
         VolumeGridsArray[i] = new double*[fieldsGridsSize+1];
@@ -1472,6 +1474,8 @@ double*** VolumeGridsField( double*** ptrVolumeCellArray_in)
             }
         }
     }
+    
+    std::cout << " test 2.2";
     return VolumeGridsArray;
 }
 
@@ -2469,7 +2473,7 @@ Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in)
 {
     static Vector3* mem_BVectorFaceArray = new Vector3[ 3 * totalFace * (fieldsGridsSize+1) * (fieldsGridsSize+1) *(fieldsGridsSize+1)];
     Vector3***** ptrBFaceArray = new Vector3 ****[3];
-    for( int direction = 0; direcion < 3; direction++)
+    for( int direction = 0; direction < 3; direction++)
     {
         ptrBFaceArray[direction] = new Vector3***[totalFace];
         for( int face = 0; face < totalFace; face++)
@@ -2509,9 +2513,9 @@ Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in)
                         }
 
                         double r = sqrt(pow(tempPos.x(),2.0) + pow(tempPos.y(),2.0) + pow(tempPos.z(),2.0));
-                        tempB.Setx( 3 * dMoment * v.x() * v.z() / pow(r,5.0));
-                        tempB.Sety( 3 * dMoment * v.y() * v.z() / pow(r,5.0));
-                        tempB.Setz( dMoment * (3 * pow(v.z(),2.0) - pow(r,2.0)) / pow(r,5.0));
+                        tempB.Setx( 3 * dMoment * tempPos.x() * tempPos.z() / pow(r,5.0));
+                        tempB.Sety( 3 * dMoment * tempPos.y() * tempPos.z() / pow(r,5.0));
+                        tempB.Setz( dMoment * (3 * pow(tempPos.z(),2.0) - pow(r,2.0)) / pow(r,5.0));
                         ptrBFaceArray[direction][face][i][j][k] = tempB;
                     }
                 }
@@ -2662,7 +2666,7 @@ void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFace
 
                             dBOnFace = sumtempB.ScaleProduct( 1.0 / sumWeightB);
                             ptrBFaceArray_in[direction][face][i][j][k] = 
-                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep);
+                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep));
 
                         } else if( direction == 1) // perpendicular to j direction
                         {
@@ -2758,7 +2762,7 @@ void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFace
 
                             dBOnFace = sumtempB.ScaleProduct( 1.0 / sumWeightB);
                             ptrBFaceArray_in[direction][face][i][j][k] = 
-                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep);
+                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep));
                         } else
                         {
                             if( i == fieldsGridsSize+1 || j == fieldsGridsSize+1)
@@ -2853,7 +2857,7 @@ void BVectorFaceArrayUpdate( GridsPoints***** ptrArray_in, Vector3***** ptrBFace
                             
                             dBOnFace = sumtempB.ScaleProduct( 1.0 / sumWeightB);
                             ptrBFaceArray_in[direction][face][i][j][k] = 
-                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep);
+                            ptrBFaceArray_in[direction][face][i][j][k].PlusProduct(dBOnFace.ScaleProduct(tstep));
                         }
                         
                     }
@@ -2884,20 +2888,20 @@ Vector3*** CurlBCellArray( GridsPoints***** ptrArray_in,
                                ptrBVectorFaceArray[0][face_in][i][j][k]);
                         temp = temp.PlusProduct(
                                AreaVectorR( ptrArray_in, face_in, i, j, k).CrossProduct(
-                               ptrBVectorFaceArray[0][face_in][i+1][j][k]);
+                               ptrBVectorFaceArray[0][face_in][i+1][j][k]));
                         temp = temp.PlusProduct(
                                AreaVectorT( ptrArray_in, face_in, i, j, k).CrossProduct(
-                               ptrBVectorFaceArray[1][face_in][i][j+1][k]);
+                               ptrBVectorFaceArray[1][face_in][i][j+1][k]));
                         temp = temp.PlusProduct(
                                AreaVectorBot( ptrArray_in, face_in, i, j, k).CrossProduct(
-                               ptrBVectorFaceArray[1][face_in][i][j][k]);
+                               ptrBVectorFaceArray[1][face_in][i][j][k]));
                         temp = temp.PlusProduct(
                                AreaVectorF( ptrArray_in, face_in, i, j, k).CrossProduct(
-                               ptrBVectorFaceArray[2][face_in][i][j][k+1]);
+                               ptrBVectorFaceArray[2][face_in][i][j][k+1]));
                         temp = temp.PlusProduct(
                                AreaVectorBack( ptrArray_in, face_in, i, j, k).CrossProduct(
-                               ptrBVectorFaceArray[2][face_in][i][j][k]);
-                double volumetemp = ptrVolumeCellArray_in[i][j][k];
+                               ptrBVectorFaceArray[2][face_in][i][j][k]));
+                double volumetemp = ptrVolumeCellArray[i][j][k];
                 
                 temp = temp.ScaleProduct( 1.0 / volumetemp);
                 ptrVectorCellArray[i][j][k].SetVector3( temp); 
@@ -2969,72 +2973,72 @@ void UpdateECellArray(  GridsPoints***** ptrArray,
                     
                 if(i==1&&j==1) 
                 {
-                EVector = ptrEVectorCellArray[face_in][1][0][k-1].PlusProduct(
-                                    ptrEVectorCellArray[face_in][1][1][k-1]);
+                EVector = ptrEVectorCellArray[face_in][1][0][k-1]->PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][1][k-1]->V3());
                 EVector = EVector.PlusProduct(           
-                                    ptrEVectorCellArray[face_in][0][1][k-1]);
+                                    ptrEVectorCellArray[face_in][0][1][k-1]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][1][0][k]);
+                                    ptrEVectorCellArray[face_in][1][0][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][1][1][k]);
+                                    ptrEVectorCellArray[face_in][1][1][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][0][1][k]).ScaleProduct(1.0/6.0);            
+                                    ptrEVectorCellArray[face_in][0][1][k]->V3()).ScaleProduct(1.0/6.0);            
                 }
                 else if(i==1&&j==fieldsGridsSize+1) 
                 {
                 
-                EVector = ptrEVectorCellArray[face_in][1][fieldsGridsSize+1][k-1].PlusProduct(
-                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize][k-1]);
+                EVector = ptrEVectorCellArray[face_in][1][fieldsGridsSize+1][k-1]->PlusProduct(
+                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize][k-1]->V3());
                 EVector = EVector.PlusProduct(           
-                                    ptrEVectorCellArray[face_in][0][fieldsGridsSize][k-1]);
+                                    ptrEVectorCellArray[face_in][0][fieldsGridsSize][k-1]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize+1][k]);
+                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize+1][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize][k]);
+                                    ptrEVectorCellArray[face_in][1][fieldsGridsSize][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][0][fieldsGridsSize][k]).ScaleProduct(1.0/6.0);
+                                    ptrEVectorCellArray[face_in][0][fieldsGridsSize][k]->V3()).ScaleProduct(1.0/6.0);
                 }
                 else if(i==fieldsGridsSize+1&&j==fieldsGridsSize+1)
                 {
-                EVector = ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize+1][k-1].PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize][k-1]);
+                EVector = ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize+1][k-1]->PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize][k-1]->V3());
                 EVector = EVector.PlusProduct(           
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][fieldsGridsSize][k-1]);
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][fieldsGridsSize][k-1]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize+1][k]);
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize+1][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize][k]);
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][fieldsGridsSize][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][fieldsGridsSize][k]).ScaleProduct(1.0/6.0);
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][fieldsGridsSize][k]->V3()).ScaleProduct(1.0/6.0);
                 }
                 else if(i==fieldsGridsSize+1&&j==1) 
                 {
-                EVector = ptrEVectorCellArray[face_in][fieldsGridsSize][0][k-1].PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize][1][k-1]);
+                EVector = ptrEVectorCellArray[face_in][fieldsGridsSize][0][k-1]->PlusProduct(
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][1][k-1]->V3());
                 EVector = EVector.PlusProduct(           
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][1][k-1]);
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][1][k-1]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize][0][k]);
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][0][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize][1][k]);
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize][1][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][1][k]).ScaleProduct(1.0/6.0);                
+                                    ptrEVectorCellArray[face_in][fieldsGridsSize+1][1][k]->V3()).ScaleProduct(1.0/6.0);                
                 } else
                 {
-                EVector = ptrEVectorCellArray[face_in][i-1][j-1][k-1].PlusProduct(
-                                    ptrEVectorCellArray[face_in][i][j-1][k-1]);
+                EVector = ptrEVectorCellArray[face_in][i-1][j-1][k-1]->PlusProduct(
+                                    ptrEVectorCellArray[face_in][i][j-1][k-1]->V3());
                 EVector = EVector.PlusProduct(           
-                                    ptrEVectorCellArray[face_in][i-1][j][k-1]);
+                                    ptrEVectorCellArray[face_in][i-1][j][k-1]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][i][j][k-1]);
+                                    ptrEVectorCellArray[face_in][i][j][k-1]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][i-1][j-1][k]);
+                                    ptrEVectorCellArray[face_in][i-1][j-1][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][i][j-1][k]);
+                                    ptrEVectorCellArray[face_in][i][j-1][k]->V3());
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][i-1][j][k]);    
+                                    ptrEVectorCellArray[face_in][i-1][j][k]->V3());    
                 EVector = EVector.PlusProduct(
-                                    ptrEVectorCellArray[face_in][i][j][k]).ScaleProduct(1.0/8.0);
+                                    ptrEVectorCellArray[face_in][i][j][k]->V3()).ScaleProduct(1.0/8.0);
                 }
                 // update E
                 ptrArray[face_in][i][j][k]->E3().SetVector3(EVector);
@@ -3074,7 +3078,7 @@ void BVectorGridsArrayUpdate(   GridsPoints***** ptrArray,
                     }
                     if( j == 1  || j == fieldsGridsSize+1)
                     {
-                        ptrBVectorFaceArray[1][face][i-1][j][k-1]).PlusProduct(
+                        Btemp = ptrBVectorFaceArray[1][face][i-1][j][k-1].PlusProduct(
                             ptrBVectorFaceArray[1][face][i-1][j][k-1]).PlusProduct(
                             ptrBVectorFaceArray[1][face][i][j][k]).PlusProduct(
                             ptrBVectorFaceArray[1][face][i][j][k]).ScaleProduct( 1.0 / 4.0);
@@ -3099,69 +3103,69 @@ void BVectorGridsArrayUpdate(   GridsPoints***** ptrArray,
     for( int k = 0; k < fieldsGridsSize+1; k++)
     {
 // On face 0
-        Btemp = ptrBFaceArray_in[0][0][1][1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][0][1][1][k-1]).PlusProduct(
-                ptrBFaceArray_in[4][1][fieldsGridsSize+1][1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][0][1][1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][0][1][1][k]).PlusProduct(
-                            ptrBFaceArray_in[4][1][fieldsGridsSize+1][1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][0][1][1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][0][1][1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[4][1][fieldsGridsSize+1][1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][0][1][1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][0][1][1][k]).PlusProduct(
+                            ptrBVectorFaceArray[4][1][fieldsGridsSize+1][1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[0][1][1][k]->B3().SetVector3(Btemp);
 
-        Btemp = ptrBFaceArray_in[0][0][fieldsGridsSize+1][1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][0][fieldsGridsSize+1][1][k-1]).PlusProduct(
-                ptrBFaceArray_in[1][1][1][1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][0][fieldsGridsSize+1][1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][0][fieldsGridsSize+1][1][k]).PlusProduct(
-                            ptrBFaceArray_in[1][1][1][1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][0][fieldsGridsSize+1][1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][0][fieldsGridsSize+1][1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[1][1][1][1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][0][fieldsGridsSize+1][1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][0][fieldsGridsSize+1][1][k]).PlusProduct(
+                            ptrBVectorFaceArray[1][1][1][1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[0][fieldsGridsSize+1][1][k]->B3().SetVector3(Btemp);
         
-        Btemp = ptrBFaceArray_in[0][0][1][fieldsGridsSize+1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][0][1][fieldsGridsSize+1][k-1]).PlusProduct(
-                ptrBFaceArray_in[4][1][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][0][1][fieldsGridsSize+1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][0][1][fieldsGridsSize+1][k]).PlusProduct(
-                            ptrBFaceArray_in[4][1][fieldsGridsSize+1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][0][1][fieldsGridsSize+1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][0][1][fieldsGridsSize+1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[4][1][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][0][1][fieldsGridsSize+1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][0][1][fieldsGridsSize+1][k]).PlusProduct(
+                            ptrBVectorFaceArray[4][1][fieldsGridsSize+1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[0][1][fieldsGridsSize+1][k]->B3().SetVector3(Btemp);
 
-        Btemp = ptrBFaceArray_in[0][0][fieldsGridsSize+1][fieldsGridsSize+1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][0][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
-                ptrBFaceArray_in[1][1][1][fieldsGridsSize+1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][0][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][0][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
-                            ptrBFaceArray_in[1][1][1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][0][fieldsGridsSize+1][fieldsGridsSize+1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][0][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[1][1][1][fieldsGridsSize+1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][0][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][0][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
+                            ptrBVectorFaceArray[1][1][1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[0][fieldsGridsSize+1][fieldsGridsSize+1][k]->B3().SetVector3(Btemp);
 
 // On face 3
-        Btemp = ptrBFaceArray_in[0][3][1][1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][3][1][1][k-1]).PlusProduct(
-                ptrBFaceArray_in[1][1][fieldsGridsSize+1][1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][3][1][1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][3][1][1][k]).PlusProduct(
-                            ptrBFaceArray_in[1][1][fieldsGridsSize+1][1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][3][1][1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][3][1][1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[1][1][fieldsGridsSize+1][1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][3][1][1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][3][1][1][k]).PlusProduct(
+                            ptrBVectorFaceArray[1][1][fieldsGridsSize+1][1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[3][1][1][k]->B3().SetVector3(Btemp);
 
-        Btemp = ptrBFaceArray_in[0][3][fieldsGridsSize+1][1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][3][fieldsGridsSize+1][1][k-1]).PlusProduct(
-                ptrBFaceArray_in[1][4][1][1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][3][fieldsGridsSize+1][1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][3][fieldsGridsSize+1][1][k]).PlusProduct(
-                            ptrBFaceArray_in[1][4][1][1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][3][fieldsGridsSize+1][1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][3][fieldsGridsSize+1][1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[1][4][1][1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][3][fieldsGridsSize+1][1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][3][fieldsGridsSize+1][1][k]).PlusProduct(
+                            ptrBVectorFaceArray[1][4][1][1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[3][fieldsGridsSize+1][1][k]->B3().SetVector3(Btemp);
         
-        Btemp = ptrBFaceArray_in[0][3][1][fieldsGridsSize+1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][3][1][fieldsGridsSize+1][k-1]).PlusProduct(
-                ptrBFaceArray_in[1][1][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][3][1][fieldsGridsSize+1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][3][1][fieldsGridsSize+1][k]).PlusProduct(
-                            ptrBFaceArray_in[1][1][fieldsGridsSize+1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][3][1][fieldsGridsSize+1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][3][1][fieldsGridsSize+1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[1][1][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][3][1][fieldsGridsSize+1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][3][1][fieldsGridsSize+1][k]).PlusProduct(
+                            ptrBVectorFaceArray[1][1][fieldsGridsSize+1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[3][1][fieldsGridsSize+1][k]->B3().SetVector3(Btemp);
 
-        Btemp = ptrBFaceArray_in[0][3][fieldsGridsSize+1][fieldsGridsSize+1][k-1].PlusProduct(
-            ptrBFaceArray_in[1][3][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
-                ptrBFaceArray_in[1][4][1][fieldsGridsSize+1][k-1]).PlusProduct(
-                    ptrBFaceArray_in[0][3][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
-                        ptrBFaceArray_in[1][3][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
-                            ptrBFaceArray_in[1][4][1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
+        Btemp = ptrBVectorFaceArray[0][3][fieldsGridsSize+1][fieldsGridsSize+1][k-1].PlusProduct(
+            ptrBVectorFaceArray[1][3][fieldsGridsSize+1][fieldsGridsSize+1][k-1]).PlusProduct(
+                ptrBVectorFaceArray[1][4][1][fieldsGridsSize+1][k-1]).PlusProduct(
+                    ptrBVectorFaceArray[0][3][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
+                        ptrBVectorFaceArray[1][3][fieldsGridsSize+1][fieldsGridsSize+1][k]).PlusProduct(
+                            ptrBVectorFaceArray[1][4][1][fieldsGridsSize+1][k]).ScaleProduct( 1.0 / 6.0);    
         ptrArray[3][fieldsGridsSize+1][fieldsGridsSize+1][k]->B3().SetVector3(Btemp);
     }
 }
