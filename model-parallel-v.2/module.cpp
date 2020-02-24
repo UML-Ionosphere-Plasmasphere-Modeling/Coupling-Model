@@ -14,9 +14,9 @@
 #include "H5Cpp.h"
 #include <bitset>
 
+using std::vector;
 using std::cout;
 using std::endl;
-using std::vector;
 
 
 
@@ -33,35 +33,25 @@ void ProcessFunc()
 {
     // Prerun 1.0 // Create Grids, including B and Pos. And then Velocity (corotation) and N (exponential )
     // Prerun 1.1 // And then E (electron momentum equation).
-    cout << " Create Grids" << endl;
+    std::cout << " Create Grids" << std::endl;
     GridsPoints***** ptrArray =  GridsCreation();
+        
+    std::cout << LMin << " " << LMax << std::endl;
 
     Titheridge_Te( ptrArray); // initial Temprature of electron
-    
-//    SetTopBoundary( ptrArray);
-//    SetBotBoundary( ptrArray);
-    
-    cout << LMin << " " << LMax << endl;
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     // The size is [fsize+2][fsize+2][fsize+2]
     Vector3*** ptrVectorCellArray = VectorCellField();  
     Vector3*** ptrVelVectorCellArray = VectorCellField();
     Vector3*** ptrGradVectorCellArray= VectorCellField();
-
-    std::cout << " test 1";
     // Prerun 1.3 // Create grids field array of volum for one face of six
     // The size is [fsize+2][fsize+2][fsize+2]
-    cout << " Create array of Volume at cells and at grids" << std::endl;
-    double*** ptrVolumeCellArray = VolumeCellsField( ptrArray);
-    
-    std::cout << " test 2";
     std::cout << " Create array of Volume at cells and at grids" << std::endl;
-    
-    std::cout << " test 22";
-    // The size if [fsize+1][fsize+1][fsize+1]
+    double*** ptrVolumeCellArray = VolumeCellsField( ptrArray);
+    std::cout << " Create array of Volume at cells and at grids " << std::endl;
+    // The size is [fsize+1][fsize+1][fsize+1]
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
 
-    std::cout << " test 3";
     // Presun 1.4 // Create Cell centered field array for E
     // [totalface * fsize+2 * fsize+2 * fsize+2] 
     Vector3***** ptrEVectorCellArray = EVectorCellArray( ptrArray);
@@ -69,7 +59,6 @@ void ProcessFunc()
     // [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
     Vector3***** ptrBVectorFaceArray = BVectorFaceArray( ptrArray);
     
-    std::cout << " test 4";
     // Initialize condition
     if( update_type == 0)
     {
@@ -138,6 +127,7 @@ void ProcessFunc()
 
     for( int timeline = 1; timeline <= timeLineLimit; timeline++)   // timeline start with 1
     {
+        std::cout << " timeline " << timeline << std::endl;
         // set boundary condition: 60s initial time interval
         // can be developed for info exchanging boundary
         if( update_type == 1)
@@ -161,6 +151,7 @@ void ProcessFunc()
         {
             std::cout << " PrintOut Const" << std::endl;
             PrintOutHdf5( ptrArray, timeline, h5FileCheck);
+            h5FileCheck = 1;
         }
         // average pho, v, update grids info B, E & reset pho, v
         if( timeline % updateInfoPeriod ==0)
@@ -173,6 +164,7 @@ void ProcessFunc()
             CalculatingAveragedPhoVatGrids( ptrArray, 
                                             ptrVolumeGridArray,
                                             updateInfoPeriod);
+            std::cout << " test1 " << std::endl;
             // Run 2.5.2 
             for( int face = 0; face < 6; face++)
             {
@@ -236,10 +228,11 @@ void ProcessFunc()
                                 face);
                 }
             }
+            std::cout << " test2 " << std::endl;
             // printout 
             if( timeline % printTimePeriod == 0)
             {
-                std::cout << " PrintOut  " << timeline << std::endl;
+                std::cout << " PrintOut  " << timeline << " " << h5FileCheck <<std::endl;
                 PrintOutHdf5( ptrArray, timeline, h5FileCheck);
             }
             // reset pho and v

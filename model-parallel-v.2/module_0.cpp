@@ -1384,9 +1384,8 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
     if(h5FileCheck_in == 0)
     {
-
-        H5File* file = new H5File( FILE_NAME, H5F_ACC_TRUNC);
         h5FileCheck = 1;
+        H5File* file = new H5File( FILE_NAME, H5F_ACC_TRUNC);
 
         DataSet* dataset_const;
         dataset_const = new DataSet(file->createDataSet( DATASET_CONST_NAME, mtype_grids_const, space));
@@ -1400,7 +1399,6 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
     }
     else
     {
-
         H5File* file = new H5File( FILE_NAME, H5F_ACC_RDWR);
   
         DataSet* dataset;
@@ -1428,8 +1426,6 @@ double*** VolumeGridsField( double*** ptrVolumeCellArray_in)
     static double* mem_VolumeGridsArray = new double[(fieldsGridsSize+1)*(fieldsGridsSize+1)*(fieldsGridsSize+1)]; 
     double*** VolumeGridsArray = new double **[fieldsGridsSize+1];
 
-
-    std::cout << " test 2.1";
     for( int i =0; i < fieldsGridsSize+1; i++)
     {
         VolumeGridsArray[i] = new double*[fieldsGridsSize+1];
@@ -1475,7 +1471,6 @@ double*** VolumeGridsField( double*** ptrVolumeCellArray_in)
         }
     }
     
-    std::cout << " test 2.2";
     return VolumeGridsArray;
 }
 
@@ -2336,16 +2331,23 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     for( int face = 0; face < totalFace; face++)
     {
         ptrEArray[face] = new Vector3***[fieldsGridsSize + 4];
-        for( int i = 2; i < fieldsGridsSize + 2; i++)
+        for( int i = 0; i < fieldsGridsSize + 4; i++)
         {
             ptrEArray[face][i] = new Vector3 **[fieldsGridsSize + 4];
-            for( int j = 2; j < fieldsGridsSize + 2; j++)
+            for( int j = 0; j < fieldsGridsSize + 4; j++)
             {
                 ptrEArray[face][i][j] = new Vector3 *[fieldsGridsSize];
                 for( int k = 0; k < fieldsGridsSize; k++)
                 {
+                    if( 2<=i && i<=fieldsGridsSize+1 && 2<=j && j<=fieldsGridsSize+1 )
+                    {
                     ptrEArray[face][i][j][k] = mem_EVectorCellArray + face * fieldsGridsSize * fieldsGridsSize * fieldsGridsSize
                                                 + (i-2) * fieldsGridsSize * fieldsGridsSize + (j-2) * fieldsGridsSize + k; 
+                    } else
+                    {
+                        continue;
+                    }
+                    
                 }
             }
         }
@@ -2356,17 +2358,17 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     {
         for( int k = 0; k < fieldsGridsSize; k++)
         {
-            ptrArray[0][i][0][k] = ptrArray[5][i][fieldsGridsSize][k]; // bot
-            ptrArray[0][i][1][k] = ptrArray[5][i][fieldsGridsSize+1][k]; // bot
+            ptrEArray[0][i][0][k] = ptrEArray[5][i][fieldsGridsSize][k]; // bot
+            ptrEArray[0][i][1][k] = ptrEArray[5][i][fieldsGridsSize+1][k]; // bot
 
-            ptrArray[0][fieldsGridsSize+3][i][k] = ptrArray[1][3][i][k]; // right
-            ptrArray[0][fieldsGridsSize+2][i][k] = ptrArray[1][2][i][k]; // right
+            ptrEArray[0][fieldsGridsSize+3][i][k] = ptrEArray[1][3][i][k]; // right
+            ptrEArray[0][fieldsGridsSize+2][i][k] = ptrEArray[1][2][i][k]; // right
 
-            ptrArray[0][i][fieldsGridsSize+3][k] = ptrArray[2][i][3][k]; // top
-            ptrArray[0][i][fieldsGridsSize+2][k] = ptrArray[2][i][2][k]; // top
+            ptrEArray[0][i][fieldsGridsSize+3][k] = ptrEArray[2][i][3][k]; // top
+            ptrEArray[0][i][fieldsGridsSize+2][k] = ptrEArray[2][i][2][k]; // top
 
-            ptrArray[0][0][i][k] = ptrArray[4][fieldsGridsSize][i][k];  // left
-            ptrArray[0][1][i][k] = ptrArray[4][fieldsGridsSize+1][i][k];  // left
+            ptrEArray[0][0][i][k] = ptrEArray[4][fieldsGridsSize][i][k];  // left
+            ptrEArray[0][1][i][k] = ptrEArray[4][fieldsGridsSize+1][i][k];  // left
         }
     }
     // face 1
@@ -2374,17 +2376,17 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     {
         for( int k = 0; k <= fieldsGridsSize; k++)
         {
-        ptrArray[1][i][0][k] = ptrArray[5][fieldsGridsSize][fieldsGridsSize+3-i][k]; // bot
-        ptrArray[1][i][1][k] = ptrArray[5][fieldsGridsSize+1][fieldsGridsSize+3-i][k]; // bot
+        ptrEArray[1][i][0][k] = ptrEArray[5][fieldsGridsSize][fieldsGridsSize+3-i][k]; // bot
+        ptrEArray[1][i][1][k] = ptrEArray[5][fieldsGridsSize+1][fieldsGridsSize+3-i][k]; // bot
         
-        ptrArray[1][fieldsGridsSize+3][i][k] = ptrArray[3][2][i][k]; // right
-        ptrArray[1][fieldsGridsSize+2][i][k] = ptrArray[3][2][i][k]; // right
+        ptrEArray[1][fieldsGridsSize+3][i][k] = ptrEArray[3][2][i][k]; // right
+        ptrEArray[1][fieldsGridsSize+2][i][k] = ptrEArray[3][2][i][k]; // right
 
-        ptrArray[1][i][fieldsGridsSize+3][k] = ptrArray[2][fieldsGridsSize][i][k]; // top
-        ptrArray[1][i][fieldsGridsSize+2][k] = ptrArray[2][fieldsGridsSize+1][i][k]; // top
+        ptrEArray[1][i][fieldsGridsSize+3][k] = ptrEArray[2][fieldsGridsSize][i][k]; // top
+        ptrEArray[1][i][fieldsGridsSize+2][k] = ptrEArray[2][fieldsGridsSize+1][i][k]; // top
 
-        ptrArray[1][0][i][k] = ptrArray[0][fieldsGridsSize][i][k];  // left
-        ptrArray[1][1][i][k] = ptrArray[0][fieldsGridsSize+1][i][k];  // left
+        ptrEArray[1][0][i][k] = ptrEArray[0][fieldsGridsSize][i][k];  // left
+        ptrEArray[1][1][i][k] = ptrEArray[0][fieldsGridsSize+1][i][k];  // left
         }
     }
     // face 2
@@ -2392,17 +2394,17 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     {
         for( int k = 0; k <= fieldsGridsSize; k++)
         {
-        ptrArray[2][i][0][k] = ptrArray[0][i][fieldsGridsSize][k]; // bot
-        ptrArray[2][i][1][k] = ptrArray[0][i][fieldsGridsSize+1][k]; // bot
+        ptrEArray[2][i][0][k] = ptrEArray[0][i][fieldsGridsSize][k]; // bot
+        ptrEArray[2][i][1][k] = ptrEArray[0][i][fieldsGridsSize+1][k]; // bot
         
-        ptrArray[2][fieldsGridsSize+3][i][k] = ptrArray[1][i][fieldsGridsSize][k]; // right
-        ptrArray[2][fieldsGridsSize+2][i][k] = ptrArray[1][i][fieldsGridsSize+1][k]; // right
+        ptrEArray[2][fieldsGridsSize+3][i][k] = ptrEArray[1][i][fieldsGridsSize][k]; // right
+        ptrEArray[2][fieldsGridsSize+2][i][k] = ptrEArray[1][i][fieldsGridsSize+1][k]; // right
         
-        ptrArray[2][i][fieldsGridsSize+3][k] = ptrArray[3][fieldsGridsSize+3-i][fieldsGridsSize][k]; // top
-        ptrArray[2][i][fieldsGridsSize+2][k] = ptrArray[3][fieldsGridsSize+3-i][fieldsGridsSize+1][k]; // top
+        ptrEArray[2][i][fieldsGridsSize+3][k] = ptrEArray[3][fieldsGridsSize+3-i][fieldsGridsSize][k]; // top
+        ptrEArray[2][i][fieldsGridsSize+2][k] = ptrEArray[3][fieldsGridsSize+3-i][fieldsGridsSize+1][k]; // top
         
-        ptrArray[2][0][i][k] = ptrArray[4][fieldsGridsSize+3-i][fieldsGridsSize][k];  // left
-        ptrArray[2][1][i][k] = ptrArray[4][fieldsGridsSize+3-i][fieldsGridsSize+1][k];  // left
+        ptrEArray[2][0][i][k] = ptrEArray[4][fieldsGridsSize+3-i][fieldsGridsSize][k];  // left
+        ptrEArray[2][1][i][k] = ptrEArray[4][fieldsGridsSize+3-i][fieldsGridsSize+1][k];  // left
         }
     }
     //face 3
@@ -2410,17 +2412,17 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     {
         for( int k = 0; k <= fieldsGridsSize; k++)
         {
-        ptrArray[3][i][0][k] = ptrArray[5][fieldsGridsSize+3-i][3][k]; // bot
-        ptrArray[3][i][1][k] = ptrArray[5][fieldsGridsSize+3-i][2][k]; // bot
+        ptrEArray[3][i][0][k] = ptrEArray[5][fieldsGridsSize+3-i][3][k]; // bot
+        ptrEArray[3][i][1][k] = ptrEArray[5][fieldsGridsSize+3-i][2][k]; // bot
 
-        ptrArray[3][fieldsGridsSize+3][i][k] = ptrArray[4][3][i][k]; // right
-        ptrArray[3][fieldsGridsSize+2][i][k] = ptrArray[4][2][i][k]; // right
+        ptrEArray[3][fieldsGridsSize+3][i][k] = ptrEArray[4][3][i][k]; // right
+        ptrEArray[3][fieldsGridsSize+2][i][k] = ptrEArray[4][2][i][k]; // right
 
-        ptrArray[3][i][fieldsGridsSize+3][k] = ptrArray[2][fieldsGridsSize+3-i][fieldsGridsSize][k]; // top
-        ptrArray[3][i][fieldsGridsSize+2][k] = ptrArray[2][fieldsGridsSize+3-i][fieldsGridsSize+1][k]; // top
+        ptrEArray[3][i][fieldsGridsSize+3][k] = ptrEArray[2][fieldsGridsSize+3-i][fieldsGridsSize][k]; // top
+        ptrEArray[3][i][fieldsGridsSize+2][k] = ptrEArray[2][fieldsGridsSize+3-i][fieldsGridsSize+1][k]; // top
 
-        ptrArray[3][0][i][k] = ptrArray[1][fieldsGridsSize][i][k];  // left
-        ptrArray[3][1][i][k] = ptrArray[1][fieldsGridsSize+1][i][k];  // left
+        ptrEArray[3][0][i][k] = ptrEArray[1][fieldsGridsSize][i][k];  // left
+        ptrEArray[3][1][i][k] = ptrEArray[1][fieldsGridsSize+1][i][k];  // left
         }
     }
     // face 4
@@ -2428,17 +2430,17 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     {
         for( int k = 0; k <= fieldsGridsSize; k++)
         {
-        ptrArray[4][i][0][k] = ptrArray[5][3][i][k]; // bot
-        ptrArray[4][i][1][k] = ptrArray[5][2][i][k]; // bot
+        ptrEArray[4][i][0][k] = ptrEArray[5][3][i][k]; // bot
+        ptrEArray[4][i][1][k] = ptrEArray[5][2][i][k]; // bot
         
-        ptrArray[4][fieldsGridsSize+3][i][k] = ptrArray[0][3][i][k]; // right
-        ptrArray[4][fieldsGridsSize+2][i][k] = ptrArray[0][2][i][k]; // right
+        ptrEArray[4][fieldsGridsSize+3][i][k] = ptrEArray[0][3][i][k]; // right
+        ptrEArray[4][fieldsGridsSize+2][i][k] = ptrEArray[0][2][i][k]; // right
         
-        ptrArray[4][i][fieldsGridsSize+3][k] = ptrArray[2][3][fieldsGridsSize+3-i][k]; // top
-        ptrArray[4][i][fieldsGridsSize+2][k] = ptrArray[2][2][fieldsGridsSize+3-i][k]; // top
+        ptrEArray[4][i][fieldsGridsSize+3][k] = ptrEArray[2][3][fieldsGridsSize+3-i][k]; // top
+        ptrEArray[4][i][fieldsGridsSize+2][k] = ptrEArray[2][2][fieldsGridsSize+3-i][k]; // top
         
-        ptrArray[4][0][i][k] = ptrArray[3][fieldsGridsSize][i][k];  // left
-        ptrArray[4][1][i][k] = ptrArray[3][fieldsGridsSize+1][i][k];  // left
+        ptrEArray[4][0][i][k] = ptrEArray[3][fieldsGridsSize][i][k];  // left
+        ptrEArray[4][1][i][k] = ptrEArray[3][fieldsGridsSize+1][i][k];  // left
         }
     }
     // face 5
@@ -2446,17 +2448,17 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     {
         for( int k = 0; k <= fieldsGridsSize; k++)
         {
-        ptrArray[5][i][0][k] = ptrArray[3][fieldsGridsSize+3-i][3][k]; // bot
-        ptrArray[5][i][1][k] = ptrArray[3][fieldsGridsSize+3-i][2][k]; // bot
+        ptrEArray[5][i][0][k] = ptrEArray[3][fieldsGridsSize+3-i][3][k]; // bot
+        ptrEArray[5][i][1][k] = ptrEArray[3][fieldsGridsSize+3-i][2][k]; // bot
 
-        ptrArray[5][fieldsGridsSize+3][i][k] = ptrArray[1][fieldsGridsSize+3-i][3][k]; // right
-        ptrArray[5][fieldsGridsSize+2][i][k] = ptrArray[1][fieldsGridsSize+3-i][2][k]; // right
+        ptrEArray[5][fieldsGridsSize+3][i][k] = ptrEArray[1][fieldsGridsSize+3-i][3][k]; // right
+        ptrEArray[5][fieldsGridsSize+2][i][k] = ptrEArray[1][fieldsGridsSize+3-i][2][k]; // right
 
-        ptrArray[5][i][fieldsGridsSize+3][k] = ptrArray[0][i][3][k]; // top
-        ptrArray[5][i][fieldsGridsSize+2][k] = ptrArray[0][i][2][k]; // top
+        ptrEArray[5][i][fieldsGridsSize+3][k] = ptrEArray[0][i][3][k]; // top
+        ptrEArray[5][i][fieldsGridsSize+2][k] = ptrEArray[0][i][2][k]; // top
 
-        ptrArray[5][0][i][k] = ptrArray[4][i][3][k];  // left
-        ptrArray[5][1][i][k] = ptrArray[4][i][2][k];  // left
+        ptrEArray[5][0][i][k] = ptrEArray[4][i][3][k];  // left
+        ptrEArray[5][1][i][k] = ptrEArray[4][i][2][k];  // left
             
         }
     }
@@ -2497,11 +2499,13 @@ Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in)
                         Vector3 tempB, tempPos;
                         if( direction == 0) // face perpendicular to i direction 
                         {
+                            if( k == fieldsGridsSize) continue;
                             tempPos = ptrArray_in[face][I][J][K]->Pos3().PlusProduct( ptrArray_in[face][I][J+1][K]->Pos3());
                             tempPos = tempPos.PlusProduct( ptrArray_in[face][I][J][K+1]->Pos3()).PlusProduct( ptrArray_in[face][I][J+1][K+1]->Pos3());
                             tempPos = tempPos.ScaleProduct(0.25);
                         } else if ( direction ==1)  // face perpendicular to j direction
                         {
+                            if( k == fieldsGridsSize) continue;
                             tempPos = ptrArray_in[face][I][J][K]->Pos3().PlusProduct( ptrArray_in[face][I+1][J][K]->Pos3());
                             tempPos = tempPos.PlusProduct( ptrArray_in[face][I][J][K+1]->Pos3()).PlusProduct( ptrArray_in[face][I+1][J][K+1]->Pos3());
                             tempPos = tempPos.ScaleProduct(0.25);

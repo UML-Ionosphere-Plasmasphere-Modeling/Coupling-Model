@@ -52,7 +52,7 @@
     // fieldGridsLevel max shouble better be 9 
     // particlesGridsLevel max should be 10 greater than fieldGridsLevel
     
-    const int fieldsGridsLevel = 3;
+    const int fieldsGridsLevel = 4;
     const int particlesGridsLevel = fieldsGridsLevel + 10;
     const int cellSize1 = 1 << (particlesGridsLevel - fieldsGridsLevel);
     const int cellSize3 = 1 << (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel) <<  (particlesGridsLevel - fieldsGridsLevel);
@@ -126,7 +126,7 @@
 //************************************************************************
 //************************************************************************ 
     // 0- no current 1- with current
-    const int update_type = 0;  
+    const int update_type = 1;  
 
     // work only with update_type = 1
     // 0- zero velocity 
