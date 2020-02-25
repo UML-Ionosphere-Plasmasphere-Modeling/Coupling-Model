@@ -164,7 +164,6 @@ void ProcessFunc()
             CalculatingAveragedPhoVatGrids( ptrArray, 
                                             ptrVolumeGridArray,
                                             updateInfoPeriod);
-            std::cout << " test1 " << std::endl;
             // Run 2.5.2 
             for( int face = 0; face < 6; face++)
             {
@@ -191,6 +190,7 @@ void ProcessFunc()
                             face); // update E
                 } else
                 {
+            std::cout << " test1 " << std::endl;
                 // 1. Calculate the curl B, need ptrBFaceArray 
                 // With the B on the faces and area vectors
                 ptrVectorCellArray = CurlBCellArray(ptrArray, 
@@ -198,6 +198,7 @@ void ProcessFunc()
                                                     ptrBVectorFaceArray,
                                                     ptrVolumeCellArray,
                                                     face);
+            std::cout << " test2 " << std::endl;
                 // 2. Calculate the gradient of Pe
                 // ( fsize+2 * fsize+2 * fsize)
                 ptrGradVectorCellArray = ValueGradient( ptrVectorCellArray, 
@@ -205,6 +206,7 @@ void ProcessFunc()
                                                     ptrArray, 
                                                     face, 
                                                     'P');
+            std::cout << " test3 " << std::endl;
                 // 3. Calculate the B at the center of cells
                 // 4. Update E at the center of cells and at the grids
                 UpdateECellArray(  ptrArray, 
@@ -212,11 +214,13 @@ void ProcessFunc()
                                    ptrVectorCellArray,
                                    ptrGradVectorCellArray,
                                    face);
+            std::cout << " test4 " << std::endl;
                 // 5. Update B at center of cells and at the grids
                 BVectorFaceArrayUpdate( ptrArray, ptrBVectorFaceArray);
                 BVectorGridsArrayUpdate( ptrArray, ptrBVectorFaceArray);
                 
 
+            std::cout << " test5 " << std::endl;
                 // Update gradient norm B
                 ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
                                                     ptrVolumeCellArray, 

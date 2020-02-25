@@ -2888,24 +2888,41 @@ Vector3*** CurlBCellArray( GridsPoints***** ptrArray_in,
         {
             for( int k = tempGridsCellLevel; k < fieldsGridsSize - tempGridsCellLevel; k++)
             {
+                i = 1;
+                j = 16;
+                std::cout << " Curl " << i << j << k << std::endl;
                 Vector3 temp = AreaVectorL( ptrArray_in, face_in, i, j, k).CrossProduct(
                                ptrBVectorFaceArray[0][face_in][i][j][k]);
+                std::cout << temp.x() << " " << temp.y() << " " << temp.z() << " " << std::endl;
                         temp = temp.PlusProduct(
                                AreaVectorR( ptrArray_in, face_in, i, j, k).CrossProduct(
                                ptrBVectorFaceArray[0][face_in][i+1][j][k]));
+                std::cout << temp.x() << " " << temp.y() << " " << temp.z() << " " << std::endl;
+
+                std::cout << ptrBVectorFaceArray[1][face_in][i][j+1][k].x() <<
+                         " " << ptrBVectorFaceArray[1][face_in][i][j+1][k].y() << 
+                         " " << ptrBVectorFaceArray[1][face_in][i][j+1][k].z() << 
+                         " " << std::endl;
+
                         temp = temp.PlusProduct(
                                AreaVectorT( ptrArray_in, face_in, i, j, k).CrossProduct(
                                ptrBVectorFaceArray[1][face_in][i][j+1][k]));
+                std::cout << temp.x() << " " << temp.y() << " " << temp.z() << " " << std::endl;
                         temp = temp.PlusProduct(
                                AreaVectorBot( ptrArray_in, face_in, i, j, k).CrossProduct(
                                ptrBVectorFaceArray[1][face_in][i][j][k]));
+                std::cout << temp.x() << " " << temp.y() << " " << temp.z() << " " << std::endl;
                         temp = temp.PlusProduct(
                                AreaVectorF( ptrArray_in, face_in, i, j, k).CrossProduct(
                                ptrBVectorFaceArray[2][face_in][i][j][k+1]));
+                std::cout << temp.x() << " " << temp.y() << " " << temp.z() << " " << std::endl;
                         temp = temp.PlusProduct(
                                AreaVectorBack( ptrArray_in, face_in, i, j, k).CrossProduct(
                                ptrBVectorFaceArray[2][face_in][i][j][k]));
+                std::cout << temp.x() << " " << temp.y() << " " << temp.z() << " " << std::endl;
                 double volumetemp = ptrVolumeCellArray[i][j][k];
+
+                std::cout << volumetemp << std::endl;
                 
                 temp = temp.ScaleProduct( 1.0 / volumetemp);
                 ptrVectorCellArray[i][j][k].SetVector3( temp); 
