@@ -2374,7 +2374,7 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     // face 1
     for( int i = 2; i <= fieldsGridsSize+2; i++)
     {
-        for( int k = 0; k <= fieldsGridsSize; k++)
+        for( int k = 0; k < fieldsGridsSize; k++)
         {
         ptrEArray[1][i][0][k] = ptrEArray[5][fieldsGridsSize][fieldsGridsSize+3-i][k]; // bot
         ptrEArray[1][i][1][k] = ptrEArray[5][fieldsGridsSize+1][fieldsGridsSize+3-i][k]; // bot
@@ -2392,7 +2392,7 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     // face 2
     for( int i = 2; i <= fieldsGridsSize+2; i++)
     {
-        for( int k = 0; k <= fieldsGridsSize; k++)
+        for( int k = 0; k < fieldsGridsSize; k++)
         {
         ptrEArray[2][i][0][k] = ptrEArray[0][i][fieldsGridsSize][k]; // bot
         ptrEArray[2][i][1][k] = ptrEArray[0][i][fieldsGridsSize+1][k]; // bot
@@ -2410,7 +2410,7 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     //face 3
     for( int i = 2; i <= fieldsGridsSize+2; i++)
     {
-        for( int k = 0; k <= fieldsGridsSize; k++)
+        for( int k = 0; k < fieldsGridsSize; k++)
         {
         ptrEArray[3][i][0][k] = ptrEArray[5][fieldsGridsSize+3-i][3][k]; // bot
         ptrEArray[3][i][1][k] = ptrEArray[5][fieldsGridsSize+3-i][2][k]; // bot
@@ -2428,7 +2428,7 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     // face 4
     for( int i = 2; i <= fieldsGridsSize+2; i++)
     {
-        for( int k = 0; k <= fieldsGridsSize; k++)
+        for( int k = 0; k < fieldsGridsSize; k++)
         {
         ptrEArray[4][i][0][k] = ptrEArray[5][3][i][k]; // bot
         ptrEArray[4][i][1][k] = ptrEArray[5][2][i][k]; // bot
@@ -2446,7 +2446,7 @@ Vector3***** EVectorCellArray( GridsPoints***** ptrArray)
     // face 5
     for( int i = 2; i <= fieldsGridsSize+2; i++)
     {
-        for( int k = 0; k <= fieldsGridsSize; k++)
+        for( int k = 0; k < fieldsGridsSize; k++)
         {
         ptrEArray[5][i][0][k] = ptrEArray[3][fieldsGridsSize+3-i][3][k]; // bot
         ptrEArray[5][i][1][k] = ptrEArray[3][fieldsGridsSize+3-i][2][k]; // bot
