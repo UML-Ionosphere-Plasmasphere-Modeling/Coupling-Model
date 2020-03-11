@@ -814,6 +814,9 @@ void VectorCellField_Grad( Vector3 ***&cellArray);
 
 void DEL_VectorCellField( Vector3 ***&cellArray);
 
+
+void test_VectorCellField( Vector3 **&cellArray);
+
 //************************************************************************
 //************************************************************************
 // Create Cell centered field array for E 

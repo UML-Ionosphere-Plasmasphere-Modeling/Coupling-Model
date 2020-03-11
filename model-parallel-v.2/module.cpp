@@ -340,7 +340,6 @@ void ProcessFunc()
     DEL_VectorCellField( ptrVelVectorCellArray);
     DEL_VectorCellField( ptrGradVectorCellArray);
 */
-  
 
 }
 

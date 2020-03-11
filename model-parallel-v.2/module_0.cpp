@@ -496,7 +496,6 @@ GridsPoints***** GridsCreation()
 // a pointer(may not need to be a smart pointer), and would not need to 
 // delete, or would be deleted as a smart pointer.
 
-
 void VectorCellField( Vector3 ***&cellArray)
 {
     static Vector3* mem_VectorCellField = new Vector3[ (fieldsGridsSize+2)*(fieldsGridsSize+2)*fieldsGridsSize];
@@ -506,7 +505,7 @@ void VectorCellField( Vector3 ***&cellArray)
         cellArray[i] = new Vector3*[fieldsGridsSize+2];
         for( int j = 0; j < fieldsGridsSize+2; j++)
         {
-            cellArray[i][j] = new Vector3[fieldsGridsSize];
+//            cellArray[i][j] = new Vector3[fieldsGridsSize];
             cellArray[i][j] = mem_VectorCellField + i*(fieldsGridsSize+2)*(fieldsGridsSize)
                             + j* fieldsGridsSize;
             for( int k = 0; k< fieldsGridsSize; k++)
@@ -526,7 +525,6 @@ void VectorCellField_Vel( Vector3 ***&cellArray)
         cellArray[i] = new Vector3*[fieldsGridsSize+2];
         for( int j = 0; j < fieldsGridsSize+2; j++)
         {
-            cellArray[i][j] = new Vector3[fieldsGridsSize];
             cellArray[i][j] = mem_VectorCellField_Vel + i*(fieldsGridsSize+2)*(fieldsGridsSize)
                             + j* fieldsGridsSize;
             for( int k = 0; k< fieldsGridsSize; k++)
@@ -546,7 +544,6 @@ void VectorCellField_Grad( Vector3 ***&cellArray)
         cellArray[i] = new Vector3*[fieldsGridsSize+2];
         for( int j = 0; j < fieldsGridsSize+2; j++)
         {
-            cellArray[i][j] = new Vector3[fieldsGridsSize];
             cellArray[i][j] = mem_VectorCellField_Grad + i*(fieldsGridsSize+2)*(fieldsGridsSize)
                             + j* fieldsGridsSize;
             for( int k = 0; k< fieldsGridsSize; k++)
@@ -1469,7 +1466,7 @@ double*** VolumeGridsField( double*** ptrVolumeCellArray_in)
         VolumeGridsArray[i] = new double*[fieldsGridsSize+1];
         for( int j =0; j < fieldsGridsSize+1; j++)
         {
-            VolumeGridsArray[i][j]= new double [fieldsGridsSize+1];
+//            VolumeGridsArray[i][j]= new double [fieldsGridsSize+1];
             VolumeGridsArray[i][j]= mem_VolumeGridsArray + i* (fieldsGridsSize+1)*(fieldsGridsSize+1) + j*(fieldsGridsSize+1);
             for( int k = 0; k < fieldsGridsSize+1; k++)
             {
@@ -1527,7 +1524,7 @@ double*** VolumeCellsField( GridsPoints***** ptrArray_in)
         VolumeCellsArray[i] = new double*[fieldsGridsSize+2];
         for( int j = 0; j < fieldsGridsSize+2; j++)
         {         
-            VolumeCellsArray[i][j] = new double[fieldsGridsSize];
+//            VolumeCellsArray[i][j] = new double[fieldsGridsSize];
             VolumeCellsArray[i][j] = mem_VolumeCellsArray + i* (fieldsGridsSize)* (fieldsGridsSize+2) 
                                      + j* (fieldsGridsSize);
             for( int k = 0; k< fieldsGridsSize; k++)
@@ -2526,7 +2523,7 @@ Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in)
                 ptrBFaceArray[direction][face][i] = new Vector3*[fieldsGridsSize+1];
                 for( int j = 0; j<fieldsGridsSize+1; j++)
                 {
-                    ptrBFaceArray[direction][face][i][j] = new Vector3[fieldsGridsSize+1];
+//                    ptrBFaceArray[direction][face][i][j] = new Vector3[fieldsGridsSize+1];
                     ptrBFaceArray[direction][face][i][j] = mem_BVectorFaceArray + direction * totalFace * (fieldsGridsSize+1) * (fieldsGridsSize+1)* (fieldsGridsSize+1)
                                                         + face * (fieldsGridsSize+1)* (fieldsGridsSize+1)* (fieldsGridsSize+1)
                                                         + i * (fieldsGridsSize+1)* (fieldsGridsSize+1)
