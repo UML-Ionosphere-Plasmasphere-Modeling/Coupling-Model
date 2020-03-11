@@ -41,9 +41,17 @@ void ProcessFunc()
     Titheridge_Te( ptrArray); // initial Temprature of electron
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     // The size is [fsize+2][fsize+2][fsize+2]
-    Vector3*** ptrVectorCellArray = VectorCellField();  
-    Vector3*** ptrVelVectorCellArray = VectorCellField();
-    Vector3*** ptrGradVectorCellArray= VectorCellField();
+    Vector3*** ptrVectorCellArray = NULL;
+    Vector3*** ptrVelVectorCellArray = NULL;
+    Vector3*** ptrGradVectorCellArray= NULL;
+    VectorCellField( ptrVectorCellArray);
+    VectorCellField_Vel( ptrVelVectorCellArray);
+    VectorCellField_Grad( ptrGradVectorCellArray);
+
+/*    Vector3*** ptrVectorCellArray = VectorCellField();  
+    Vector3*** ptrVelVectorCellArray = VectorCellField_Vel();
+    Vector3*** ptrGradVectorCellArray= VectorCellField_Grad();
+ */
     // Prerun 1.3 // Create grids field array of volum for one face of six
     // The size is [fsize+2][fsize+2][fsize+2]
     std::cout << " Create array of Volume at cells and at grids" << std::endl;
@@ -326,6 +334,13 @@ void ProcessFunc()
     ptrParticlesList_out_H.shrink_to_fit();
     ptrParticlesList_out_He.shrink_to_fit();
     ptrParticlesList_out_O.shrink_to_fit();
+
+/*
+    DEL_VectorCellField( ptrVectorCellArray);
+    DEL_VectorCellField( ptrVelVectorCellArray);
+    DEL_VectorCellField( ptrGradVectorCellArray);
+*/
+  
 
 }
 

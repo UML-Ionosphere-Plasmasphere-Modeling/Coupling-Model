@@ -495,10 +495,12 @@ GridsPoints***** GridsCreation()
 // The data structure is array of Vector3, which is created in heap. Return
 // a pointer(may not need to be a smart pointer), and would not need to 
 // delete, or would be deleted as a smart pointer.
-Vector3*** VectorCellField()
+
+
+void VectorCellField( Vector3 ***&cellArray)
 {
     static Vector3* mem_VectorCellField = new Vector3[ (fieldsGridsSize+2)*(fieldsGridsSize+2)*fieldsGridsSize];
-    Vector3*** cellArray = new Vector3**[fieldsGridsSize+2];
+    cellArray = new Vector3**[fieldsGridsSize+2];
     for( int i = 0; i < fieldsGridsSize+2; i++)
     {
         cellArray[i] = new Vector3*[fieldsGridsSize+2];
@@ -513,24 +515,60 @@ Vector3*** VectorCellField()
             }
         }
     }
-    return cellArray;
-/*
-    Vector3**** cellArray;
-    cellArray = new Vector3***[fieldsGridsSize+2];
+}
+
+void VectorCellField_Vel( Vector3 ***&cellArray)
+{
+    static Vector3* mem_VectorCellField_Vel = new Vector3[ (fieldsGridsSize+2)*(fieldsGridsSize+2)*fieldsGridsSize];
+    cellArray = new Vector3**[fieldsGridsSize+2];
     for( int i = 0; i < fieldsGridsSize+2; i++)
     {
-        cellArray[i] = new Vector3**[fieldsGridsSize+2];
-        for( int j=0; j < fieldsGridsSize+2; j++)
+        cellArray[i] = new Vector3*[fieldsGridsSize+2];
+        for( int j = 0; j < fieldsGridsSize+2; j++)
         {
-            cellArray[i][j] = new Vector3*[fieldsGridsSize];
-            for( int k = 0; k < fieldsGridsSize; k++)
+            cellArray[i][j] = new Vector3[fieldsGridsSize];
+            cellArray[i][j] = mem_VectorCellField_Vel + i*(fieldsGridsSize+2)*(fieldsGridsSize)
+                            + j* fieldsGridsSize;
+            for( int k = 0; k< fieldsGridsSize; k++)
             {
-                cellArray[i][j][k] = new Vector3(0.0, 0.0, 0.0);
+                cellArray[i][j][k] = Vector3(0.0, 0.0, 0.0);
             }
         }
     }
-    return cellArray;
-    */
+}
+
+void VectorCellField_Grad( Vector3 ***&cellArray)
+{
+    static Vector3* mem_VectorCellField_Grad = new Vector3[ (fieldsGridsSize+2)*(fieldsGridsSize+2)*fieldsGridsSize];
+    cellArray = new Vector3**[fieldsGridsSize+2];
+    for( int i = 0; i < fieldsGridsSize+2; i++)
+    {
+        cellArray[i] = new Vector3*[fieldsGridsSize+2];
+        for( int j = 0; j < fieldsGridsSize+2; j++)
+        {
+            cellArray[i][j] = new Vector3[fieldsGridsSize];
+            cellArray[i][j] = mem_VectorCellField_Grad + i*(fieldsGridsSize+2)*(fieldsGridsSize)
+                            + j* fieldsGridsSize;
+            for( int k = 0; k< fieldsGridsSize; k++)
+            {
+                cellArray[i][j][k] = Vector3(0.0, 0.0, 0.0);
+            }
+        }
+    }
+}
+
+// DELET the NEW items
+void DEL_VectorCellField( Vector3 ***&cellArray)
+{
+    for( int i = 0; i < fieldsGridsSize+2; i++)
+    {
+        for( int j = 0; j < fieldsGridsSize+2; j++)
+        {
+            delete[] cellArray[i][j];
+        }
+     //   delete[] cellArray[i];
+    }
+    //delete[] cellArray;
 }
 
 
@@ -1505,6 +1543,8 @@ double*** VolumeCellsField( GridsPoints***** ptrArray_in)
     }
     return VolumeCellsArray;
 }
+
+
 
 
 //************************************************************************

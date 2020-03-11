@@ -806,7 +806,13 @@ GridsPoints***** GridsCreation();
 // The data structure is array of Vector3, which is created in heap. Return
 // a pointer(may not need to be a smart pointer), and would not need to 
 // delete, or would be deleted as a smart pointer.
-Vector3*** VectorCellField();
+void VectorCellField( Vector3 ***&cellArray);
+
+void VectorCellField_Vel( Vector3 ***&cellArray);
+
+void VectorCellField_Grad( Vector3 ***&cellArray);
+
+void DEL_VectorCellField( Vector3 ***&cellArray);
 
 //************************************************************************
 //************************************************************************
