@@ -89,8 +89,8 @@
     // Simulation parameters (unit) s
     const double tstep = 3 ;
     static int timeLineLimit = 240000;
-    static int printTimePeriod = 10; //60000;
-    static int updateInfoPeriod = 5; //10;
+    static int printTimePeriod = 1; //60000;
+    static int updateInfoPeriod = 1; //10;
 
 //************************************************************************
 //************************************************************************

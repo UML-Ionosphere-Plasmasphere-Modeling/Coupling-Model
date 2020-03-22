@@ -536,7 +536,7 @@ inline double EIntegrationL( GridsPoints***** ptrArray_in, int face_in, int i_in
 inline double EIntegrationR( GridsPoints***** ptrArray_in, int face_in, int i_in, int j_in, int k_in)
 {
     int I = i_in +1;
-    int J = j_in +1;
+    int J = j_in;
     int K = k_in +1;
     Vector3 temp1 = ptrArray_in[face_in][I][J][K-1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K]->Pos3());
     Vector3 temp2 = ptrArray_in[face_in][I][J+1][K-1]->Pos3().MinusProduct( ptrArray_in[face_in][I][J][K-1]->Pos3());

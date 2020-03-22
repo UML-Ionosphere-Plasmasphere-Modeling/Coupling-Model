@@ -240,7 +240,6 @@ void ProcessFunc()
                                 face);
                 }
             }
-            std::cout << " test2 " << std::endl;
             // printout 
             if( timeline % printTimePeriod == 0)
             {
