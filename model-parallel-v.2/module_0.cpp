@@ -1829,12 +1829,16 @@ void SetRotationalVelBotBoundary( GridsPoints***** ptrArray_in, int timeline_in)
 
                 latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
 
-                rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
-
-                ptrArray_in[face][i][j][k]->Density_H( rho * ratioH / mi0_H);
-                ptrArray_in[face][i][j][k]->Density_He( rho * ratioHe / mi0_He);
-                ptrArray_in[face][i][j][k]->Density_O( rho * ratioO / mi0_O);
-
+//                rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
+                rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude + PI / 2.0) + A_average;
+                
+                double r = ptrArray_in[face][i][j][k]->Pos3().norm() / radius;
+                double parameter = 0.5 * ( 1.0 - tanh( r - 6.5)) / r;
+                
+                ptrArray_in[face][i][j][k]->Density_H( rho * ratioH / mi0_H * parameter);
+                ptrArray_in[face][i][j][k]->Density_He( rho * ratioHe / mi0_He * parameter);
+                ptrArray_in[face][i][j][k]->Density_O( rho * ratioO / mi0_O * parameter);
+              
                 // set velocity
                 SetRotationalVel(ptrArray_in, face, i, j, k);
                 Vector3 original_vel = ptrArray_in[face][i][j][k]->Vel3();
@@ -1999,7 +2003,7 @@ void SetInitialCondition( GridsPoints***** ptrArray_in, Vector3*** ptrVectorCell
                                         / (ptrArray_in[face][i][j][k+1]->Pos3().norm() - ptrArray_in[face][i][j][k]->Pos3().norm())) ;
                 
                 ptrArray_in[face][i][j][k]->updateE( temp_gradPe);
-
+                
                 k = fieldsGridsSize - 1;
                 
                 temp_gradPe = ptrArray_in[face][i][j][k]->Pos3().NormalizedVector().ScaleProduct( (ptrArray_in[face][i][j][k+1]->Density() * ptrArray_in[face][i][j][k+1]->Temperature() -
@@ -2259,7 +2263,7 @@ void GradBNorm( GridsPoints***** ptrArray_in)
                     
                     ptrArray_in[face][i][j][k]->XYZtoGradBNorm();
 
-                    // set stopSign
+                    // set stopSigns
                     ptrArray_in[face][i][j][k]->SetStopSign(1);
                 }
             }

@@ -98,13 +98,48 @@ inline void XYZtoDensity( )
     scaleHeight = ikT / mi0_O / gravity;
     if( pos3.norm() > 0)
     density_O= N0_O * exp(-1 * (pos3.norm() - radius) / scaleHeight);  
-*/
+
     double r = pos3.norm() / radius;
     if( r > 0){
     density_H = N0_H / r * ( 1.0 - tanh( r - 6.5));
     density_He= N0_He / r * ( 1.0 - tanh( r - 6.5));
     density_O = N0_O / r * ( 1.0 - tanh( r - 6.5));
     }
+*/
+    // Set density for sin function
+    double PI = 3.1415926535897;
+    double x = pos3.x();
+    double y = pos3.y();
+    double z = pos3.z();
+    double longtitude;
+    double latitude;
+    double A = 0.5 * ( rho_max - rho_min);
+    double A_average = 0.5 * ( rho_max + rho_min);
+    double rho;
+    if( x == 0 && y == 0)
+    { rho = A_average;}
+    else if( x == 0 && y > 0)
+    { longtitude = PI / 2.0;}
+    else if( x == 0 && y < 0)
+    { longtitude = PI / 2.0 * 3.0;}
+    else if( x!= 0)
+    {
+    
+    longtitude = atan( y / x);
+    if( x<0) { longtitude = longtitude + PI;}
+    }
+    latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
+//      rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
+    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude + PI / 2.0) + A_average;
+    
+    double r = pos3.norm() / radius;
+    double parameter = 0.5 * ( 1.0 - tanh( r - 6.5)) / r;
+    
+    density_H = rho * ratioH / mi0_H * parameter;
+    density_He= rho * ratioHe / mi0_He * parameter;
+    density_O = rho * ratioO / mi0_O * parameter;
+    
+    
 }
 //************************************************************************
 //************************************************************************

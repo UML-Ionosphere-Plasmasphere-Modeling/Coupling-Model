@@ -68,10 +68,9 @@ void ProcessFunc()
     Vector3***** ptrBVectorFaceArray = BVectorFaceArray( ptrArray);
     
     // Initialize condition
-    if( update_type == 0)
-    {
-        SetInitialCondition( ptrArray, ptrVectorCellArray, ptrVolumeCellArray);
-    }
+    
+    SetInitialCondition( ptrArray, ptrVectorCellArray, ptrVolumeCellArray);
+    
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     
