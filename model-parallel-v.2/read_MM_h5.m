@@ -3,10 +3,11 @@ clear all;clc
 close all
 clearvars -except inputyear mode    
 % h5_files=dir(['c:\Users\Yifan\Documents\GitHub\Coupling-Model\PICmodel\*.h5']);
-h5_files=dir(['c:\Users\Yifan\Documents\Github\Coupling-Model\PICmodel\GridsData.h5']);
+h5_files=dir(['c:\Users\Yifan\Documents\Github\Coupling-Model\model-parallel-v.2\GridsData.h5']);
 h5_files=struct2cell(h5_files);
 h5_files=h5_files(1,:)';
 
+% important: the face index is from 1-6, not like 0-5 in C code
 
 for roll=1:numel(h5_files)
 close all
@@ -17,13 +18,13 @@ filesinfo=h5info(h5_files{roll});
 % h1=h5disp(h5_files{roll});
 % gpsinfo=hdf5info('D:\DATA_calculation\TEC_mat\2015\gps150314g.001.hdf5');
 data_const = h5read(h5_files{roll},'/ArrayOfGrids_const');
-data=h5read(h5_files{roll},'/ArrayOfGrids_5');
+data=h5read(h5_files{roll},'/ArrayOfGrids_1');
 toc;
 
 % control panel
-gridsize = 65;
-showsize = 33;
-templevel = 1;
+gridsize = 17;
+showsize = 17;
+templevel = 1; % level overlap with other possible region
 %%%%%%%%%%%%%%
 
 k_level = [(templevel+2):(gridsize-1-templevel)];

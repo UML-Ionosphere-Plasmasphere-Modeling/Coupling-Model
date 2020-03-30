@@ -135,10 +135,13 @@
     // 1- normal velocity for all ( not applied)
     //    increased outer boundary velocity
     //    normal density for all
-    const int initial_bot_type = 0;
+
+    // 0- no convectional bot boundary
+    // 1- with convectional bot boundary
+    const int initial_bot_type = 1;
     // 0- no convectional top boundary
     // 1- with convectional top boundary
-    const int initial_top_type = 1;
+    const int initial_top_type = 0;
 
     const double botBoundaryInitialTimeStart = 0.0;
     const double topBoundaryInitialTimeStart = 180.0;

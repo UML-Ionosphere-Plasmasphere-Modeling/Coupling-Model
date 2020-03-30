@@ -130,11 +130,12 @@ inline void XYZtoDensity( )
     }
     latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
 //      rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
-    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude + PI / 2.0) + A_average;
     
-    double r = pos3.norm() / radius;
+    double r = pos3.norm() / radius; // r is a non-unit value
     double parameter = 0.5 * ( 1.0 - tanh( r - 6.5)) / r;
     
+    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude + PI / 2.0) / pow(r, 6.0) + A_average;
+
     density_H = rho * ratioH / mi0_H * parameter;
     density_He= rho * ratioHe / mi0_He * parameter;
     density_O = rho * ratioO / mi0_O * parameter;
@@ -335,6 +336,11 @@ inline void updateE( Vector3 GradPe_in)
         
     }
     
+}
+
+inline void SetE3( const Vector3 E3_other)
+{
+    e3.SetVector3( E3_other);
 }
 
 // Update ve from ampere's law

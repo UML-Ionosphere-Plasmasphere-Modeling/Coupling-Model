@@ -141,7 +141,7 @@ void ProcessFunc()
         { 
             if( timeline >= botBoundaryInitialTimeStart/tstep && 
                 timeline <= (botBoundaryInitialTimeStart+botBoundaryInitialTime)/tstep &&
-                initial_bot_type ==0)
+                initial_bot_type ==1)
             {
                 SetRotationalVelBotBoundary( ptrArray, timeline);
             }
