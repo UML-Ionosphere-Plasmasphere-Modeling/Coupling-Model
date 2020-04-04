@@ -1419,18 +1419,17 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in)
 
     if(h5FileCheck_in == 0)
     {
-        h5FileCheck = 1;
         H5File* file = new H5File( FILE_NAME, H5F_ACC_TRUNC);
 
+        // print const values at timeline = 0
         DataSet* dataset_const;
         dataset_const = new DataSet(file->createDataSet( DATASET_CONST_NAME, mtype_grids_const, space));
         dataset_const->write( array_data_const[0][0][0], mtype_grids_const);
 
         delete dataset_const;
-        delete data_mem_const;
+        delete data_mem_const;  // notice where is the definition
 
         delete file;
-
     }
     else
     {

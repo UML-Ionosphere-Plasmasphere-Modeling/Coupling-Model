@@ -132,7 +132,7 @@ void ProcessFunc()
     cout << " Start" << endl;
 
 
-    for( int timeline = 1; timeline <= timeLineLimit; timeline++)   // timeline start with 1
+    for( int timeline = 0; timeline <= timeLineLimit; timeline++)   // timeline start with 1
     {
         std::cout << " timeline " << timeline << std::endl;
         // set boundary condition: 60s initial time interval
@@ -154,14 +154,14 @@ void ProcessFunc()
         }
         
         // const info print out
-        if( timeline == 1)
+        if( timeline == 0)
         {
             std::cout << " PrintOut Const" << std::endl;
             PrintOutHdf5( ptrArray, timeline, h5FileCheck);
             h5FileCheck = 1;
         }
         // average pho, v, update grids info B, E & reset pho, v
-        if( timeline % updateInfoPeriod ==0)
+        if( timeline % updateInfoPeriod ==0 && timeline != 0)
         {
             cout << timeline << " H " << ptrParticlesList_H.size() << " " << ptrParticlesList_out_H.size();
             cout << " He " << ptrParticlesList_He.size() << " " << ptrParticlesList_out_He.size();
@@ -239,16 +239,17 @@ void ProcessFunc()
                                 face);
                 }
             }
-            // printout 
-            if( timeline % printTimePeriod == 0)
-            {
-                std::cout << " PrintOut  " << timeline << " " << h5FileCheck <<std::endl;
-                PrintOutHdf5( ptrArray, timeline, h5FileCheck);
-            }
             // reset pho and v
             ResetPhoVatGrids( ptrArray);
         }
-
+        
+        // printout 
+        if( timeline % printTimePeriod == 0)
+        {
+            std::cout << " PrintOut  " << timeline << " " << h5FileCheck <<std::endl;
+            PrintOutHdf5( ptrArray, timeline, h5FileCheck);
+        }
+        
         // iterate particles
         IterateParticlesMain(   ptrArray, 
                                 ptrParticlesList_H, 

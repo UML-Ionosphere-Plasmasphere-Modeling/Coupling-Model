@@ -515,6 +515,7 @@ inline void SetStopSign( int stopSign_in)
     
     private:
     Vector3 pos3;            // pos3: position for vector 3
+    
     Vector3 e3;             // e3
 
     Vector3 b3;             // b3
