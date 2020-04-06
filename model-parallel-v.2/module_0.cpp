@@ -3006,7 +3006,7 @@ void UpdateECellArray(  GridsPoints***** ptrArray,
     {
         for( int j = 1; j < fieldsGridsSize+2; j++)
         {
-            for( int k = 1; k < fieldsGridsSize; k++)
+            for( int k = tempGridsCellLevel; k < fieldsGridsSize - tempGridsCellLevel; k++)
             {
                 Vector3 EVector = Vector3(0.0, 0.0, 0.0);
                     
