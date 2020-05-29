@@ -161,7 +161,7 @@ inline uint_64 Uint_64_Trans()
 // (vector v3)    (z)      (c3)
 // Solve for ( x, y ,z) and the v is the face area vector, and c1 is the integration
 // of E along the completed loop for outside direction
-inline Vector3 FaceBSolver( const Vector3& v1, const Vector3& v2, const Vector3& v3,
+inline void FaceBSolver( const Vector3& v1, const Vector3& v2, const Vector3& v3,
                             const double& c1, const double& c2, const double& c3)
                             {
                               

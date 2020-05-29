@@ -11,7 +11,7 @@ struct structg
         int iw;  int jw;  int kw;
         double vx; double vy; double vz;
 //        Vector3 vp;
-        double mass;
+//        double mass;
     };
 
 

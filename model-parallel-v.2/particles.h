@@ -25,7 +25,7 @@ public:
 //************************************************************************
 inline structg InttoStrp1()
 {
-    struct structg strg = {0,0,0,0,0,0,0, 0.0, 0.0, 0.0, 0.0};
+    struct structg strg = {0,0,0,0,0,0,0, 0.0, 0.0, 0.0};
     strg.face = posUint >> 61;
 //std::cout << posUint << " "<< strg.face <<" "<< strg.ig<<" "<< strg.jg<<" "<< strg.kg << std::endl;
     for( int i = 0; i < fieldsGridsLevel; i++) 
@@ -43,7 +43,7 @@ inline structg InttoStrp1()
         strg.kw = (strg.kw << 1) + ((posUint >> 60-2 - i*3) & 1);
     }
     strg.vx = vp.x(); strg.vy = vp.y(); strg.vz = vp.z();
-    strg.mass = mass1;
+//    strg.mass = mass1;
 
 /*    std::cout << std::bitset<64>(posUint) << " "<< strg.face <<" "<< strg.ig<<" "<< strg.jg<<" "<< strg.kg << " "
               << strg.iw << " " << strg.jw << " " << strg.kw << std::endl;
@@ -75,7 +75,7 @@ inline structg InttoStrp2()
         strg.kw = (strg.kw << 1) + ((posUint >> 60-2 - i*3) & 1);
     }
     strg.vx = vp.x(); strg.vy = vp.y(); strg.vz = vp.z();
-    strg.mass = mass2;
+//    strg.mass = mass2;
     return strg;
 }
 
@@ -88,7 +88,7 @@ inline structg InttoStrp2()
 //
 //************************************************************************
 //************************************************************************
-int BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double mi0_in);
+int BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double mi0_in, int maindomain);
 
 //************************************************************************
 //************************************************************************
@@ -99,6 +99,7 @@ int BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double m
 //************************************************************************
 //************************************************************************
 int UpdateUint_64();
+int UpdateUint_64_temp();
 
 inline void SetOutParticles()
 {

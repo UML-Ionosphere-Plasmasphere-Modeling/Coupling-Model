@@ -18,19 +18,19 @@ filesinfo=h5info(h5_files{roll});
 % h1=h5disp(h5_files{roll});
 % gpsinfo=hdf5info('D:\DATA_calculation\TEC_mat\2015\gps150314g.001.hdf5');
 data_const = h5read(h5_files{roll},'/ArrayOfGrids_const');
-data=h5read(h5_files{roll},'/ArrayOfGrids_1');
+data=h5read(h5_files{roll},'/ArrayOfGrids_200');
 toc;
 
 % control panel
-gridsize = 17;
-showsize = 17;
+gridsize = 17; % fsize+1
+showsize = 3; % shell
 templevel = 1; % level overlap with other possible region
 %%%%%%%%%%%%%%
 
 k_level = [(templevel+2):(gridsize-1-templevel)];
 
 
-face=[3,6];
+face=[1,2,3,4,5,6];
 posx=data_const.pos3.x(:,:,:,face)/1e3/(6371);
 posy=data_const.pos3.y(:,:,:,face)/1e3/(6371);
 posz=data_const.pos3.z(:,:,:,face)/1e3/(6371);
@@ -50,6 +50,18 @@ Ey_const=data_const.e3.y(showsize,:,:,face);
 Ez_const=data_const.e3.z(showsize,:,:,face);
 
 
+denH_const=data_const.densityH(showsize,:,:,face);
+denH_showsize = data.densityH(showsize,:,:,face);
+
+Vx_showsize=data.v3.x(showsize,:,:,face);
+Vy_showsize=data.v3.y(showsize,:,:,face);
+Vz_showsize=data.v3.z(showsize,:,:,face);
+Ex_showsize=data.e3.x(showsize,:,:,face);
+Ey_showsize=data.e3.y(showsize,:,:,face);
+Ez_showsize=data.e3.z(showsize,:,:,face);
+
+
+
 figure(1)
 plot3(reshape(posx,[],1),reshape(posy,[],1),reshape(posz,[],1),'o');hold on
 grid on
@@ -57,6 +69,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('pos')
 
 figure(2)
 quiver3(reshape(posx,[],1),reshape(posy,[],1),reshape(posz,[],1),reshape(Bx_const,[],1),reshape(By_const,[],1),reshape(Bz_const,[],1),3,'b');hold on
@@ -65,6 +78,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('B-const')
 
 figure(3)
 quiver3(reshape(posx_const,[],1),reshape(posy_const,[],1),reshape(posz_const,[],1),reshape(Ex_const,[],1),reshape(Ey_const,[],1),reshape(Ez_const,[],1),3,'b');hold on
@@ -74,6 +88,7 @@ xlabel('X')
 ylabel('Y')
 zlabel('Z')
 view(-55,45)
+title('E-const')
 
 figure(4)
 quiver3(reshape(posx_const,[],1),reshape(posy_const,[],1),reshape(posz_const,[],1),reshape(Vx_const,[],1),reshape(Vy_const,[],1),reshape(Vz_const,[],1),3,'b');hold on
@@ -83,9 +98,51 @@ xlabel('X')
 ylabel('Y')
 zlabel('Z')
 view(-55,45)
+title('v-const')
+
+figure(5)
+scatter3(reshape(posx_const,[],1),reshape(posy_const,[],1),reshape(posz_const,[],1),10,reshape(denH_const,[],1),'filled');hold on
+grid on
+box on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+view(-55,45)
+title('denH-const')
+colorbar()
+set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
 
 
+figure(6)
+scatter3(reshape(posx_const,[],1),reshape(posy_const,[],1),reshape(posz_const,[],1),10,reshape(denH_showsize,[],1),'filled');hold on
+grid on
+box on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+view(-55,45)
+title('denH-showsize')
+colorbar
+set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
 
+
+figure(7)
+quiver3(reshape(posx_const,[],1),reshape(posy_const,[],1),reshape(posz_const,[],1),reshape(Vx_showsize,[],1),reshape(Vy_showsize,[],1),reshape(Vz_showsize,[],1),3,'b');hold on
+grid on
+box on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+title('v-showsize')
+
+figure(8)
+quiver3(reshape(posx_const,[],1),reshape(posy_const,[],1),reshape(posz_const,[],1),reshape(Ex_showsize,[],1),reshape(Ey_showsize,[],1),reshape(Ez_showsize,[],1),3,'b');hold on
+grid on
+box on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+title('E-showsize')
 
 
 
@@ -107,6 +164,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')    
+title('v-ion')
 set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
 
 %equatorial plane density 
@@ -119,6 +177,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('den_O')
 colorbar
 set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
 
@@ -132,6 +191,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('den_H')
 colorbar
 set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
         
@@ -152,6 +212,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('vO')
 set(gca,'Xlim',[-5,5],'Ylim',[-0.5,0.5],'Zlim',[-5,5])
     
 
@@ -165,6 +226,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('den_O')
 colorbar
 set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
    
@@ -181,6 +243,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('vH')
 set(gca,'Xlim',[-5,5],'Ylim',[-0.5,0.5],'Zlim',[-5,5])
     
 
@@ -194,6 +257,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('den_H')
 colorbar
 set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
 
@@ -231,6 +295,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('v_O')
 set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
 
 % vertical plane density dawn/dust O
@@ -242,6 +307,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('den_O')
 colorbar
 
 
@@ -271,6 +337,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('v_H')
 set(gca,'Xlim',[-5,5],'Ylim',[-5,5],'Zlim',[-5,5])
 
 % vertical plane density dawn/dust H
@@ -282,6 +349,7 @@ box on
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
+title('den_H')
 colorbar
 
 %%%

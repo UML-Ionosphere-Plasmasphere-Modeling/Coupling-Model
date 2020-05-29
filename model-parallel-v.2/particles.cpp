@@ -66,36 +66,43 @@ int Particles::UpdateUint_64()
     }    
     else
     {
-        kp = static_cast<uint_64>( floor( log10(L / LMin)/logRatio *cellSize1)); 
-        // 4.2 XYZtoUV, note that -1<UV<1 
-        face = Getface(px, py, pz);
-        switch (face)
+        double tempRandom = (double) rand() / (RAND_MAX);
+        if( (L > LMax_centraldomain || L < LMin_centraldomain) && tempRandom < neutralizeRate)
         {
-        case 0: temp[0] = py/px; temp[1] = pz/px; break;
-        case 1: temp[0] =-px/py; temp[1] = pz/py; break;
-        case 2: temp[0] = py/pz; temp[1] =-px/pz; break;
-        case 3: temp[0] = py/px; temp[1] =-pz/px; break;
-        case 4: temp[0] =-px/py; temp[1] =-pz/py; break;
-        default:temp[0] =-py/pz; temp[1] =-px/pz; break;
-        }
-        // 4.3 UVtoST, note that 0<ST<1
-        for (int i=0; i<=1; i++)
+            check = 1;
+            return check;
+        } else
         {
-        if (temp[i] >= 0) temp[i] = 0.5 * std::sqrt(1 + 3*temp[i]);
-        else            temp[i] = 1 - 0.5 * std::sqrt(1 - 3*temp[i]);
-        }
-        // 4.4 STtoIpJp
-        ip= static_cast<unsigned int>(floor(temp[0] * particlesGridsSize ));
-        jp= static_cast<unsigned int>(floor(temp[1] * particlesGridsSize ));
+            kp = static_cast<uint_64>( floor( log10(L / LMin)/logRatio *cellSize1)); 
+            // 4.2 XYZtoUV, note that -1<UV<1 
+            face = Getface(px, py, pz);
+            switch (face)
+            {
+            case 0: temp[0] = py/px; temp[1] = pz/px; break;
+            case 1: temp[0] =-px/py; temp[1] = pz/py; break;
+            case 2: temp[0] = py/pz; temp[1] =-px/pz; break;
+            case 3: temp[0] = py/px; temp[1] =-pz/px; break;
+            case 4: temp[0] =-px/py; temp[1] =-pz/py; break;
+            default:temp[0] =-py/pz; temp[1] =-px/pz; break;
+            }
+            // 4.3 UVtoST, note that 0<ST<1
+            for (int i=0; i<=1; i++)
+            {
+            if (temp[i] >= 0) temp[i] = 0.5 * std::sqrt(1 + 3*temp[i]);
+            else            temp[i] = 1 - 0.5 * std::sqrt(1 - 3*temp[i]);
+            }
+            // 4.4 STtoIpJp
+            ip= static_cast<unsigned int>(floor(temp[0] * particlesGridsSize ));
+            jp= static_cast<unsigned int>(floor(temp[1] * particlesGridsSize ));
 
-        // 5. F ip jp kp to Uint_64
-        posUint = face << 61 ;
-        for( int i = 0; i < particlesGridsLevel; i++)
-        {
-        posUint += (((ip >> particlesGridsLevel-1-i) & 1 )<< 60 - i *3) 
-                    + (((jp >> particlesGridsLevel-1-i) & 1 )<< 60-1 - i *3)
-                    + (((kp >> particlesGridsLevel-1-i) & 1 )<< 60-2 - i *3) ;
-        }
+            // 5. F ip jp kp to Uint_64
+            posUint = face << 61 ;
+            for( int i = 0; i < particlesGridsLevel; i++)
+            {
+            posUint += (((ip >> particlesGridsLevel-1-i) & 1 )<< 60 - i *3) 
+                        + (((jp >> particlesGridsLevel-1-i) & 1 )<< 60-1 - i *3)
+                        + (((kp >> particlesGridsLevel-1-i) & 1 )<< 60-2 - i *3) ;
+            }
 /*        std::cout << " next " << std::endl;
     std::cout << std::bitset<64>(face) << " " << face << std::endl;
     std::cout << std::bitset<64>(ip) << " " << ip << std::endl;
@@ -103,8 +110,91 @@ int Particles::UpdateUint_64()
     std::cout << std::bitset<64>(kp) << " " << kp << std::endl << std::endl;
     int pause;
     std::cin >>pause;
-*/
-    return check;        
+*/  
+            return check;        
+        }
+        
+    }
+}
+
+//************************************************************************
+//************************************************************************
+// FUNCTION // Update uint_64 IN 
+// And return a int "0" means in the main domain
+// "1" means out of the main domain
+//************************************************************************
+//************************************************************************
+int Particles::UpdateUint_64_temp()
+{
+    uint_64 face = 0, ip = 0, jp = 0, kp = 0;
+    double px, py, pz;
+    double temp[2];
+    int check=0;
+
+    px = posP.x(); py = posP.y(); pz = posP.z();
+    // 3. update double x y z
+    px += vp.x() * tstep;
+    py += vp.y() * tstep;
+    pz += vp.z() * tstep;
+
+    // 4. transfor to face ip kp jp
+    // 4.1 radial kp
+    double L = sqrt( px*px + py*py + pz*pz )/radius;
+
+    // check if in the main domain
+    if( L > LMax_centraldomain || L < LMin_centraldomain) 
+    {
+        // in this case, did not update posint64
+        check = 1;
+        return check;
+    }    
+    else if( L > LMax || L < LMin)
+    {
+        // in this case, set out of whole domain
+        check = 2; 
+        return check;
+    } else
+    {
+            kp = static_cast<uint_64>( floor( log10(L / LMin)/logRatio *cellSize1)); 
+            // 4.2 XYZtoUV, note that -1<UV<1 
+            face = Getface(px, py, pz);
+            switch (face)
+            {
+            case 0: temp[0] = py/px; temp[1] = pz/px; break;
+            case 1: temp[0] =-px/py; temp[1] = pz/py; break;
+            case 2: temp[0] = py/pz; temp[1] =-px/pz; break;
+            case 3: temp[0] = py/px; temp[1] =-pz/px; break;
+            case 4: temp[0] =-px/py; temp[1] =-pz/py; break;
+            default:temp[0] =-py/pz; temp[1] =-px/pz; break;
+            }
+            // 4.3 UVtoST, note that 0<ST<1
+            for (int i=0; i<=1; i++)
+            {
+            if (temp[i] >= 0) temp[i] = 0.5 * std::sqrt(1 + 3*temp[i]);
+            else            temp[i] = 1 - 0.5 * std::sqrt(1 - 3*temp[i]);
+            }
+            // 4.4 STtoIpJp
+            ip= static_cast<unsigned int>(floor(temp[0] * particlesGridsSize ));
+            jp= static_cast<unsigned int>(floor(temp[1] * particlesGridsSize ));
+
+            // 5. F ip jp kp to Uint_64
+            posUint = face << 61 ;
+            for( int i = 0; i < particlesGridsLevel; i++)
+            {
+            posUint += (((ip >> particlesGridsLevel-1-i) & 1 )<< 60 - i *3) 
+                        + (((jp >> particlesGridsLevel-1-i) & 1 )<< 60-1 - i *3)
+                        + (((kp >> particlesGridsLevel-1-i) & 1 )<< 60-2 - i *3) ;
+            }
+/*        std::cout << " next " << std::endl;
+    std::cout << std::bitset<64>(face) << " " << face << std::endl;
+    std::cout << std::bitset<64>(ip) << " " << ip << std::endl;
+    std::cout << std::bitset<64>(jp) << " " << jp << std::endl;
+    std::cout << std::bitset<64>(kp) << " " << kp << std::endl << std::endl;
+    int pause;
+    std::cin >>pause;
+*/  
+            return check;        
+        
     }
 }
 
@@ -116,7 +206,7 @@ int Particles::UpdateUint_64()
 //
 //************************************************************************
 //************************************************************************
-int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double mi0_in)
+int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_in, double mi0_in, int maindomain)
 {
     // 1. pre-set some variables
     // 1.1 qtm = q * dt / m /2 
@@ -219,7 +309,6 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
 
     // mu / e , mu = m * v^2 / e / B
     tempGradB = tempGradB.ScaleProduct( mu / qi0 );
-
     // revised E including gravity and gradB
     tempe = tempe.PlusProduct(tempPos).PlusProduct(tempGradB.ScaleProduct( -1.0));
     
@@ -240,8 +329,14 @@ int Particles::BorisMethod( struct structg *strg_in, GridsPoints***** ptrArray_i
     // 2.4 equation IV: v = v3 + E * qtm
     vp = v3.PlusProduct(tempe.ScaleProduct(qtm));
     // 3. update the postion 
-    return UpdateUint_64();
-
+    if( maindomain == 0)
+    {
+        return UpdateUint_64();
+    } else
+    {
+        return UpdateUint_64_temp();
+    }
+    
 }
 
 

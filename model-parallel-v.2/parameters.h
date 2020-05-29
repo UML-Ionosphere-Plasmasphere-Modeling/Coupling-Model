@@ -27,6 +27,8 @@
     const double mi0_O = 2.656e-26;
     // Vacuum permeability mu0
     const double mu0 = 1.256637e-6;
+    // Const 1eV = 
+    const double energy1eV = 1.60217662e-19;
 
     // ion kT k =  1.38 x 10−23 J·K−1, T = 1000 K
     const double ikT = 1.38e-20;
@@ -59,6 +61,7 @@
     const int fieldsGridsSize = 1 << fieldsGridsLevel;
     const int particlesGridsSize = 1 << particlesGridsLevel;
     const int tempGridsCellLevel = 1;
+    const int coverGridsCellLevel = 1;
   //  extern uint_64 fieldsGridsSize;
    // extern uint_64 particlesGridsSize;
     //extern uint_64 radialGridsSize;
@@ -78,8 +81,10 @@
     const double LMax = LMin * pow(ratio, fieldsGridsSize);
 
     
-    const double LMin_maindomain = LMin * pow(ratio, 1.0);
-    const double LMax_maindomain = LMin * pow(ratio, fieldsGridsSize-1);
+    const double LMin_maindomain = LMin * pow(ratio, tempGridsCellLevel - coverGridsCellLevel);
+    const double LMax_maindomain = LMin * pow(ratio, fieldsGridsSize-tempGridsCellLevel+coverGridsCellLevel);
+    const double LMin_centraldomain = LMin * pow(ratio, tempGridsCellLevel);
+    const double LMax_centraldomain = LMin * pow(ratio, fieldsGridsSize-tempGridsCellLevel);
 //************************************************************************
 //************************************************************************
 // run time control
@@ -87,11 +92,11 @@
 //************************************************************************
 
     // Simulation parameters (unit) s
-    const double tstep = 0.01 ;
+    const double tstep = 0.1 ;
     static int timeLineLimit = 240000;
-    static int printTimePeriod = 1; //60000;
-    static int updateInfoPeriod = 1; //10;
-
+    static int printTimePeriod = 3; //60000;
+    static int printTimePeriodParticles = 3; // 200
+    static int updateInfoPeriod = 3; //10;
 //************************************************************************
 //************************************************************************
 // For printout
@@ -99,6 +104,8 @@
 //************************************************************************
     
     static int h5FileCheck = 0; // 0: create a new h5, 1: open exist h5
+    static int continueParticles = 0; // 0: create a new particles array
+                                        // 1: read from file
 
 
 //************************************************************************
@@ -108,6 +115,7 @@
 //************************************************************************           
     const double mu_MaxwellDis = 0.0;
     const double sigma_MaxwellDis = 0.15;
+    const double neutralizeRate = 0.05;
     // number density at base level ( / m^3) for H
     const double N0_H =  100000000000.0;
     // number density at base level for He
@@ -115,7 +123,7 @@
     // number density at base level for O
     const double N0_O =  100000000000.0;
     // initial particle numbers per cell ( count)
-    const int iniParticleNumberPerCell = 10;
+    const int iniParticleNumberPerCell = 50;
     // temp cell particle number per cell ( count)
     const int tempParticleNumberPerCell = 100;
 
@@ -162,7 +170,7 @@
 // For bot boundary initialization, in degree
 //************************************************************************
 //************************************************************************ 
-    const double rho_max = 7.0e-18;
+    const double rho_max = 1.0e-17;
     const double rho_min = 1.0e-18;
     const double ratioH = 1.0 / 3.0;
     const double ratioHe = 1.0 /3.0;

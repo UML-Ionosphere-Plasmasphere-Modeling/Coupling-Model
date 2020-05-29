@@ -10,6 +10,9 @@
 #include <cmath>
 #include <limits>
 #include <bitset>
+#include <vector>
+
+using std::vector;
 
 
 //************************************************************************
@@ -786,6 +789,25 @@ void UpdateGradBNorm( Vector3*** gradBNorm_in, GridsPoints***** ptrArray_in, int
 // Step 1: Generate a new matrix fulling with gridspoints class
 // Step 2: Print out it as .h5
 void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in);
+//************************************************************************
+//************************************************************************
+// FUNCTION
+// Printout the particles
+void PrintOutHdf5_Particles(int timeline, 
+                            vector<Particles>& ptrParticlesList_H,
+                            vector<Particles>& ptrParticlesList_He,
+                            vector<Particles>& ptrParticlesList_O);
+                            
+//************************************************************************
+//************************************************************************
+// Read particles
+void ReadParticlesVector(   vector<Particles>& ptrParticlesList_H,
+                            vector<Particles>& ptrParticlesList_He,
+                            vector<Particles>& ptrParticlesList_O,
+                            vector<int>& ptrParticlesList_out_H,
+                            vector<int>& ptrParticlesList_out_He,
+                            vector<int>& ptrParticlesList_out_O
+                            );
 
 //************************************************************************
 //************************************************************************
@@ -794,6 +816,9 @@ void PrintOutHdf5( GridsPoints***** ptrArray_in, int i_in, int h5FileCheck_in);
 
 GridsPoints***** GridsCreation();
 
+GridsPoints***** GridsCreation( GridsPoints***** ptrArray, int gridsSize);
+
+ void InitializeTempGrids( GridsPoints***** ptrArray, GridsPoints***** ptrArray_bot, GridsPoints***** ptrArray_top, int gridsSize);
 //************************************************************************
 //************************************************************************
 // FUNCTION // Set up a matrix to store the curl E or B for Faraday's Law
@@ -826,7 +851,9 @@ Vector3***** EVectorCellArray(GridsPoints***** ptrArray);
 //************************************************************************
 // FUNCTION
 // finish culmulating and average the density and velocity
-void CalculatingAveragedPhoVatGrids(GridsPoints***** ptrArray_in, 
+void CalculatingAveragedPhoVatGrids(GridsPoints***** ptrArray_in,  
+                                    GridsPoints***** ptrArray_bot, 
+                                    GridsPoints***** ptrArray_top,
                                     double*** ptrVolumeGridArray_in,
                                     int updateInfoPeriod_in);
                                     
@@ -856,6 +883,13 @@ void SetConvectionVelTopBoundary( GridsPoints***** ptrArray_in, int timeline_in)
 // The size of this array is [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
 Vector3***** BVectorFaceArray( GridsPoints***** ptrArray_in);
 
+
+//************************************************************************
+//************************************************************************
+// Prerun 1.6 // Create const array of B at center of each cells
+// [totalface * fsize+2 * fsize+2 * fsize +2]
+Vector3***** BVectorCellArray( GridsPoints***** ptrArray); 
+
 //************************************************************************
 //************************************************************************
 // FUNCTION 
@@ -879,9 +913,10 @@ Vector3*** CurlBCellArray( GridsPoints***** ptrArray,
 // Calculate the curl B at the center of each cell   
 void UpdateECellArray(  GridsPoints***** ptrArray, 
                         Vector3***** ptrEVectorCellArray,
-                        Vector3*** CurlBCellArray,
+                        Vector3*** ptrVeleVectorCellArray,
+                        Vector3*** ptrVectorCellArray,
                         Vector3*** ptrGradVectorCellArray,
-                        int face_in);
+                        int face);
                         
 // ******************************************************
 // Update the B on each grids

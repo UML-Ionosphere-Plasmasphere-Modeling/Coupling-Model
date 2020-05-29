@@ -29,8 +29,7 @@ using std::make_shared;
 void ParticlesLists(vector<Particles>& listsPtr_in,
                     GridsPoints***** ptrArray_in, 
                     double*** ptrVolumeCellArray_in, 
-                    double mi0, 
-                    double N0)
+                    double mi0)
 {
    //list<Particles> listP;
 //    auto listsPtr = make_shared<list<Particles>>();
@@ -44,12 +43,22 @@ void ParticlesLists(vector<Particles>& listsPtr_in,
         {
             for( int k = 1; k <= fieldsGridsSize; k++)
             {
-                for( int s = 1; s <= fieldsGridsSize-2; s++)
+                for( int s = tempGridsCellLevel; s <= fieldsGridsSize-tempGridsCellLevel-1; s++)
                 {
                     // number of real particles ( notice the unit is number density)
                     //double N = N0 * exp(-1.0 * (ptrArray_in[i][j][k][s]->Pos3().norm() - radius) / scaleHeight);
                     double r = ptrArray_in[i][j][k][s]->Pos3().norm() / radius;
-                    double N = N0 / r * ( 1.0 - tanh( r - 6.5));
+                    double N ;
+                    if( mi0 == mi0_H)
+                    {
+                        N = ptrArray_in[i][j][k][s]->Density_H() * 0.5 + ptrArray_in[i][j][k][s+1]->Density_H() *0.5;
+                    } else if ( mi0 == mi0_He)
+                    {
+                        N = ptrArray_in[i][j][k][s]->Density_He() * 0.5 + ptrArray_in[i][j][k][s+1]->Density_He() *0.5;
+                    } else if ( mi0 == mi0_O)
+                    {
+                        N = ptrArray_in[i][j][k][s]->Density_O() * 0.5 + ptrArray_in[i][j][k][s+1]->Density_O() *0.5;
+                    }
                     // weightNi of each simulation particle
                     double Ni_simu = N / iniParticleNumberPerCell * ptrVolumeCellArray_in[j][k][s];
 
@@ -74,10 +83,10 @@ void ParticlesLists(vector<Particles>& listsPtr_in,
          //           std::cout<< MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x()) << std::endl;
          //           std:: cout << ptrArray_in[i][j][k][s]->B3().norm()<< " B "<< std::endl;                        
                     
-
-                    Vector3 vVel = Vector3( MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x(), mi0),
-                                            MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().y(), mi0),
-                                            MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
+                    // parallel vel 
+                    Vector3 vVel = MaxwellDisV( ptrArray_in, intPos, mi0);
+                    
+                    // perpendicular vel
                     double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
                     // put the particles at the end of list
                     Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
@@ -163,7 +172,8 @@ Vector3 Uint64ToVector3( uint_64 intPos_in)
 //************************************************************************
 //************************************************************************
 void ParticlesListsTemp(vector<Particles>& listsPtrTemp_in,
-                        GridsPoints***** ptrArray_in,
+                        GridsPoints***** ptrArray_bot,
+                        GridsPoints***** ptrArray_top,
                         double*** ptrVolumeCellArray_in,
                         double mi0,
                         int ionType_in)
@@ -178,40 +188,46 @@ void ParticlesListsTemp(vector<Particles>& listsPtrTemp_in,
         {
             for( int k =1; k<= fieldsGridsSize; k++)
             {
-                int s = 0;
-                // number density
-                switch (ionType_in)
+                for( int s = 0; s<tempGridsCellLevel; s++)
                 {
-                case 1:
-                    N = ptrArray_in[i][j][k][s]->Density_H() * 3.0 * ratioH_bot;
-                    break;
-                case 4:
-                    N = ptrArray_in[i][j][k][s]->Density_He()* 3.0 * ratioHe_bot;
-                    break;                
-                default:
-                    N = ptrArray_in[i][j][k][s]->Density_O()* 3.0 * ratioO_bot;
-                    break;
-                }
-                // mass of each simulation particle 
-                Ni_simu = N / tempParticleNumberPerCell * ptrVolumeCellArray_in[j][k][s];
-                for ( int t = 1; t <= tempParticleNumberPerCell; t++)
-                {
-                // calculate random position
-                uint_64 intPos = UniDisInCell( ptrArray_in, i, j, k, s);
-                Vector3 tempVector3 = Uint64ToVector3 ( intPos);   
+                    // number density
+                    switch (ionType_in)
+                    {
+                    case 1:
+                        N = ptrArray_bot[i][j][k][s]->Density_H() * 3.0 * ratioH_bot;
+                        break;
+                    case 4:
+                        N = ptrArray_bot[i][j][k][s]->Density_He()* 3.0 * ratioHe_bot;
+                        break;                
+                    default:
+                        N = ptrArray_bot[i][j][k][s]->Density_O()* 3.0 * ratioO_bot;
+                        break;
+                    }
+                    // mass of each simulation particle 
+                    Ni_simu = N / tempParticleNumberPerCell * ptrVolumeCellArray_in[j][k][s];
+                    for ( int t = 1; t <= tempParticleNumberPerCell; t++)
+                    {
+                    // calculate random position
+                    uint_64 intPos = UniDisInCell( ptrArray_bot, i, j, k, s);
+                    Vector3 tempVector3 = Uint64ToVector3 ( intPos);   
 
-                // calculate random velocity
-                Vector3 vVel = Vector3( MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x(), mi0),
-                                            MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().y(), mi0),
-                                            MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
-                double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
-                // put the particles at the end of list
-                Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
-                listsPtrTemp_in.push_back( tempP);           
+
+                    // parallel vel 
+                    Vector3 vVel = MaxwellDisV( ptrArray_bot, intPos, mi0);
+                    
+                    // perpendicular vel
+                    double mu_simu = MaxwellDisEnergy( ptrArray_bot, intPos);
+                        
+                    // put the particles at the end of list
+                    Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
+                    listsPtrTemp_in.push_back( tempP);           
+                }
+
                 }
             }
         }
     }
+
 
 
     // for top temp domain
@@ -221,39 +237,42 @@ void ParticlesListsTemp(vector<Particles>& listsPtrTemp_in,
         {
             for( int k =1; k<= fieldsGridsSize; k++)
             {
-                int s = fieldsGridsSize - 1;
+                for( int s = 1; s <=tempGridsCellLevel; s++)
+                {      
+                    int temp = fieldsGridsSize - tempGridsCellLevel + s;
 
-                // number density
-                switch (ionType_in)
-                {
-                case 1:
-                    N = ptrArray_in[i][j][k][s]->Density_H()* 3.0 * ratioH_top;
-                    break;
-                case 4:
-                    N = ptrArray_in[i][j][k][s]->Density_He()* 3.0 * ratioHe_top;
-                    break;                
-                default:
-                    N = ptrArray_in[i][j][k][s]->Density_O()* 3.0 * ratioO_top;
-                    break;
-                }
-                
+                    // number density
+                    switch (ionType_in)
+                    {
+                    case 1:
+                        N = ptrArray_top[i][j][k][s]->Density_H()* 3.0 * ratioH_top;
+                        break;
+                    case 4:
+                        N = ptrArray_top[i][j][k][s]->Density_He()* 3.0 * ratioHe_top;
+                        break;                
+                    default:
+                        N = ptrArray_top[i][j][k][s]->Density_O()* 3.0 * ratioO_top;
+                        break;
+                    }
 
-                // mass of each simulation particle 
-                Ni_simu = N / tempParticleNumberPerCell *mi0 * ptrVolumeCellArray_in[j][k][s];
-                for ( int t = 1; t <= tempParticleNumberPerCell; t++)
-                {
-                // calculate random position
-                uint_64 intPos = UniDisInCell( ptrArray_in, i, j, k, s);
-                Vector3 tempVector3 = Uint64ToVector3 ( intPos);   
 
-                // calculate random velocity
-                Vector3 vVel = Vector3( MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().x(), mi0),
-                                            MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().y(), mi0),
-                                            MaxwellDisV( ikT, ptrArray_in[i][j][k][s]->Vel3().z(), mi0));
-                double mu_simu = MaxwellDisEnergy( ptrArray_in, intPos);
-                // put the particles at the end of list
-                Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
-                listsPtrTemp_in.push_back( tempP);           
+                    // mass of each simulation particle 
+                    Ni_simu = N / tempParticleNumberPerCell *mi0 * ptrVolumeCellArray_in[j][k][temp-1];
+                    for ( int t = 1; t <= tempParticleNumberPerCell; t++)
+                    {
+                    // calculate random position
+                    uint_64 intPos = UniDisInCell( ptrArray_top, i, j, k, temp-1);
+                    Vector3 tempVector3 = Uint64ToVector3 ( intPos);   
+
+                    // parallel vel 
+                    Vector3 vVel = MaxwellDisV( ptrArray_bot, intPos, mi0);
+
+                    // perpendicular vel
+                    double mu_simu = MaxwellDisEnergy( ptrArray_bot, intPos);
+                         // put the particles at the end of list
+                    Particles tempP= Particles(intPos, tempVector3, vVel, Ni_simu, mu_simu);
+                    listsPtrTemp_in.push_back( tempP);           
+                    }
                 }
             }
         }
@@ -297,19 +316,26 @@ void IterateParticlesMain( GridsPoints***** ptrArray_in,
             Vector3 tempVel = iter->VelParticles();
 
             #pragma omp critical
-            if( tempStr.kg > tempGridsCellLevel ){
-            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
-            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
-            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
-            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, 1);
+            if( tempStr.kg > tempGridsCellLevel - coverGridsCellLevel && tempStr.kg < fieldsGridsSize - tempGridsCellLevel + coverGridsCellLevel)
+            {
+            //  std::cout << "checkUp "<< tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw << " " ;
+            //  std::cout << "str.v "<< tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << " " 
+            //  << "tempNumber "<< tempNumber << std::endl;
+                if( tempStr.kg > tempGridsCellLevel - coverGridsCellLevel + 1){
+                    ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, mi0_in);
+                    ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, cellSize1 - tempStr.kw, tempNumber, tempVel, mi0_in);
+                    ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, mi0_in);
+                    ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         cellSize1 - tempStr.kw, tempNumber, tempVel, mi0_in);
+                }
+                if( tempStr.kg < fieldsGridsSize - tempGridsCellLevel + coverGridsCellLevel - 1){
+                    ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, mi0_in);
+                    ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, mi0_in);
+                    ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, mi0_in);
+                    ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, mi0_in);
+                }
+                
             }
-            #pragma omp critical
-            if( tempStr.kg < fieldsGridsSize - 1 - tempGridsCellLevel ){
-            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 1);
-            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+1][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         cellSize1 - tempStr.jw, tempStr.kw + 1,         tempNumber, tempVel, 1);
-            ptrArray_in[tempStr.face][tempStr.ig+1][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( cellSize1 - tempStr.iw, tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 1);
-            ptrArray_in[tempStr.face][tempStr.ig+2][tempStr.jg+2][tempStr.kg+1]->UpdateDueToWgt( tempStr.iw + 1,         tempStr.jw + 1,         tempStr.kw + 1,         tempNumber, tempVel, 1);
-            }
+
             
             // boris method, update particle info
             // update vector_out_particles
@@ -318,9 +344,9 @@ void IterateParticlesMain( GridsPoints***** ptrArray_in,
                 continue;
             } else
             {    
-                int check; // check whether in the main domain or not, "0" means in "1" means out
+                int check; // check whether in the main domain or not, "0" means in; "1" means out
                 // update velocity // update position
-                check = iter->BorisMethod( &tempStr, ptrArray_in, mi0_in);
+                check = iter->BorisMethod( &tempStr, ptrArray_in, mi0_in, 0);
                 // check if still in the main domain
                 if( check == 1) // out of the domain
                 {
@@ -372,20 +398,29 @@ void IterateParticlesTemp( GridsPoints***** ptrArray_in,
             struct structg tempStr = iter->InttoStrp1();
             int check; // check whether in the main domain or not, "0" means in "1" means out
             // update velocity  // update position
-            check = iter->BorisMethod( &tempStr, ptrArray_in, mi0_in);
-            // check if still in the main domain
-            if( check == 0) // in the domain
-            {   
-                #pragma omp critical
-                if( ptrParticlesList_out_in.size() > 0)
+            if( iter->PosUint()==0) continue;
+            else
+            {
+                check = iter->BorisMethod( &tempStr, ptrArray_in, mi0_in, 1);
+                // check if still in the main domain
+                if( check == 0) // in the central domain
+                {   
+                    #pragma omp critical
+                    if( ptrParticlesList_out_in.size() > 0)
+                    {
+                        auto temp_pos_out = ptrParticlesList_out_in.end() - 1;
+                        ptrParticlesList_in[ *temp_pos_out] = temp;
+                        temp_pos_out = ptrParticlesList_out_in.erase(temp_pos_out);
+                    }
+                    else
+                    {
+                        ptrParticlesList_in.push_back( temp);
+                    }
+
+                    iter->SetOutParticles();
+                } else if( check == 2) // out of whole domain
                 {
-                    auto temp_pos_out = ptrParticlesList_out_in.end() - 1;
-                    ptrParticlesList_in[ *temp_pos_out] = temp;
-                    temp_pos_out = ptrParticlesList_out_in.erase(temp_pos_out);
-                }
-                else
-                {
-                    ptrParticlesList_in.push_back( temp);
+                    iter->SetOutParticles();
                 }
             }
 
@@ -443,19 +478,20 @@ void  UpdateInfoGrids( GridsPoints***** ptrArray_in,
         // get the info of mass(weight of each simulation particle)
         double tempNumber = iter->WeightNi();
 
-/*      // std::cout << temp.VelParticles().x() << " " << temp.VelParticles().y() << " " << temp.VelParticles().z() << std::endl;
-        // std::cout << temp.WeightMi() << " <== " << std::endl;
-        // int pause;
-        // std::cin >>pause;
-        // std::cout << "checkUp "<< tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw << " " ;
-        // std::cout << "str.v "<< tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << " " ;
-        // std::cout << "tempVel "<< tempVel.x() << " " << tempVel.y() << " " << tempVel.z() << " ";
-        // std::cout << "tempNumber "<< tempNumber << std::endl;
-        // int pause ;
-        // std::cin >> pause;
-        // std::cout << tempStr.face <<  tempStr.ig+1 << tempStr.jg+1 << tempStr.kg << " " << tempStr.iw << tempStr.jw << tempStr.kw << " mass " << tempNumber << " xxxx "; ;
+        //std::cout << temp.VelParticles().x() << " " << temp.VelParticles().y() << " " << temp.VelParticles().z() << std::endl;
+        //std::cout << temp.WeightMi() << " <== " << std::endl;
+        //int pause;
+        //std::cin >>pause;
+        //std::cout << "checkUp "<< tempStr.face << " " << tempStr.ig << " " << tempStr.jg << " " << tempStr.kg << " " << tempStr.iw << " " << tempStr.jw << " " << tempStr.kw << " " ;
+        //std::cout << "str.v "<< tempStr.vx << " " << tempStr.vy << " " << tempStr.vz << " " ;
+        //std::cout << "tempVel "<< tempVel.x() << " " << tempVel.y() << " " << tempVel.z() << " ";
+        //std::cout << "tempNumber "<< tempNumber << std::endl;
+        //int pause ;
+        //std::cin >> pause;
+        //std::cout << tempStr.face <<  tempStr.ig+1 << tempStr.jg+1 << tempStr.kg << " " << tempStr.iw << tempStr.jw << tempStr.kw << " mass " << tempNumber << " xxxx "; ;
+       
         // get the info of velocity
-*/        
+        
         Vector3 tempVel = iter->VelParticles();
         // update density and velocity in the grids
 

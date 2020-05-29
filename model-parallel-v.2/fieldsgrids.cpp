@@ -44,7 +44,7 @@ GridsPoints::GridsPoints( double px_in, double py_in, double pz_in,
 
 GridsPoints::GridsPoints(const GridsPoints& other)
 {
-    pos3.SetVector3( other.pos3);
+  //  pos3.SetVector3( other.pos3);
     pos3 = Vector3( other.pos3);
     e3 = Vector3( other.e3);
     b3 = Vector3( other.b3);

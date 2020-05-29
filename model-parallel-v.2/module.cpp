@@ -35,18 +35,20 @@ void ProcessFunc()
     // Prerun 1.1 // And then E (electron momentum equation).
     std::cout << " Create Grids" << std::endl;
     GridsPoints***** ptrArray =  GridsCreation();
-        
+    GridsPoints***** ptrArray_bot = GridsCreation( ptrArray_bot, tempGridsCellLevel);
+    GridsPoints***** ptrArray_top = GridsCreation( ptrArray_top, tempGridsCellLevel);
+
     std::cout << LMin << " " << LMax << std::endl;
 
     Titheridge_Te( ptrArray); // initial Temprature of electron
     // Prerun 1.2 // Create Cell centered field array for nesseary calculation for one face of six
     // The size is [fsize+2][fsize+2][fsize+2]
     Vector3*** ptrVectorCellArray = NULL;
-    Vector3*** ptrVelVectorCellArray = NULL;
+    Vector3*** ptrVeleVectorCellArray = NULL;
     Vector3*** ptrGradVectorCellArray= NULL;
-    VectorCellField( ptrVectorCellArray);
-    VectorCellField_Vel( ptrVelVectorCellArray);
-    VectorCellField_Grad( ptrGradVectorCellArray);
+    VectorCellField( ptrVectorCellArray);   // curl B
+    VectorCellField_Vel( ptrVeleVectorCellArray);    // vel e
+    VectorCellField_Grad( ptrGradVectorCellArray);  // grad Pe or grad |B|
 
 /*    Vector3*** ptrVectorCellArray = VectorCellField();  
     Vector3*** ptrVelVectorCellArray = VectorCellField_Vel();
@@ -59,18 +61,29 @@ void ProcessFunc()
     std::cout << " Create array of Volume at cells and at grids " << std::endl;
     // The size is [fsize+1][fsize+1][fsize+1]
     double*** ptrVolumeGridArray = VolumeGridsField( ptrVolumeCellArray);
+    // Create const array of B at center of each cells
+    // [totalface * fsize+2 * fsize+2 * fsize +2]
+//    Vector3***** ptrBVectorCellArray = BVectorCellArray( ptrArray);
 
     // Presun 1.4 // Create Cell centered field array for E
     // [totalface * fsize+2 * fsize+2 * fsize+2] 
     Vector3***** ptrEVectorCellArray = EVectorCellArray( ptrArray);
-    // Presun 1.5 // Create Face centered field array for B
+    // Presun 1.5 // Create Face centered field array for dB, perturbation of magnetic field
     // [direction * face * (fsize+1) * (fsize+1) * (fsize+1)]
-    Vector3***** ptrBVectorFaceArray = BVectorFaceArray( ptrArray);
+    Vector3***** ptrBVectorFaceArray = BVectorFaceArray( ptrArray); 
+  
     
-    // Initialize condition
+    // Initialize condition for no current case
     
     SetInitialCondition( ptrArray, ptrVectorCellArray, ptrVolumeCellArray);
     
+    // Initiallize temp_bot and temp_top 
+
+    InitializeTempGrids( ptrArray, ptrArray_bot, ptrArray_top, tempGridsCellLevel);
+
+    int timeline = 0;
+    PrintOutHdf5( ptrArray, timeline, h5FileCheck);
+
     // Prerun 1.4 // Create particles list, initialize the velocity and position of each particles
     cout << " Create particles list of main domain" << endl;
     
@@ -94,45 +107,59 @@ void ProcessFunc()
     ptrParticlesListTemp_He.reserve(5000000);
     ptrParticlesListTemp_O.reserve(5000000);
 
-    #pragma omp parallel
+
+
+    if( continueParticles == 0)
     {
-        #pragma omp sections
+        //create particles array
+        #pragma omp parallel
         {
-            #pragma omp section
+            #pragma omp sections
             {
-                ParticlesLists( ptrParticlesList_H, 
-                                ptrArray, 
-                                ptrVolumeCellArray, 
-                                mi0_H, 
-                                N0_H);
+                #pragma omp section
+                {
+                    ParticlesLists( ptrParticlesList_H, 
+                                    ptrArray, 
+                                    ptrVolumeCellArray, 
+                                    mi0_H);
+                }
+                #pragma omp section
+                {
+                    ParticlesLists( ptrParticlesList_He, 
+                                    ptrArray, 
+                                    ptrVolumeCellArray, 
+                                    mi0_He);
+                }
+                #pragma omp section
+                {
+                    ParticlesLists( ptrParticlesList_O, 
+                                    ptrArray, 
+                                    ptrVolumeCellArray, 
+                                    mi0_O);
+                }
             }
-            #pragma omp section
-            {
-                ParticlesLists( ptrParticlesList_He, 
-                                ptrArray, 
-                                ptrVolumeCellArray, 
-                                mi0_He, 
-                                N0_He);
-            }
-            #pragma omp section
-            {
-                ParticlesLists( ptrParticlesList_O, 
-                                ptrArray, 
-                                ptrVolumeCellArray, 
-                                mi0_O, 
-                                N0_O);
-            }
+            #pragma omp barrier
         }
-        #pragma omp barrier
+    } else
+    {
+        // read particles array
+    ReadParticlesVector(ptrParticlesList_H,
+                        ptrParticlesList_He,
+                        ptrParticlesList_O,
+                        ptrParticlesList_out_H,
+                        ptrParticlesList_out_He,
+                        ptrParticlesList_out_O
+                        );
     }
-   
+
+
     
     // Run 2.0
     
     cout << " Start" << endl;
 
 
-    for( int timeline = 0; timeline <= timeLineLimit; timeline++)   // timeline start with 1
+    for( int timeline = 0; timeline <= timeLineLimit; timeline++)   // 
     {
         std::cout << " timeline " << timeline << std::endl;
         // set boundary condition: 60s initial time interval
@@ -157,47 +184,55 @@ void ProcessFunc()
         if( timeline == 0)
         {
             std::cout << " PrintOut Const" << std::endl;
-            PrintOutHdf5( ptrArray, timeline, h5FileCheck);
+        //    PrintOutHdf5( ptrArray, timeline, h5FileCheck);
             h5FileCheck = 1;
         }
-        // average pho, v, update grids info B, E & reset pho, v
+        
+
+        //verage pho, v, update grids info B, E & reset pho, v
         if( timeline % updateInfoPeriod ==0 && timeline != 0)
         {
-            cout << timeline << " H " << ptrParticlesList_H.size() << " " << ptrParticlesList_out_H.size();
-            cout << " He " << ptrParticlesList_He.size() << " " << ptrParticlesList_out_He.size();
-            cout << " O " << ptrParticlesList_O.size() << " " << ptrParticlesList_out_O.size() << endl;
-        
             // average pho and v
-            CalculatingAveragedPhoVatGrids( ptrArray, 
+            CalculatingAveragedPhoVatGrids( ptrArray,
+                                            ptrArray_bot,
+                                            ptrArray_top, 
                                             ptrVolumeGridArray,
                                             updateInfoPeriod);
-            // Run 2.5.2 
-            for( int face = 0; face < 6; face++)
+        }
+        if( timeline % updateInfoPeriod ==0 )
+        {
+            if( timeline !=0)
             {
                 if( update_type == 0)
+            { 
+                for( int face = 0; face < 6; face++)
                 {
-                // Update E without current
-                // Calculate curl dB update ve3, ve3 = v3
-                ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 
-                                                    ptrVolumeCellArray, 
-                                                    ptrArray, 
-                                                    face, 
-                                                    'D');
-                UpdateVe3(  ptrVectorCellArray, 
-                            ptrArray,   
-                            face);
-                // Calculate the gradient of Pe
-                ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
-                                                    ptrVolumeCellArray, 
-                                                    ptrArray, 
-                                                    face, 
-                                                    'P');
-                UpdateE3(   ptrVectorCellArray, 
-                            ptrArray, 
-                            face); // update E
-                } else
+
+                    // Update E without current
+                    // Calculate curl dB update ve3, ve3 = v3
+                /*    ptrVectorCellArray = ValueCurlField(ptrVectorCellArray, 
+                                                        ptrVolumeCellArray, 
+                                                        ptrArray, 
+                                                        face, 
+                                                        'D');
+                    UpdateVe3(  ptrVectorCellArray, 
+                                ptrArray,   
+                                face);
+                */
+                    // Calculate the gradient of Pe
+                    ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
+                                                        ptrVolumeCellArray, 
+                                                        ptrArray, 
+                                                        face, 
+                                                        'P');
+                    UpdateE3(   ptrVectorCellArray, 
+                                ptrArray, 
+                                face); // update E
+            } 
+            }else if( update_type == 1)
+            {
+                for( int face =0; face < 6; face++)
                 {
-            std::cout << " test1 " << std::endl;
                 // 1. Calculate the curl B, need ptrBFaceArray 
                 // With the B on the faces and area vectors
                 ptrVectorCellArray = CurlBCellArray(ptrArray, 
@@ -205,7 +240,6 @@ void ProcessFunc()
                                                     ptrBVectorFaceArray,
                                                     ptrVolumeCellArray,
                                                     face);
-            std::cout << " test2 " << std::endl;
                 // 2. Calculate the gradient of Pe
                 // ( fsize+2 * fsize+2 * fsize)
                 ptrGradVectorCellArray = ValueGradient( ptrVectorCellArray, 
@@ -213,21 +247,19 @@ void ProcessFunc()
                                                     ptrArray, 
                                                     face, 
                                                     'P');
-            std::cout << " test3 " << std::endl;
                 // 3. Calculate the B at the center of cells
                 // 4. Update E at the center of cells and at the grids
                 UpdateECellArray(  ptrArray, 
                                    ptrEVectorCellArray,
+                                   ptrVeleVectorCellArray,
                                    ptrVectorCellArray,
                                    ptrGradVectorCellArray,
                                    face);
-            std::cout << " test4 " << std::endl;
                 // 5. Update B at center of cells and at the grids
                 BVectorFaceArrayUpdate( ptrArray, ptrBVectorFaceArray);
                 BVectorGridsArrayUpdate( ptrArray, ptrBVectorFaceArray);
                 
 
-            std::cout << " test5 " << std::endl;
                 // Update gradient norm B
                 ptrVectorCellArray = ValueGradient( ptrVectorCellArray, 
                                                     ptrVolumeCellArray, 
@@ -238,19 +270,31 @@ void ProcessFunc()
                                 ptrArray, 
                                 face);
                 }
+            }    
             }
+        
+            // Run 2.5.2 
+                // printout 
+            if( timeline % printTimePeriod == 0)
+            {
+                std::cout << " PrintOut  " << timeline << " " << h5FileCheck <<std::endl;
+                PrintOutHdf5( ptrArray, timeline, h5FileCheck);
+            }
+            if( timeline% printTimePeriodParticles ==0)
+            {
+                std::cout<< " PrintOut " << timeline << " particles " << std::endl;
+                PrintOutHdf5_Particles( timeline,  
+                                        ptrParticlesList_H,
+                                        ptrParticlesList_He,
+                                        ptrParticlesList_O);
+            }
+
             // reset pho and v
             ResetPhoVatGrids( ptrArray);
         }
         
-        // printout 
-        if( timeline % printTimePeriod == 0)
-        {
-            std::cout << " PrintOut  " << timeline << " " << h5FileCheck <<std::endl;
-            PrintOutHdf5( ptrArray, timeline, h5FileCheck);
-        }
         
-        // iterate particles
+        // iterate main particles
         IterateParticlesMain(   ptrArray, 
                                 ptrParticlesList_H, 
                                 ptrParticlesList_out_H,
@@ -263,39 +307,50 @@ void ProcessFunc()
                                 ptrParticlesList_O, 
                                 ptrParticlesList_out_O,
                                 mi0_O);
-                                
-        #pragma omp parallel
-        {
-            #pragma omp sections
-            {
-                #pragma omp section
-                {
-                    ParticlesListsTemp( ptrParticlesListTemp_H, 
-                                        ptrArray, 
-                                        ptrVolumeCellArray, 
-                                        mi0_H, 
-                                        1);
-                }
-                #pragma omp section
-                {
-                    ParticlesListsTemp( ptrParticlesListTemp_He, 
-                                        ptrArray, 
-                                        ptrVolumeCellArray, 
-                                        mi0_He, 
-                                        4);
-                }
-                #pragma omp section
-                {
-                    ParticlesListsTemp( ptrParticlesListTemp_O, 
-                                        ptrArray, 
-                                        ptrVolumeCellArray, 
-                                        mi0_O, 
-                                        16);
-                }
-            }
-            #pragma omp barrier
-        }
+        // iterate temp particles
+        if( timeline % updateInfoPeriod ==0)
+        {                    
             
+            ptrParticlesListTemp_H.clear();
+            ptrParticlesListTemp_He.clear();
+            ptrParticlesListTemp_O.clear();
+
+            #pragma omp parallel
+            {
+                #pragma omp sections
+                {
+                    #pragma omp section
+                    {
+                        ParticlesListsTemp( ptrParticlesListTemp_H, 
+                                            ptrArray_bot,
+                                            ptrArray_top, 
+                                            ptrVolumeCellArray, 
+                                            mi0_H, 
+                                            1);
+                    }
+                    #pragma omp section
+                    {
+                        ParticlesListsTemp( ptrParticlesListTemp_He, 
+                                            ptrArray_bot,
+                                            ptrArray_top, 
+                                            ptrVolumeCellArray, 
+                                            mi0_He, 
+                                            4);
+                    }
+                    #pragma omp section
+                    {
+                        ParticlesListsTemp( ptrParticlesListTemp_O, 
+                                            ptrArray_bot,
+                                            ptrArray_top, 
+                                            ptrVolumeCellArray, 
+                                            mi0_O, 
+                                            16);
+                    }
+                }
+                #pragma omp barrier
+            }
+        }    
+
         // temp particles
         IterateParticlesTemp(   ptrArray, 
                                 ptrParticlesList_H, 
@@ -313,11 +368,13 @@ void ProcessFunc()
                                 ptrParticlesList_out_O,
                                 mi0_O);         
 
-        ptrParticlesListTemp_H.clear();
-        ptrParticlesListTemp_He.clear();
-        ptrParticlesListTemp_O.clear();
-
-        }
+       
+        
+        cout << timeline << " H " << ptrParticlesList_H.size() << " " << ptrParticlesList_out_H.size();
+        cout << " He " << ptrParticlesList_He.size() << " " << ptrParticlesList_out_He.size();
+        cout << " O " << ptrParticlesList_O.size() << " " << ptrParticlesList_out_O.size() << endl;
+    
+    }
 
     delete ptrVectorCellArray;
     delete ptrArray;

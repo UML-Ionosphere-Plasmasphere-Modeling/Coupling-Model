@@ -128,13 +128,13 @@ inline void XYZtoDensity( )
     longtitude = atan( y / x);
     if( x<0) { longtitude = longtitude + PI;}
     }
-    latitude = PI / 2.0 - acos( z / sqrt( x*x + y*y + z*z));   
-//      rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude) + A_average;
+    latitude = acos( z / sqrt( x*x + y*y + z*z));   
     
     double r = pos3.norm() / radius; // r is a non-unit value
     double parameter = 0.5 * ( 1.0 - tanh( r - 6.5)) / r;
     
-    rho = ( A - 2.0 * A / PI * abs( latitude)) * sin( longtitude + PI / 2.0) / pow(r, 6.0) + A_average;
+    rho = A * sin( latitude) * sin( longtitude + PI / 2.0) / pow(r, 6.0) + A_average;
+//    rho = A_average;
 
     density_H = rho * ratioH / mi0_H * parameter;
     density_He= rho * ratioHe / mi0_He * parameter;
@@ -240,8 +240,12 @@ inline void ResetParameters()
 // Vector3 vp_in: velocity of each simulation particle
 //************************************************************************
 //************************************************************************
-inline void UpdateDueToWgt( int iw, int jw, int kw, double number_in, Vector3 vp_in, int ionType_in)
+inline void UpdateDueToWgt( int iw, int jw, int kw, double number_in, Vector3 vp_in, double ion_mass)
 {
+    int ionType_in;
+    if( ion_mass == mi0_H) ionType_in = 1;
+    if( ion_mass == mi0_He) ionType_in =4;
+    if( ion_mass == mi0_O) ionType_in =16;
     switch (ionType_in)
     {
     case 1: {
@@ -338,10 +342,6 @@ inline void updateE( Vector3 GradPe_in)
     
 }
 
-inline void SetE3( const Vector3 E3_other)
-{
-    e3.SetVector3( E3_other);
-}
 
 // Update ve from ampere's law
 // ve = vi - curl B / mu0 / qi0 / total number density
@@ -368,7 +368,7 @@ void updatedB( Vector3 E_in)
 
 
 // update grad norm B
-inline Vector3 UpdateGradBNorm( Vector3 gradBNorm_other)
+inline void UpdateGradBNorm( Vector3& gradBNorm_other)
 {
     gradB3 = gradBNorm_other;
 }
@@ -385,6 +385,11 @@ inline Vector3 E3()
 {
     return e3;
 }
+
+inline void SetE3( const Vector3& E3_other)
+{
+    e3.SetVector3( E3_other);
+}
 // return Vector3 b3 only
 inline Vector3 B3_base()
 {
@@ -400,6 +405,11 @@ inline Vector3 B3()
 inline Vector3 DB3()
 {
     return dB3;
+}
+
+inline void SetdB3( const Vector3& dB3_other)
+{
+    dB3.SetVector3( dB3_other);
 }
 
 // return Vector3 pos3
@@ -432,15 +442,15 @@ inline double Density_O()
     return density_O;
 }
 // set density 
-inline double Density_H( double den_in)
+inline void Density_H( double den_in)
 {
     density_H = den_in;
 }
-inline double Density_He( double den_in)
+inline void Density_He( double den_in)
 {
     density_He = den_in;
 }
-inline double Density_O( double den_in)
+inline void Density_O( double den_in)
 {
     density_O = den_in;
 }
@@ -471,6 +481,11 @@ inline Vector3 Vel_e3()
     return ve3;
 }
 
+inline void SetVel_e3( const Vector3& other_v3)
+{
+    ve3.SetVector3( other_v3);
+}
+
 // return stopSign
 inline int StopSign()
 {
@@ -491,7 +506,27 @@ inline void SetStopSign( int stopSign_in)
 {
     stopSign = stopSign_in;
 }
+// Set grids
+inline void SetGridsPoints(const GridsPoints& other)
+{  
+    pos3 = Vector3( other.pos3);
+    e3 = Vector3( other.e3);
+    b3 = Vector3( other.b3);
+    dB3= Vector3( other.dB3);
+    v3 = Vector3( other.v3);
+    vH3 = Vector3( other.vH3);
+    vHe3 = Vector3( other.vHe3);
+    vO3 = Vector3( other.vO3);
+    ve3= Vector3( other.ve3);
+    gradB3 = Vector3( other.gradB3);
 
+    density_H = other.density_H;
+    density_He = other.density_He;
+    density_O = other.density_O;
+
+    temperature = other.temperature;
+    stopSign = other.stopSign;
+}
 //////////////////////////    
     // Constructors
     GridsPoints( double px_in, double py_in, double pz_in,

@@ -20,8 +20,7 @@ using std::vector;
 void ParticlesLists(vector<Particles>& listsPtr_in,
                     GridsPoints***** ptrArray_in, 
                     double*** ptrVolumeCellArray_in, 
-                    double mi0, 
-                    double N0);
+                    double mi0);
 
 //************************************************************************
 //************************************************************************
@@ -29,7 +28,8 @@ void ParticlesLists(vector<Particles>& listsPtr_in,
 // Initialization the particles for velocity and position 
 // Generate lists of particles for bot and top region temp
 void ParticlesListsTemp(vector<Particles>& listsPtrTemp_in,
-                        GridsPoints***** ptrArray_in,
+                        GridsPoints***** ptrArray_bot,
+                        GridsPoints***** ptrArray_top,
                         double*** ptrVolumeCellArray_in,
                         double mi0,
                         int ionType_in);
@@ -268,7 +268,64 @@ inline double MaxwellDisV( double iKT, double bulkV, double mi0_in)
     return erfinv( 2.0* temp - 1.0) * sqrt(2.0) * sigma + bulkV;
 }
 
+inline Vector3 MaxwellDisV( GridsPoints***** ptrArray_in, uint_64 posUint, double mi0)
+{
+    //************************************************************************
+    struct structg strg_in = {0,0,0,0,0,0,0, 0.0, 0.0, 0.0};
+    strg_in.face = posUint >> 61;
+    for( int i = 0; i < fieldsGridsLevel; i++) 
+    {
+        strg_in.ig = (strg_in.ig << 1) + ((posUint >> 60   - i*3) & 1);
+        strg_in.jg = (strg_in.jg << 1) + ((posUint >> 60-1 - i*3) & 1);
+        strg_in.kg = (strg_in.kg << 1) + ((posUint >> 60-2 - i*3) & 1);
+    }
 
+    for( int i = fieldsGridsLevel; i < particlesGridsLevel; i++)
+    {
+        strg_in.iw = (strg_in.iw << 1) + ((posUint >> 60   - i*3) & 1);
+        strg_in.jw = (strg_in.jw << 1) + ((posUint >> 60-1 - i*3) & 1);
+        strg_in.kw = (strg_in.kw << 1) + ((posUint >> 60-2 - i*3) & 1);
+    }
+    strg_in.vx = 0.0; strg_in.vy = 0.0; strg_in.vz = 0.0; // not need
+ //   strg_in.mass = 0.0; // not need
+//************************************************************************
+
+    Vector3 tempb1=ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+1][strg_in.kg]->B3();
+    Vector3 tempb2=ptrArray_in[strg_in.face][strg_in.ig+2][strg_in.jg+1][strg_in.kg]->B3();
+    Vector3 tempb3=ptrArray_in[strg_in.face][strg_in.ig+2][strg_in.jg+2][strg_in.kg]->B3();
+    Vector3 tempb4=ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+2][strg_in.kg]->B3();
+    Vector3 tempb5=ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+1][strg_in.kg+1]->B3();
+    Vector3 tempb6=ptrArray_in[strg_in.face][strg_in.ig+2][strg_in.jg+1][strg_in.kg+1]->B3();
+    Vector3 tempb7=ptrArray_in[strg_in.face][strg_in.ig+2][strg_in.jg+2][strg_in.kg+1]->B3();
+    Vector3 tempb8=ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+2][strg_in.kg+1]->B3();
+
+    double w1 = 1- (strg_in.iw +1) * (strg_in.jw +1) * (strg_in.kw +1) / cellSize3;
+    double w2 = 1- (cellSize1- strg_in.iw)* (strg_in.jw +1) * (strg_in.kw +1) / cellSize3;
+    double w3 = 1- (cellSize1- strg_in.iw) * (cellSize1- strg_in.jw) * (strg_in.kw +1) / cellSize3;
+    double w4 = 1- (strg_in.iw +1) * (cellSize1- strg_in.jw )* (strg_in.kw +1)/ cellSize3;
+    double w5 = 1- (strg_in.iw +1) * (strg_in.jw +1) * (cellSize1- strg_in.kw) / cellSize3;
+    double w6 = 1- (cellSize1- strg_in.iw)* (strg_in.jw +1) * (cellSize1- strg_in.kw) / cellSize3;
+    double w7 = 1- (cellSize1- strg_in.iw) * (cellSize1- strg_in.jw) * (cellSize1- strg_in.kw) / cellSize3;
+    double w8 = 1- (strg_in.iw +1) * (cellSize1- strg_in.jw )* (cellSize1- strg_in.kw) / cellSize3;
+
+    Vector3 tempb;
+    tempb.Setx(tempb1.x()*w1 + tempb2.x()*w2 + tempb3.x()*w3 + tempb4.x()*w4 
+                + tempb5.x()*w5 + tempb6.x()*w6 + tempb7.x()*w7 + tempb8.x()*w8);
+                
+    tempb.Sety(tempb1.y()*w1 + tempb2.y()*w2 + tempb3.y()*w3 + tempb4.y()*w4 
+                + tempb5.y()*w5 + tempb6.y()*w6 + tempb7.y()*w7 + tempb8.y()*w8);
+                
+    tempb.Setz(tempb1.z()*w1 + tempb2.z()*w2 + tempb3.z()*w3 + tempb4.z()*w4 
+                + tempb5.z()*w5 + tempb6.z()*w6 + tempb7.z()*w7 + tempb8.z()*w8);
+    
+    
+    Vector3 tempV = Vector3( MaxwellDisV( ikT, ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+1][strg_in.kg]->Vel3().x(), mi0),
+                            MaxwellDisV( ikT, ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+1][strg_in.kg]->Vel3().y(), mi0),
+                            MaxwellDisV( ikT, ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+1][strg_in.kg]->Vel3().z(), mi0));
+
+    return tempV.NormalizedVector().ScaleProduct( tempV.DotProduct( tempb.NormalizedVector()));
+    
+}
 //************************************************************************
 //************************************************************************
 // FUNCTION return maxwell distrubtion random double number of particle 
@@ -285,11 +342,11 @@ inline double MaxwellDisEnergy( GridsPoints***** ptrArray_in, uint_64 posUint)
     {
         temp = dRand();
     }
-    double x_temp = pow( 10.0, erfinv( 2.0* temp -1.0 ) * sqrt(2.0) * sigma_in + mu_in);
+    double x_temp = energy1eV * 0.6667 * pow( 10.0, erfinv( 2.0* temp -1.0 ) * sqrt(2.0) * sigma_in + mu_in);
 
 
 //************************************************************************
-    struct structg strg_in = {0,0,0,0,0,0,0, 0.0, 0.0, 0.0, 0.0};
+    struct structg strg_in = {0,0,0,0,0,0,0, 0.0, 0.0, 0.0};
     strg_in.face = posUint >> 61;
     for( int i = 0; i < fieldsGridsLevel; i++) 
     {
@@ -305,7 +362,7 @@ inline double MaxwellDisEnergy( GridsPoints***** ptrArray_in, uint_64 posUint)
         strg_in.kw = (strg_in.kw << 1) + ((posUint >> 60-2 - i*3) & 1);
     }
     strg_in.vx = 0.0; strg_in.vy = 0.0; strg_in.vz = 0.0; // not need
-    strg_in.mass = 0.0; // not need
+ //   strg_in.mass = 0.0; // not need
 //************************************************************************
 
     Vector3 tempb1=ptrArray_in[strg_in.face][strg_in.ig+1][strg_in.jg+1][strg_in.kg]->B3();
